@@ -6,45 +6,27 @@ import (
 	"html/template"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+
+	"github.com/izumin5210/grapi/pkg/grapicmd"
 )
 
 var (
-	tmplByPath = map[string]string{
-		"api/proto/.keep": "",
-		"app/run.go": `package app
-
-import (
-	"github.com/izumin5210/grapi/pkg/grapiserver"
+	tmplPaths []string
 )
 
-func Run() error {
-	return grapiserver.New().
-		AddRegisterGrpcServerImplFuncs(
-			// TODO
-		).
-		AddRegisterGatewayHandlerFuncs(
-			// TODO
-		).
-		Serve()
-}
-`,
-		"cmd/server/run.go": `package main
-
-import (
-	"{{ .importPath }}/app"
-)
-
-func Run(args []string) error {
-	return app.Run()
-}
-`,
+func init() {
+	tmplPaths = make([]string, 0, len(grapicmd.Assets.Files))
+	for path := range grapicmd.Assets.Files {
+		tmplPaths = append(tmplPaths, path)
 	}
-)
+	sort.Strings(tmplPaths)
+}
 
 func newInitCommand() *cobra.Command {
 	return &cobra.Command{
@@ -95,12 +77,13 @@ func initProject(fs afero.Fs, rootPath string) error {
 	data := map[string]string{
 		"importPath": importPath,
 	}
-	for relPath, tmplStr := range tmplByPath {
-		tmpl, err := template.New("").Parse(tmplStr)
-		if err != nil {
-			return errors.Wrapf(err, "failed to parse the template of %s", relPath)
+	for _, tmplPath := range tmplPaths {
+		entry := grapicmd.Assets.Files[tmplPath]
+		if entry.IsDir() {
+			continue
 		}
-		absPath := filepath.Join(rootPath, relPath)
+		path := strings.TrimSuffix(tmplPath, ".tmpl")
+		absPath := filepath.Join(rootPath, path)
 		dirPath := filepath.Dir(absPath)
 		if ok, err := afero.DirExists(fs, dirPath); err != nil {
 			return errors.Wrapf(err, "failed to retrieve %s", dirPath)
@@ -110,14 +93,18 @@ func initProject(fs afero.Fs, rootPath string) error {
 				return errors.Wrapf(err, "failed to create %s", dirPath)
 			}
 		}
+		tmpl, err := template.New("").Parse(string(entry.Data))
+		if err != nil {
+			return errors.Wrapf(err, "failed to parse the template of %s", path)
+		}
 		buf := new(bytes.Buffer)
 		err = tmpl.Execute(buf, data)
 		if err != nil {
-			return errors.Wrapf(err, "failed to generate %s", relPath)
+			return errors.Wrapf(err, "failed to generate %s", path)
 		}
 		err = afero.WriteFile(fs, absPath, buf.Bytes(), 0644)
 		if err != nil {
-			return errors.Wrapf(err, "failed to write %s", relPath)
+			return errors.Wrapf(err, "failed to write %s", path)
 		}
 	}
 	return nil
