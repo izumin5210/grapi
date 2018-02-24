@@ -1,0 +1,10 @@
+package main
+
+import (
+	"{{ .importPath }}/app"
+)
+
+// Run starts the grapiserver.
+func Run(args []string) error {
+	return app.Run()
+}
