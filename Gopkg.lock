@@ -39,10 +39,37 @@
   version = "v1.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/jessevdk/go-assets"
+  packages = ["."]
+  revision = "4f4301a06e153ff90e17793577ab6bf79f8dc5c5"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jessevdk/go-assets-builder"
+  packages = ["."]
+  revision = "b8483521738fd2198ecfc378067a4e8a6079f8e5"
+
+[[projects]]
+  name = "github.com/jessevdk/go-flags"
+  packages = ["."]
+  revision = "96dc06278ce32a0e9d957d590bb987c81ee66407"
+  version = "v1.3.0"
+
+[[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
+
+[[projects]]
+  name = "github.com/spf13/afero"
+  packages = [
+    ".",
+    "mem"
+  ]
+  revision = "bb8f1927f2a9d3ab41c9340aa034f6b803f4359c"
+  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/spf13/cobra"
@@ -132,6 +159,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7497b22c44a44c5e4579fdb13246115760ba093a1dfaf9f0494ca3673df09d18"
+  inputs-digest = "2ca437823b6ad2289cb02d93118d03cf24cb73c65e1aa8d26bc7ced0bd81c2b7"
   solver-name = "gps-cdcl"
   solver-version = 1

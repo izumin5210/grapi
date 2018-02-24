@@ -24,6 +24,9 @@
 #   go-tests = true
 #   unused-packages = true
 
+required = [
+  "github.com/jessevdk/go-assets-builder",
+]
 
 [[constraint]]
   branch = "master"
