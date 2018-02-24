@@ -16,7 +16,7 @@ func NewGrapiCommand(fs afero.Fs, inReader io.Reader, outWriter, errWriter io.Wr
 		Short: "grapi is JSON API implemented with gRPC and Gateway",
 		Long:  "",
 	}
-	cmd.AddCommand(newInitCommand())
+	cmd.AddCommand(newInitCommand(outWriter))
 
 	udCmds := make([]*cobra.Command, 0)
 	wd, err := os.Getwd()

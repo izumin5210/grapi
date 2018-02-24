@@ -2,13 +2,16 @@ package cmd
 
 import (
 	"bytes"
+	"fmt"
 	"go/build"
 	"html/template"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -21,14 +24,24 @@ var (
 )
 
 func init() {
+	rootFiles := make([]string, 0, len(grapicmd.Assets.Files))
 	tmplPaths = make([]string, 0, len(grapicmd.Assets.Files))
-	for path := range grapicmd.Assets.Files {
-		tmplPaths = append(tmplPaths, path)
+	for path, entry := range grapicmd.Assets.Files {
+		if entry.IsDir() {
+			continue
+		}
+		if strings.Count(entry.Path[1:], "/") == 0 {
+			rootFiles = append(rootFiles, path)
+		} else {
+			tmplPaths = append(tmplPaths, path)
+		}
 	}
+	sort.Strings(rootFiles)
 	sort.Strings(tmplPaths)
+	tmplPaths = append(rootFiles, tmplPaths...)
 }
 
-func newInitCommand() *cobra.Command {
+func newInitCommand(out io.Writer) *cobra.Command {
 	return &cobra.Command{
 		Use:   "init [name]",
 		Short: "Initialize a grapi application",
@@ -56,12 +69,60 @@ func newInitCommand() *cobra.Command {
 				return errors.Errorf("invalid argument count: want 0 or 1, got %d", argCnt)
 			}
 
-			return errors.WithStack(initProject(afero.NewOsFs(), root))
+			return errors.WithStack(initProject(afero.NewOsFs(), out, root))
 		},
 	}
 }
 
-func initProject(fs afero.Fs, rootPath string) error {
+type status int
+
+const (
+	statusCreate status = iota
+	statusExist
+	statusIdentical
+	statusConflicted
+	statusForce
+	statusSkipped
+)
+
+var (
+	nameByStatus = map[status]string{
+		statusCreate:     "create",
+		statusExist:      "exist",
+		statusIdentical:  "identical",
+		statusConflicted: "conflicted",
+		statusForce:      "force",
+		statusSkipped:    "skipped",
+	}
+	colorAttrsByStatus = map[status][]color.Attribute{
+		statusCreate:     {color.FgGreen, color.Bold},
+		statusExist:      {color.FgBlue, color.Bold},
+		statusIdentical:  {color.FgBlue, color.Bold},
+		statusConflicted: {color.FgRed, color.Bold},
+		statusForce:      {color.FgYellow, color.Bold},
+		statusSkipped:    {color.FgYellow, color.Bold},
+	}
+	creatableStatusSet = map[status]struct{}{
+		statusCreate: struct{}{},
+		statusForce:  struct{}{},
+	}
+)
+
+func (s status) String() string {
+	return nameByStatus[s]
+}
+
+func (s status) Fprintln(out io.Writer, msg string) {
+	colored := color.New(colorAttrsByStatus[s]...).SprintfFunc()
+	fmt.Fprintf(out, "%s  %s\n", colored("%12s", s.String()), msg)
+}
+
+func (s status) ShouldCreate() bool {
+	_, ok := creatableStatusSet[s]
+	return ok
+}
+
+func initProject(fs afero.Fs, out io.Writer, rootPath string) error {
 	var importPath string
 	for _, gopath := range filepath.SplitList(build.Default.GOPATH) {
 		prefix := filepath.Join(gopath, "src") + "/"
@@ -79,12 +140,11 @@ func initProject(fs afero.Fs, rootPath string) error {
 	}
 	for _, tmplPath := range tmplPaths {
 		entry := grapicmd.Assets.Files[tmplPath]
-		if entry.IsDir() {
-			continue
-		}
 		path := strings.TrimSuffix(tmplPath, ".tmpl")
 		absPath := filepath.Join(rootPath, path)
 		dirPath := filepath.Dir(absPath)
+
+		// create directory if not exists
 		if ok, err := afero.DirExists(fs, dirPath); err != nil {
 			return errors.Wrapf(err, "failed to retrieve %s", dirPath)
 		} else if !ok {
@@ -93,6 +153,8 @@ func initProject(fs afero.Fs, rootPath string) error {
 				return errors.Wrapf(err, "failed to create %s", dirPath)
 			}
 		}
+
+		// generate content
 		tmpl, err := template.New("").Parse(string(entry.Data))
 		if err != nil {
 			return errors.Wrapf(err, "failed to parse the template of %s", path)
@@ -102,10 +164,35 @@ func initProject(fs afero.Fs, rootPath string) error {
 		if err != nil {
 			return errors.Wrapf(err, "failed to generate %s", path)
 		}
-		err = afero.WriteFile(fs, absPath, buf.Bytes(), 0644)
-		if err != nil {
-			return errors.Wrapf(err, "failed to write %s", path)
+
+		// check existed entries
+		st := statusCreate
+		if ok, err := afero.Exists(fs, path); err != nil {
+			// TODO: handle an error
+			st = statusSkipped
+		} else if ok {
+			body, err := afero.ReadFile(fs, path)
+			if err != nil {
+				// TODO: handle an error
+				st = statusSkipped
+			}
+			if string(body) == buf.String() {
+				st = statusIdentical
+			} else {
+				// TODO: ask to overwrite
+				st = statusConflicted
+			}
 		}
+
+		// create
+		if st.ShouldCreate() {
+			err = afero.WriteFile(fs, absPath, buf.Bytes(), 0644)
+			if err != nil {
+				return errors.Wrapf(err, "failed to write %s", path)
+			}
+		}
+
+		st.Fprintln(out, path[1:])
 	}
 	return nil
 }
