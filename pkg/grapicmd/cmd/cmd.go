@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"io"
+	"os"
+	"path/filepath"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -15,5 +17,20 @@ func NewGrapiCommand(fs afero.Fs, inReader io.Reader, outWriter, errWriter io.Wr
 		Long:  "",
 	}
 	cmd.AddCommand(newInitCommand())
+
+	udCmds := make([]*cobra.Command, 0)
+	wd, err := os.Getwd()
+	if err == nil {
+		paths, err := afero.Glob(fs, filepath.Join(wd, "cmd/*/run.go"))
+		if err == nil {
+			for _, path := range paths {
+				udCmds = append(udCmds, newUserDefinedCommand(path))
+			}
+		}
+	}
+	if len(udCmds) > 0 {
+		cmd.AddCommand(udCmds...)
+	}
+
 	return cmd
 }

@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/cmd"
 	"github.com/spf13/afero"
+
+	"github.com/izumin5210/grapi/pkg/grapicmd/cmd"
 )
 
 func main() {
