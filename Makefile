@@ -1,8 +1,10 @@
 .DEFAULT_GOAL := all
 
 SRC_FILES := $(shell git ls-files --cached --others --exclude-standard | grep -E "\.go$$")
+VERSION := 0.0.1
+REVISION := $(shell git describe --always)
 
-GO_BUILD_FLAGS := -v -ldflags="-s -w"
+GO_BUILD_FLAGS := -v
 GO_TEST_FLAGS := -v
 GO_COVER_FLAGS := -coverpkg ./... -coverprofile coverage.txt -covermode atomic
 
@@ -37,12 +39,14 @@ GENERATED_BINS :=
 CMDS := $(wildcard ./cmd/*)
 
 define cmd-tmpl
+
 $(eval NAME := $(notdir $(1)))
 $(eval OUT := $(addprefix $(BIN_DIR),$(NAME)))
+$(eval LDFLAGS := -ldflags "-X main.Name=$(NAME) -X main.Version=$(VERSION) -X main.Revision=$(REVISION)")
 $(eval GENERATED_BINS += $(OUT))
 $(OUT): $(SRC_FILES)
 	$(call section,Building $(OUT))
-	@go build $(GO_BUILD_FLAGS) -o $(OUT) $(1)
+	go build $(GO_BUILD_FLAGS) $(LDFLAGS) -o $(OUT) $(1)
 
 .PHONY: $(NAME)
 $(NAME): $(OUT)
