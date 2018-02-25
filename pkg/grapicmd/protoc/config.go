@@ -1,22 +1,19 @@
 package grapicmd
 
 import (
-	"bytes"
-	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/pkg/errors"
 )
 
-type ProtocConfig struct {
+type Config struct {
 	ImportDirs []string `mapstructure:"import_dirs"`
 	ProtosDir  string   `mapstructure:"protos_dir"`
 	OutDir     string   `mapstructure:"out_dir"`
-	Plugins    []*ProtocPlugin
+	Plugins    []*Plugin
 }
 
-func (c *ProtocConfig) OutDirOf(rootDir string, protoPath string) (string, error) {
+func (c *Config) OutDirOf(rootDir string, protoPath string) (string, error) {
 	protosDir := filepath.Join(rootDir, c.ProtosDir)
 	relProtoDir, err := filepath.Rel(protosDir, filepath.Dir(protoPath))
 	if err != nil {
@@ -26,7 +23,7 @@ func (c *ProtocConfig) OutDirOf(rootDir string, protoPath string) (string, error
 	return filepath.Join(c.OutDir, relProtoDir), nil
 }
 
-func (c *ProtocConfig) Commands(rootDir, protoPath string) ([][]string, error) {
+func (c *Config) Commands(rootDir, protoPath string) ([][]string, error) {
 	cmds := make([][]string, 0, len(c.Plugins))
 	relOutDir, err := c.OutDirOf(rootDir, protoPath)
 	if err != nil {
@@ -51,25 +48,4 @@ func (c *ProtocConfig) Commands(rootDir, protoPath string) ([][]string, error) {
 	}
 
 	return cmds, nil
-}
-
-// ProtocPlugin contains args and plugin name for using in protoc command.
-type ProtocPlugin struct {
-	Path string
-	Name string
-	Args map[string]interface{}
-}
-
-func (p *ProtocPlugin) toProtocArg(outputPath string) string {
-	buf := new(bytes.Buffer)
-	buf.WriteString("--" + p.Name + "_out")
-	args := make([]string, 0, len(p.Args))
-	for k, v := range p.Args {
-		args = append(args, k+"="+fmt.Sprint(v))
-	}
-	if len(args) > 0 {
-		buf.WriteString("=" + strings.Join(args, ","))
-	}
-	buf.WriteString(":" + outputPath)
-	return buf.String()
 }
