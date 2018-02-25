@@ -11,10 +11,11 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
-func newProtocCommand(cfg grapicmd.Config) *cobra.Command {
+func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 	return &cobra.Command{
 		Use:   "protoc",
 		Short: "Run protoc",
@@ -32,13 +33,14 @@ func newProtocCommand(cfg grapicmd.Config) *cobra.Command {
 				} else if ok {
 					continue
 				}
+				ui.PrintInfo(filepath.Base(plugin.Path), "install")
 				c := exec.Command("go", "install", ".")
 				c.Dir = filepath.Join(cfg.RootDir(), plugin.Path)
 				c.Env = append(c.Env, os.Environ()...)
 				c.Env = append(c.Env, "GOBIN="+binDir)
 				out, err := c.CombinedOutput()
-				fmt.Println(string(out)) // FIXME
 				if err != nil {
+					fmt.Println(string(out)) // FIXME
 					return errors.Wrapf(err, "failed to execute command: %#v", c)
 				}
 			}
@@ -61,6 +63,8 @@ func newProtocCommand(cfg grapicmd.Config) *cobra.Command {
 						if err != nil {
 							return errors.WithStack(err)
 						}
+						relPath, _ := filepath.Rel(cfg.RootDir(), path)
+						ui.PrintInfo(relPath, "protoc")
 						for _, cmd := range cmds {
 							c := exec.Command(cmd[0], cmd[1:]...)
 							c.Env = append(c.Env, os.Environ()...)

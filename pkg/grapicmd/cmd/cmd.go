@@ -23,8 +23,10 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
 	cfg.Init(cfgFile)
 
-	cmd.AddCommand(newInitCommand(ui.New(cfg.OutWriter())))
-	cmd.AddCommand(newProtocCommand(cfg))
+	ui := ui.New(cfg.OutWriter())
+
+	cmd.AddCommand(newInitCommand(ui))
+	cmd.AddCommand(newProtocCommand(cfg, ui))
 
 	udCmds := make([]*cobra.Command, 0)
 	wd, err := os.Getwd()
