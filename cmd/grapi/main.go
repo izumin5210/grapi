@@ -22,7 +22,13 @@ var (
 )
 
 func main() {
-	err := cmd.NewGrapiCommand(grapicmd.NewConfig(
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	err = cmd.NewGrapiCommand(grapicmd.NewConfig(
+		cwd,
 		Name,
 		Version,
 		Revision,
