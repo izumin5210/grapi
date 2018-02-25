@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"bytes"
 	"go/build"
-	"html/template"
 	"os"
 	"path/filepath"
 	"sort"
@@ -14,8 +12,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
-	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 var (
@@ -73,53 +71,6 @@ func newInitCommand(ui ui.UI) *cobra.Command {
 	}
 }
 
-type status int
-
-const (
-	statusCreate status = iota
-	statusExist
-	statusIdentical
-	statusConflicted
-	statusForce
-	statusSkipped
-)
-
-var (
-	nameByStatus = map[status]string{
-		statusCreate:     "create",
-		statusExist:      "exist",
-		statusIdentical:  "identical",
-		statusConflicted: "conflicted",
-		statusForce:      "force",
-		statusSkipped:    "skipped",
-	}
-	levelByStatus = map[status]ui.Level{
-		statusCreate:     ui.LevelSuccess,
-		statusExist:      ui.LevelInfo,
-		statusIdentical:  ui.LevelInfo,
-		statusConflicted: ui.LevelFail,
-		statusForce:      ui.LevelWarn,
-		statusSkipped:    ui.LevelWarn,
-	}
-	creatableStatusSet = map[status]struct{}{
-		statusCreate: struct{}{},
-		statusForce:  struct{}{},
-	}
-)
-
-func (s status) String() string {
-	return nameByStatus[s]
-}
-
-func (s status) Level() ui.Level {
-	return levelByStatus[s]
-}
-
-func (s status) ShouldCreate() bool {
-	_, ok := creatableStatusSet[s]
-	return ok
-}
-
 func initProject(afs afero.Fs, ui ui.UI, rootPath string) error {
 	var importPath string
 	for _, gopath := range filepath.SplitList(build.Default.GOPATH) {
@@ -136,56 +87,5 @@ func initProject(afs afero.Fs, ui ui.UI, rootPath string) error {
 	data := map[string]string{
 		"importPath": importPath,
 	}
-	for _, tmplPath := range tmplPaths {
-		entry := grapicmd.Assets.Files[tmplPath]
-		path := strings.TrimSuffix(tmplPath, ".tmpl")
-		absPath := filepath.Join(rootPath, path)
-		dirPath := filepath.Dir(absPath)
-
-		// create directory if not exists
-		if err := fs.CreateDirIfNotExists(afs, dirPath); err != nil {
-			return errors.WithStack(err)
-		}
-
-		// generate content
-		tmpl, err := template.New("").Parse(string(entry.Data))
-		if err != nil {
-			return errors.Wrapf(err, "failed to parse the template of %s", path)
-		}
-		buf := new(bytes.Buffer)
-		err = tmpl.Execute(buf, data)
-		if err != nil {
-			return errors.Wrapf(err, "failed to generate %s", path)
-		}
-
-		// check existed entries
-		st := statusCreate
-		if ok, err := afero.Exists(afs, path); err != nil {
-			// TODO: handle an error
-			st = statusSkipped
-		} else if ok {
-			body, err := afero.ReadFile(afs, path)
-			if err != nil {
-				// TODO: handle an error
-				st = statusSkipped
-			}
-			if string(body) == buf.String() {
-				st = statusIdentical
-			} else {
-				// TODO: ask to overwrite
-				st = statusConflicted
-			}
-		}
-
-		// create
-		if st.ShouldCreate() {
-			err = afero.WriteFile(afs, absPath, buf.Bytes(), 0644)
-			if err != nil {
-				return errors.Wrapf(err, "failed to write %s", path)
-			}
-		}
-
-		ui.PrintWithStatus(path[1:], st)
-	}
-	return nil
+	return generate.NewGenerator(afs, ui, rootPath, grapicmd.Assets).Run(data)
 }
