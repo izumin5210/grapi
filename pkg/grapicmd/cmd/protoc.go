@@ -6,10 +6,12 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+
+	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 func newProtocCommand(cfg grapicmd.Config) *cobra.Command {
@@ -19,12 +21,8 @@ func newProtocCommand(cfg grapicmd.Config) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// TODO: force rebuild plugins option
 			binDir := filepath.Join(cfg.RootDir(), "bin")
-			if ok, err := afero.DirExists(cfg.Fs(), binDir); err != nil {
-				return errors.Wrapf(err, "failed to get %q directory", binDir)
-			} else if !ok {
-				if err = cfg.Fs().MkdirAll(binDir, 0755); err != nil {
-					return errors.Wrapf(err, "failed to create %q directory", binDir)
-				}
+			if err := fs.CreateDirIfNotExists(cfg.Fs(), binDir); err != nil {
+				return errors.WithStack(err)
 			}
 			for _, plugin := range cfg.ProtocConfig().Plugins {
 				binName := filepath.Base(plugin.Path)
@@ -56,12 +54,8 @@ func newProtocCommand(cfg grapicmd.Config) *cobra.Command {
 						if err != nil {
 							return errors.WithStack(err)
 						}
-						if ok, err := afero.DirExists(cfg.Fs(), outDir); err != nil {
+						if err = fs.CreateDirIfNotExists(cfg.Fs(), outDir); err != nil {
 							return errors.WithStack(err)
-						} else if !ok {
-							if err = cfg.Fs().MkdirAll(outDir, 0755); err != nil {
-								return errors.Wrapf(err, "failed to create %q directory", outDir)
-							}
 						}
 						cmds, err := cfg.ProtocConfig().Commands(cfg.RootDir(), path)
 						if err != nil {

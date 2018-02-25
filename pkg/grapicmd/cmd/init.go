@@ -17,6 +17,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 var (
@@ -122,7 +123,7 @@ func (s status) ShouldCreate() bool {
 	return ok
 }
 
-func initProject(fs afero.Fs, out io.Writer, rootPath string) error {
+func initProject(afs afero.Fs, out io.Writer, rootPath string) error {
 	var importPath string
 	for _, gopath := range filepath.SplitList(build.Default.GOPATH) {
 		prefix := filepath.Join(gopath, "src") + "/"
@@ -145,13 +146,8 @@ func initProject(fs afero.Fs, out io.Writer, rootPath string) error {
 		dirPath := filepath.Dir(absPath)
 
 		// create directory if not exists
-		if ok, err := afero.DirExists(fs, dirPath); err != nil {
-			return errors.Wrapf(err, "failed to retrieve %s", dirPath)
-		} else if !ok {
-			err = fs.MkdirAll(dirPath, 0755)
-			if err != nil {
-				return errors.Wrapf(err, "failed to create %s", dirPath)
-			}
+		if err := fs.CreateDirIfNotExists(afs, dirPath); err != nil {
+			return errors.WithStack(err)
 		}
 
 		// generate content
@@ -167,11 +163,11 @@ func initProject(fs afero.Fs, out io.Writer, rootPath string) error {
 
 		// check existed entries
 		st := statusCreate
-		if ok, err := afero.Exists(fs, path); err != nil {
+		if ok, err := afero.Exists(afs, path); err != nil {
 			// TODO: handle an error
 			st = statusSkipped
 		} else if ok {
-			body, err := afero.ReadFile(fs, path)
+			body, err := afero.ReadFile(afs, path)
 			if err != nil {
 				// TODO: handle an error
 				st = statusSkipped
@@ -186,7 +182,7 @@ func initProject(fs afero.Fs, out io.Writer, rootPath string) error {
 
 		// create
 		if st.ShouldCreate() {
-			err = afero.WriteFile(fs, absPath, buf.Bytes(), 0644)
+			err = afero.WriteFile(afs, absPath, buf.Bytes(), 0644)
 			if err != nil {
 				return errors.Wrapf(err, "failed to write %s", path)
 			}
