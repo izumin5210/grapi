@@ -2,21 +2,19 @@ package cmd
 
 import (
 	"bytes"
-	"fmt"
 	"go/build"
 	"html/template"
-	"io"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -42,7 +40,7 @@ func init() {
 	tmplPaths = append(rootFiles, tmplPaths...)
 }
 
-func newInitCommand(out io.Writer) *cobra.Command {
+func newInitCommand(ui ui.UI) *cobra.Command {
 	return &cobra.Command{
 		Use:   "init [name]",
 		Short: "Initialize a grapi application",
@@ -70,7 +68,7 @@ func newInitCommand(out io.Writer) *cobra.Command {
 				return errors.Errorf("invalid argument count: want 0 or 1, got %d", argCnt)
 			}
 
-			return errors.WithStack(initProject(afero.NewOsFs(), out, root))
+			return errors.WithStack(initProject(afero.NewOsFs(), ui, root))
 		},
 	}
 }
@@ -95,13 +93,13 @@ var (
 		statusForce:      "force",
 		statusSkipped:    "skipped",
 	}
-	colorAttrsByStatus = map[status][]color.Attribute{
-		statusCreate:     {color.FgGreen, color.Bold},
-		statusExist:      {color.FgBlue, color.Bold},
-		statusIdentical:  {color.FgBlue, color.Bold},
-		statusConflicted: {color.FgRed, color.Bold},
-		statusForce:      {color.FgYellow, color.Bold},
-		statusSkipped:    {color.FgYellow, color.Bold},
+	levelByStatus = map[status]ui.Level{
+		statusCreate:     ui.LevelSuccess,
+		statusExist:      ui.LevelInfo,
+		statusIdentical:  ui.LevelInfo,
+		statusConflicted: ui.LevelFail,
+		statusForce:      ui.LevelWarn,
+		statusSkipped:    ui.LevelWarn,
 	}
 	creatableStatusSet = map[status]struct{}{
 		statusCreate: struct{}{},
@@ -113,9 +111,8 @@ func (s status) String() string {
 	return nameByStatus[s]
 }
 
-func (s status) Fprintln(out io.Writer, msg string) {
-	colored := color.New(colorAttrsByStatus[s]...).SprintfFunc()
-	fmt.Fprintf(out, "%s  %s\n", colored("%12s", s.String()), msg)
+func (s status) Level() ui.Level {
+	return levelByStatus[s]
 }
 
 func (s status) ShouldCreate() bool {
@@ -123,7 +120,7 @@ func (s status) ShouldCreate() bool {
 	return ok
 }
 
-func initProject(afs afero.Fs, out io.Writer, rootPath string) error {
+func initProject(afs afero.Fs, ui ui.UI, rootPath string) error {
 	var importPath string
 	for _, gopath := range filepath.SplitList(build.Default.GOPATH) {
 		prefix := filepath.Join(gopath, "src") + "/"
@@ -188,7 +185,7 @@ func initProject(afs afero.Fs, out io.Writer, rootPath string) error {
 			}
 		}
 
-		st.Fprintln(out, path[1:])
+		ui.PrintWithStatus(path[1:], st)
 	}
 	return nil
 }

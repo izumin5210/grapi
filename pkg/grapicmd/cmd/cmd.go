@@ -4,9 +4,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+
+	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 )
 
 // NewGrapiCommand creates a new command object.
@@ -21,7 +23,7 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
 	cfg.Init(cfgFile)
 
-	cmd.AddCommand(newInitCommand(cfg.OutWriter()))
+	cmd.AddCommand(newInitCommand(ui.New(cfg.OutWriter())))
 	cmd.AddCommand(newProtocCommand(cfg))
 
 	udCmds := make([]*cobra.Command, 0)
