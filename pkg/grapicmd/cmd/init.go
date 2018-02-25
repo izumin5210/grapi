@@ -13,6 +13,7 @@ import (
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
+	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 )
 
@@ -87,5 +88,5 @@ func initProject(afs afero.Fs, ui ui.UI, rootPath string) error {
 	data := map[string]string{
 		"importPath": importPath,
 	}
-	return generate.NewGenerator(afs, ui, rootPath, grapicmd.Assets).Run(data)
+	return generate.NewGenerator(afs, ui, rootPath, template.Init).Run(data)
 }
