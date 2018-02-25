@@ -1,4 +1,4 @@
-package grapicmd
+package protoc
 
 import (
 	"path/filepath"

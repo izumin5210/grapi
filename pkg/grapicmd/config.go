@@ -5,6 +5,8 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
+
+	"github.com/izumin5210/grapi/pkg/grapicmd/protoc"
 )
 
 // Config stores general setting params and provides accessors for them.
