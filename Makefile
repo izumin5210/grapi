@@ -46,7 +46,7 @@ $(eval LDFLAGS := -ldflags "-X main.Name=$(NAME) -X main.Version=$(VERSION) -X m
 $(eval GENERATED_BINS += $(OUT))
 $(OUT): $(SRC_FILES)
 	$(call section,Building $(OUT))
-	go build $(GO_BUILD_FLAGS) $(LDFLAGS) -o $(OUT) $(1)
+	@go build $(GO_BUILD_FLAGS) $(LDFLAGS) -o $(OUT) $(1)
 
 .PHONY: $(NAME)
 $(NAME): $(OUT)
