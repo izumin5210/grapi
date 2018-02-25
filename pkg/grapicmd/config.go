@@ -18,6 +18,7 @@ type Config interface {
 	InReader() io.Reader
 	OutWriter() io.Writer
 	ErrWriter() io.Writer
+	ProtocConfig() *ProtocConfig
 }
 
 // NewConfig creates new Config object.
@@ -87,4 +88,10 @@ func (c *config) OutWriter() io.Writer {
 
 func (c *config) ErrWriter() io.Writer {
 	return c.err
+}
+
+func (c *config) ProtocConfig() *ProtocConfig {
+	cfg := &ProtocConfig{}
+	c.v.UnmarshalKey("protoc", cfg)
+	return cfg
 }
