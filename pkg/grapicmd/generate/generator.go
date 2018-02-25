@@ -36,7 +36,10 @@ type generator struct {
 func (g *generator) Run(data interface{}) error {
 	for _, tmplPath := range g.sortedEntryPaths() {
 		entry := g.tmplFs.Files[tmplPath]
-		path := strings.TrimSuffix(tmplPath, ".tmpl")
+		path, err := TemplateString(strings.TrimSuffix(tmplPath, ".tmpl")).Compile(data)
+		if err != nil {
+			return errors.Wrapf(err, "failed to parse path: %s", path)
+		}
 		absPath := filepath.Join(g.rootPath, path)
 		dirPath := filepath.Dir(absPath)
 

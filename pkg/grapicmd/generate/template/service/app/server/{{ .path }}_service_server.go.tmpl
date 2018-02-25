@@ -1,0 +1,31 @@
+package {{ .packageName }}
+
+import (
+	"context"
+	"fmt"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"{{ .importPath }}/{{ .pbgoPackagePath }}"
+)
+
+// Register{{ .serviceName }}ServiceServerFactory creates a function to register card service server impl to grpc.Server.
+func Register{{ .serviceName }}ServiceServerFactory() func(s *grpc.Server) {
+	return func(s *grpc.Server) {
+		{{ .packageName }}.Register{{ .serviceName }}ServiceServer(s, New())
+	}
+}
+
+// New creates a new {{ .serviceName }}ServiceServer instance.
+func New() {{ .pbgoPackageName }}.{{ .serviceName }}ServiceServer {
+	return &{{ .name }}ServiceServerImpl{}
+}
+
+type {{ .name }}ServiceServerImpl struct {
+}
+
+func (s *{{ .name }}ServiceServerImpl) Get{{ .serviceName }}(ctx context.Context, req *{{ .pbgoPackageName }}.Get{{ .serviceName }}Request) (*{{ .pbgoPackageName }}.Get{{ .serviceName }}Response, error) {
+	return nil, status.Error(codes.Unimplemented, "not yet implemented")
+}

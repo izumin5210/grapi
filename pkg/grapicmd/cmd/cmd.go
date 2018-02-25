@@ -26,6 +26,7 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	ui := ui.New(cfg.OutWriter())
 
 	cmd.AddCommand(newInitCommand(ui))
+	cmd.AddCommand(newGenerateCommand(cfg, ui))
 	cmd.AddCommand(newProtocCommand(cfg, ui))
 
 	udCmds := make([]*cobra.Command, 0)
