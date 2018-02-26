@@ -56,11 +56,11 @@ func (g *generator) Run(data interface{}) error {
 
 		// check existed entries
 		st := statusCreate
-		if ok, err := afero.Exists(g.fs, path); err != nil {
+		if ok, err := afero.Exists(g.fs, absPath); err != nil {
 			// TODO: handle an error
 			st = statusSkipped
 		} else if ok {
-			existedBody, err := afero.ReadFile(g.fs, path)
+			existedBody, err := afero.ReadFile(g.fs, absPath)
 			if err != nil {
 				// TODO: handle an error
 				st = statusSkipped
