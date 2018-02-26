@@ -17,8 +17,9 @@ import (
 
 func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 	return &cobra.Command{
-		Use:   "protoc",
-		Short: "Run protoc",
+		Use:          "protoc",
+		Short:        "Run protoc",
+		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// TODO: force rebuild plugins option
 			binDir := filepath.Join(cfg.RootDir(), "bin")

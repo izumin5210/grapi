@@ -20,8 +20,9 @@ var (
 
 func newInitCommand(ui ui.UI) *cobra.Command {
 	return &cobra.Command{
-		Use:   "init [name]",
-		Short: "Initialize a grapi application",
+		Use:          "init [name]",
+		Short:        "Initialize a grapi application",
+		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			wd, err := os.Getwd()
 			if err != nil {

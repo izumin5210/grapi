@@ -30,8 +30,9 @@ func newGenerateCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 
 func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 	return &cobra.Command{
-		Use:   "service NAME",
-		Short: "Generate a new service",
+		Use:          "service NAME",
+		Short:        "Generate a new service",
+		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// github.com/foo/bar
 			importPath, err := fs.GetImportPath(cfg.RootDir())
