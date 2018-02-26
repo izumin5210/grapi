@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os/exec"
 	"path/filepath"
 	"plugin"
@@ -16,8 +17,9 @@ func newUserDefinedCommand(entryPath string) *cobra.Command {
 	return &cobra.Command{
 		Use: name,
 		RunE: func(c *cobra.Command, args []string) error {
-			err := exec.Command("go", "build", "-v", "-buildmode=plugin", "-o="+soPath, entryPath).Run()
+			out, err := exec.Command("go", "build", "-v", "-buildmode=plugin", "-o="+soPath, entryPath).CombinedOutput()
 			if err != nil {
+				fmt.Println(string(out))
 				return errors.Wrapf(err, "failed to build %q", entryPath)
 			}
 
