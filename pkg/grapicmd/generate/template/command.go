@@ -9,7 +9,7 @@ import (
 var _Command9acbc40e153d42b0b3e06ca83e7c53e3670d8cdc = "package main\n\n// Run starts awesome process.\nfunc Run(args []string) error {\n\treturn nil\n}\n"
 
 // Command returns go-assets FileSystem
-var Command = assets.NewFileSystem(map[string][]string{"/": []string{}, "/cmd": []string{}, "/cmd/{{ .name }}": []string{"run.go.tmpl"}}, map[string]*assets.File{
+var Command = assets.NewFileSystem(map[string][]string{"/cmd/{{ .name }}": []string{"run.go.tmpl"}, "/": []string{}, "/cmd": []string{}}, map[string]*assets.File{
 	"/": &assets.File{
 		Path:     "/",
 		FileMode: 0x800001ed,
