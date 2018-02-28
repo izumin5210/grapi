@@ -35,7 +35,7 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 		paths, err := afero.Glob(cfg.Fs(), filepath.Join(wd, "cmd/*/run.go"))
 		if err == nil {
 			for _, path := range paths {
-				udCmds = append(udCmds, newUserDefinedCommand(path))
+				udCmds = append(udCmds, newUserDefinedCommand(cfg, path))
 			}
 		}
 	}

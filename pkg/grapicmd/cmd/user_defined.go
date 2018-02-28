@@ -4,41 +4,37 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
-	"plugin"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
-func newUserDefinedCommand(entryPath string) *cobra.Command {
-	dirPath := filepath.Dir(entryPath)
-	name := filepath.Base(dirPath)
-	soPath := filepath.Join(dirPath, name+".so")
+func newUserDefinedCommand(cfg grapicmd.Config, entryPath string) *cobra.Command {
+	name := filepath.Base(filepath.Dir(entryPath))
+	binDir := filepath.Join(cfg.RootDir(), "bin")
+	binPath := filepath.Join(binDir, name)
 	return &cobra.Command{
 		Use: name,
 		RunE: func(c *cobra.Command, args []string) error {
-			out, err := exec.Command("go", "build", "-v", "-buildmode=plugin", "-o="+soPath, entryPath).CombinedOutput()
+			err := fs.CreateDirIfNotExists(cfg.Fs(), binDir)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+
+			out, err := exec.Command("go", "build", "-v", "-o="+binPath, entryPath).CombinedOutput()
 			if err != nil {
 				fmt.Println(string(out))
 				return errors.Wrapf(err, "failed to build %q", entryPath)
 			}
 
-			p, err := plugin.Open(soPath)
-			if err != nil {
-				return errors.Wrap(err, "failed to laod plugin")
-			}
-
-			runSym, err := p.Lookup("Run")
-			if err != nil {
-				return errors.Wrap(err, "failed to lookup `func Run(args []string) error`")
-			}
-
-			run, ok := runSym.(func([]string) error)
-			if !ok {
-				return errors.Wrap(err, "`Run` should be `func(args []string) error`")
-			}
-
-			return run(args)
+			cmd := exec.Command(binPath)
+			cmd.Stdin = cfg.InReader()
+			cmd.Stdout = cfg.OutWriter()
+			cmd.Stderr = cfg.ErrWriter()
+			return errors.WithStack(cmd.Run())
 		},
 	}
 }
