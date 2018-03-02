@@ -20,7 +20,7 @@ before_install:
 - export PATH=$PWD/bin:$PATH
 
 install:
-- make dep
+- make setup
 
 script:
 - make lint
