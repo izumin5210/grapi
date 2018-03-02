@@ -38,5 +38,6 @@ deploy:
   api_key: $GITHUB_TOKEN
   file_glob: true
   file: 'dist/*.tar.gz'
-  # on:
+  on:
+    all_branches: true
   #   tags: true
