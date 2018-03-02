@@ -7,11 +7,13 @@ import (
 	"github.com/fatih/color"
 )
 
+// Status represents is a level and a message prefix.
 type Status interface {
 	fmt.Stringer
 	Level() Level
 }
 
+// UI is an interface for intaracting with the terminal.
 type UI interface {
 	PrintWithStatus(msg string, status Status)
 	PrintSuccess(msg, status string)
@@ -20,6 +22,7 @@ type UI interface {
 	PrintFail(msg, status string)
 }
 
+// New creates a new UI instance.
 func New(out io.Writer) UI {
 	return &uiImpl{
 		out: out,

@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Config stores setting params related protoc.
 type Config struct {
 	ImportDirs []string `mapstructure:"import_dirs"`
 	ProtosDir  string   `mapstructure:"protos_dir"`
@@ -13,6 +14,7 @@ type Config struct {
 	Plugins    []*Plugin
 }
 
+// OutDirOf returns a directory path of protoc result output path for given proto file.
 func (c *Config) OutDirOf(rootDir string, protoPath string) (string, error) {
 	protosDir := filepath.Join(rootDir, c.ProtosDir)
 	relProtoDir, err := filepath.Rel(protosDir, filepath.Dir(protoPath))
@@ -23,6 +25,7 @@ func (c *Config) OutDirOf(rootDir string, protoPath string) (string, error) {
 	return filepath.Join(c.OutDir, relProtoDir), nil
 }
 
+// Commands returns protoc command and arguments for given proto file.
 func (c *Config) Commands(rootDir, protoPath string) ([][]string, error) {
 	cmds := make([][]string, 0, len(c.Plugins))
 	relOutDir, err := c.OutDirOf(rootDir, protoPath)

@@ -1,12 +1,18 @@
 .DEFAULT_GOAL := all
 
 SRC_FILES := $(shell git ls-files --cached --others --exclude-standard | grep -E "\.go$$")
+ROOT_PKG := github.com/izumin5210/grapi
+GOFMT_TARGET := $(filter-out pkg/grapicmd/generate/template/%,$(SRC_FILES))
+GOLINT_TARGET := $(shell go list ./... | grep -v -E "$(ROOT_PKG)/pkg/grapicmd/generate/template")
 VERSION := 0.0.1
 REVISION := $(shell git describe --always)
 
 GO_BUILD_FLAGS := -v
 GO_TEST_FLAGS := -v
 GO_COVER_FLAGS := -coverpkg ./... -coverprofile coverage.txt -covermode atomic
+
+XC_ARCH := 386 amd64
+XC_OS := darwin linux windows
 
 #  Utils
 #----------------------------------------------------------------
@@ -18,7 +24,8 @@ endef
 #----------------------------------------------------------------
 DEP_BIN_DIR := ./vendor/.bin/
 DEP_SRCS := \
-	github.com/jessevdk/go-assets-builder
+	github.com/jessevdk/go-assets-builder \
+	github.com/mitchellh/gox
 
 DEP_BINS := $(addprefix $(DEP_BIN_DIR),$(notdir $(DEP_SRCS)))
 
@@ -35,7 +42,9 @@ $(foreach src,$(DEP_SRCS),$(eval $(call dep-bin-tmpl,$(src))))
 #  App
 #----------------------------------------------------------------
 BIN_DIR := ./bin/
+PACKAGES_DIR := ./dist
 GENERATED_BINS :=
+PACKAGES :=
 CMDS := $(wildcard ./cmd/*)
 
 define cmd-tmpl
@@ -50,6 +59,18 @@ $(OUT): $(SRC_FILES)
 
 .PHONY: $(NAME)
 $(NAME): $(OUT)
+
+$(eval PACKAGES += $(NAME)-package)
+
+.PHONY: $(NAME)-package
+$(NAME)-package: $(NAME)
+	@PATH=$(shell pwd)/$(DEP_BIN_DIR):$$$$PATH gox \
+		$(LDFLAGS) \
+		-parallel=5 \
+		-os="$(XC_OS)" \
+		-arch="$(XC_ARCH)" \
+		-output="$(PACKAGES_DIR)/{{.Dir}}_$(VERSION)_{{.OS}}_{{.Arch}}/$(NAME)" \
+		$(1)
 endef
 
 $(foreach src,$(CMDS),$(eval $(call cmd-tmpl,$(src))))
@@ -83,9 +104,8 @@ gen:
 .PHONY: lint
 lint:
 	$(call section,Linting)
-	@gofmt -e -d -s $(SRC_FILES) | awk '{ e = 1; print $0 } END { if (e) exit(1) }'
-	@echo $(SRC_FILES) | xargs -n1 golint -set_exit_status
-	@go vet ./...
+	@gofmt -e -d -s $(GOFMT_TARGET) | awk '{ e = 1; print $0 } END { if (e) exit(1) }'
+	@echo $(GOLINT_TARGET) | xargs -n1 golint -set_exit_status
 
 .PHONY: test
 test:
@@ -96,3 +116,10 @@ test:
 cover:
 	$(call section,Testing with coverage)
 	@go test $(GO_TEST_FLAGS) $(GO_COVER_FLAGS) ./...
+
+.PHONY: packages
+packages: $(PACKAGES)
+	@for pkg in $(PACKAGES_DIR)/* ;do \
+		tar zcf $$pkg.tar.gz $$pkg; \
+		rm -r $$pkg; \
+	done

@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// GetImportPath creates the golang package path from the given path.
 func GetImportPath(rootPath string) (importPath string, err error) {
 	for _, gopath := range filepath.SplitList(build.Default.GOPATH) {
 		prefix := filepath.Join(gopath, "src") + "/"

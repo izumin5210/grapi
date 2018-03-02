@@ -13,10 +13,12 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
+// Generator is an interface to generate files from template and given params.
 type Generator interface {
 	Run(data interface{}) error
 }
 
+// NewGenerator createes a new generator instance with specified filessytem and templates.
 func NewGenerator(fs afero.Fs, ui ui.UI, rootPath string, tmplFs *assets.FileSystem) Generator {
 	return &generator{
 		fs:       fs,

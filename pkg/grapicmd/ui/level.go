@@ -2,8 +2,10 @@ package ui
 
 import "github.com/fatih/color"
 
+// Level represents is an output priority.
 type Level int
 
+// Enum values of Level.
 const (
 	LevelSuccess Level = iota
 	LevelInfo
