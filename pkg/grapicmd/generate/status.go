@@ -31,8 +31,8 @@ var (
 		statusSkipped:    ui.LevelWarn,
 	}
 	creatableStatusSet = map[status]struct{}{
-		statusCreate: struct{}{},
-		statusForce:  struct{}{},
+		statusCreate: {},
+		statusForce:  {},
 	}
 )
 
