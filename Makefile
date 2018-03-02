@@ -1,6 +1,9 @@
 .DEFAULT_GOAL := all
 
 SRC_FILES := $(shell git ls-files --cached --others --exclude-standard | grep -E "\.go$$")
+ROOT_PKG := github.com/izumin5210/grapi
+GOFMT_TARGET := $(filter-out pkg/grapicmd/generate/template/%,$(SRC_FILES))
+GOLINT_TARGET := $(shell go list ./... | grep -v -E "$(ROOT_PKG)/pkg/grapicmd/generate/template")
 VERSION := 0.0.1
 REVISION := $(shell git describe --always)
 
@@ -101,9 +104,8 @@ gen:
 .PHONY: lint
 lint:
 	$(call section,Linting)
-	@gofmt -e -d -s $(SRC_FILES) | awk '{ e = 1; print $0 } END { if (e) exit(1) }'
-	@echo $(SRC_FILES) | xargs -n1 golint -set_exit_status
-	@go vet ./...
+	@gofmt -e -d -s $(GOFMT_TARGET) | awk '{ e = 1; print $0 } END { if (e) exit(1) }'
+	@echo $(GOLINT_TARGET) | xargs -n1 golint -set_exit_status
 
 .PHONY: test
 test:
