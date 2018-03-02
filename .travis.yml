@@ -33,11 +33,20 @@ before_deploy:
 - make packages
 
 deploy:
-  provider: releases
+- provider: releases
   skip_cleanup: true
   api_key: $GITHUB_TOKEN
   file_glob: true
   file: 'dist/*.tar.gz'
   on:
     all_branches: true
-  #   tags: true
+    # tags: true
+- provider: releases
+  skip_cleanup: true
+  api_key: $GITHUB_TOKEN
+  file_glob: true
+  file: 'dist/*.tar.gz'
+  prerelease: true
+  on:
+    all_branches: true
+    # tags: true
