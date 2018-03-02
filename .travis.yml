@@ -39,8 +39,7 @@ deploy:
   file_glob: true
   file: 'dist/*.tar.gz'
   on:
-    all_branches: true
-    # tags: true
+    tags: true
 - provider: releases
   skip_cleanup: true
   api_key: $GITHUB_TOKEN
@@ -48,5 +47,4 @@ deploy:
   file: 'dist/*.tar.gz'
   prerelease: true
   on:
-    all_branches: true
-    # tags: true
+    branch: master
