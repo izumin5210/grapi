@@ -8,6 +8,9 @@ GO_BUILD_FLAGS := -v
 GO_TEST_FLAGS := -v
 GO_COVER_FLAGS := -coverpkg ./... -coverprofile coverage.txt -covermode atomic
 
+XC_ARCH := 386 amd64
+XC_OS := darwin linux windows
+
 #  Utils
 #----------------------------------------------------------------
 define section
@@ -36,7 +39,9 @@ $(foreach src,$(DEP_SRCS),$(eval $(call dep-bin-tmpl,$(src))))
 #  App
 #----------------------------------------------------------------
 BIN_DIR := ./bin/
+PACKAGES_DIR := ./dist
 GENERATED_BINS :=
+PACKAGES :=
 CMDS := $(wildcard ./cmd/*)
 
 define cmd-tmpl
@@ -51,6 +56,18 @@ $(OUT): $(SRC_FILES)
 
 .PHONY: $(NAME)
 $(NAME): $(OUT)
+
+$(eval PACKAGES += $(NAME)-package)
+
+.PHONY: $(NAME)-package
+$(NAME)-package: $(NAME)
+	@PATH=$(shell pwd)/$(DEP_BIN_DIR):$$$$PATH gox \
+		$(LDFLAGS) \
+		-parallel=5 \
+		-os="$(XC_OS)" \
+		-arch="$(XC_ARCH)" \
+		-output="$(PACKAGES_DIR)/{{.Dir}}_$(VERSION)_{{.OS}}_{{.Arch}}/$(NAME)" \
+		$(1)
 endef
 
 $(foreach src,$(CMDS),$(eval $(call cmd-tmpl,$(src))))
@@ -97,3 +114,10 @@ test:
 cover:
 	$(call section,Testing with coverage)
 	@go test $(GO_TEST_FLAGS) $(GO_COVER_FLAGS) ./...
+
+.PHONY: packages
+packages: $(PACKAGES)
+	@for pkg in $(PACKAGES_DIR)/* ;do \
+		tar zcf $$pkg.tar.gz $$pkg; \
+		rm -r $$pkg; \
+	done
