@@ -112,6 +112,18 @@
   version = "v0.0.3"
 
 [[projects]]
+  name = "github.com/mitchellh/gox"
+  packages = ["."]
+  revision = "c9740af9c6574448fd48eb30a71f964014c7a837"
+  version = "v0.4.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/iochan"
+  packages = ["."]
+  revision = "87b45ffd0e9581375c491fef3d32130bb15c5bd7"
+
+[[projects]]
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
@@ -287,6 +299,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6d8782a1c7f171377db8d964d7932e7a27f70493bd3058265d4ea6a714a72333"
+  inputs-digest = "33fed21de24af4d49669d821959b159ddbf754ae0635a0558818ede6995945db"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -18,7 +18,8 @@ endef
 #----------------------------------------------------------------
 DEP_BIN_DIR := ./vendor/.bin/
 DEP_SRCS := \
-	github.com/jessevdk/go-assets-builder
+	github.com/jessevdk/go-assets-builder \
+	github.com/mitchellh/gox
 
 DEP_BINS := $(addprefix $(DEP_BIN_DIR),$(notdir $(DEP_SRCS)))
 

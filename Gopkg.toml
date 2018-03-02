@@ -26,6 +26,7 @@
 
 required = [
   "github.com/jessevdk/go-assets-builder",
+  "github.com/mitchellh/gox",
 ]
 
 [[constraint]]
