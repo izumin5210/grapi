@@ -20,9 +20,10 @@ var (
 
 func newInitCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 	return &cobra.Command{
-		Use:          "init [name]",
-		Short:        "Initialize a grapi application",
-		SilenceUsage: true,
+		Use:           "init [name]",
+		Short:         "Initialize a grapi application",
+		SilenceErrors: true,
+		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var err error
 			root := cfg.CurrentDir()
@@ -43,7 +44,7 @@ func newInitCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 				return errors.Errorf("invalid argument count: want 0 or 1, got %d", argCnt)
 			}
 
-			return errors.WithStack(initProject(afero.NewOsFs(), ui, root))
+			return errors.WithStack(initProject(cfg.Fs(), ui, root))
 		},
 	}
 }

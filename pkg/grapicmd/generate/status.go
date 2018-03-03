@@ -14,34 +14,21 @@ const (
 )
 
 var (
-	nameByStatus = map[status]string{
-		statusCreate:     "create",
-		statusExist:      "exist",
-		statusIdentical:  "identical",
-		statusConflicted: "conflicted",
-		statusForce:      "force",
-		statusSkipped:    "skipped",
-	}
-	levelByStatus = map[status]ui.Level{
-		statusCreate:     ui.LevelSuccess,
-		statusExist:      ui.LevelInfo,
-		statusIdentical:  ui.LevelInfo,
-		statusConflicted: ui.LevelFail,
-		statusForce:      ui.LevelWarn,
-		statusSkipped:    ui.LevelWarn,
-	}
 	creatableStatusSet = map[status]struct{}{
 		statusCreate: {},
 		statusForce:  {},
 	}
 )
 
-func (s status) String() string {
-	return nameByStatus[s]
-}
-
-func (s status) Level() ui.Level {
-	return levelByStatus[s]
+func (s status) Fprint(ui ui.UI, msg string) {
+	switch s {
+	case statusCreate, statusForce:
+		ui.ItemSuccess(msg)
+	case statusConflicted:
+		ui.ItemFailure(msg)
+	default:
+		ui.ItemSkipped(msg)
+	}
 }
 
 func (s status) ShouldCreate() bool {

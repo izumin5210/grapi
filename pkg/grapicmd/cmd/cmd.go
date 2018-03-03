@@ -15,9 +15,11 @@ import (
 // NewGrapiCommand creates a new command object.
 func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   cfg.AppName(),
-		Short: "JSON API framework implemented with gRPC and Gateway",
-		Long:  "",
+		Use:           cfg.AppName(),
+		Short:         "JSON API framework implemented with gRPC and Gateway",
+		Long:          "",
+		SilenceErrors: true,
+		SilenceUsage:  true,
 	}
 
 	var cfgFile string

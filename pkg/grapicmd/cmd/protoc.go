@@ -17,9 +17,10 @@ import (
 
 func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 	return &cobra.Command{
-		Use:          "protoc",
-		Short:        "Run protoc",
-		SilenceUsage: true,
+		Use:           "protoc",
+		Short:         "Run protoc",
+		SilenceErrors: true,
+		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			rootDir, ok := fs.LookupRoot(cfg.Fs(), cfg.CurrentDir())
 			if !ok {
@@ -31,15 +32,16 @@ func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 			if err := fs.CreateDirIfNotExists(cfg.Fs(), binDir); err != nil {
 				return errors.WithStack(err)
 			}
+			ui.Section("Install plugins")
 			for _, plugin := range cfg.ProtocConfig().Plugins {
 				binName := filepath.Base(plugin.Path)
 				binPath := filepath.Join(binDir, binName)
 				if ok, err := afero.Exists(cfg.Fs(), binPath); err != nil {
 					return errors.Wrapf(err, "failed to get %q binary", binName)
 				} else if ok {
+					ui.ItemSkipped(filepath.Base(plugin.Path))
 					continue
 				}
-				ui.PrintInfo(filepath.Base(plugin.Path), "install")
 				c := exec.Command("go", "install", ".")
 				c.Dir = filepath.Join(rootDir, plugin.Path)
 				c.Env = append(c.Env, os.Environ()...)
@@ -49,7 +51,9 @@ func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 					fmt.Println(string(out)) // FIXME
 					return errors.Wrapf(err, "failed to execute command: %#v", c)
 				}
+				ui.ItemSuccess(filepath.Base(plugin.Path))
 			}
+			ui.Section("Execute protoc")
 			return afero.Walk(
 				cfg.Fs(),
 				filepath.Join(rootDir, cfg.ProtocConfig().ProtosDir),
@@ -70,7 +74,6 @@ func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 							return errors.WithStack(err)
 						}
 						relPath, _ := filepath.Rel(rootDir, path)
-						ui.PrintInfo(relPath, "protoc")
 						for _, cmd := range cmds {
 							c := exec.Command(cmd[0], cmd[1:]...)
 							c.Env = append(c.Env, os.Environ()...)
@@ -81,6 +84,7 @@ func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 								return errors.Wrapf(err, "failed to execute command: %#v", c)
 							}
 						}
+						ui.ItemSuccess(relPath)
 					}
 					return nil
 				},

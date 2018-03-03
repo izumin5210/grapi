@@ -30,9 +30,10 @@ func newGenerateCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 
 func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 	return &cobra.Command{
-		Use:          "service NAME",
-		Short:        "Generate a new service",
-		SilenceUsage: true,
+		Use:           "service NAME",
+		Short:         "Generate a new service",
+		SilenceErrors: true,
+		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			rootDir, ok := fs.LookupRoot(cfg.Fs(), cfg.CurrentDir())
 			if !ok {

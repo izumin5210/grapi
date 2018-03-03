@@ -83,7 +83,7 @@ func (g *generator) Run(data interface{}) error {
 			}
 		}
 
-		g.ui.PrintWithStatus(path[1:], st)
+		st.Fprint(g.ui, path[1:])
 	}
 
 	return nil
