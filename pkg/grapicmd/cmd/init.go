@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 
+	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
@@ -18,18 +18,14 @@ var (
 	tmplPaths []string
 )
 
-func newInitCommand(ui ui.UI) *cobra.Command {
+func newInitCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 	return &cobra.Command{
 		Use:          "init [name]",
 		Short:        "Initialize a grapi application",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			wd, err := os.Getwd()
-			if err != nil {
-				return errors.Wrap(err, "failed to get the current working directory")
-			}
-
-			root := wd
+			var err error
+			root := cfg.CurrentDir()
 
 			if argCnt := len(args); argCnt == 1 {
 				arg := args[0]
