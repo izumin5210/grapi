@@ -60,3 +60,7 @@ required = [
 [[constraint]]
   branch = "master"
   name = "github.com/izumin5210/clicontrib"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/sync"
