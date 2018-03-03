@@ -13,7 +13,7 @@ import (
 type Config interface {
 	Init(cfgFile string)
 	Fs() afero.Fs
-	RootDir() string
+	CurrentDir() string
 	AppName() string
 	Version() string
 	Revision() string
@@ -25,21 +25,21 @@ type Config interface {
 
 // NewConfig creates new Config object.
 func NewConfig(
-	rootDir string,
+	currentDir string,
 	appName, version, revision string,
 	in io.Reader,
 	out, err io.Writer,
 ) Config {
 	return &config{
-		v:        viper.New(),
-		fs:       afero.NewOsFs(),
-		rootDir:  rootDir,
-		appName:  appName,
-		version:  version,
-		revision: revision,
-		in:       in,
-		out:      out,
-		err:      err,
+		v:          viper.New(),
+		fs:         afero.NewOsFs(),
+		currentDir: currentDir,
+		appName:    appName,
+		version:    version,
+		revision:   revision,
+		in:         in,
+		out:        out,
+		err:        err,
 	}
 }
 
@@ -47,7 +47,7 @@ type config struct {
 	cfgFile                    string
 	v                          *viper.Viper
 	fs                         afero.Fs
-	rootDir                    string
+	currentDir                 string
 	appName, version, revision string
 	in                         io.Reader
 	out, err                   io.Writer
@@ -64,8 +64,8 @@ func (c *config) Fs() afero.Fs {
 	return c.fs
 }
 
-func (c *config) RootDir() string {
-	return c.rootDir
+func (c *config) CurrentDir() string {
+	return c.currentDir
 }
 
 func (c *config) AppName() string {
