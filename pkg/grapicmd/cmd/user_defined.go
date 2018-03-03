@@ -12,9 +12,9 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
-func newUserDefinedCommand(cfg grapicmd.Config, entryPath string) *cobra.Command {
+func newUserDefinedCommand(cfg grapicmd.Config, rootDir, entryPath string) *cobra.Command {
 	name := filepath.Base(filepath.Dir(entryPath))
-	binDir := filepath.Join(cfg.RootDir(), "bin")
+	binDir := filepath.Join(rootDir, "bin")
 	binPath := filepath.Join(binDir, name)
 	return &cobra.Command{
 		Use: name,

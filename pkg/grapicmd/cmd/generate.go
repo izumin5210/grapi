@@ -34,8 +34,13 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 		Short:        "Generate a new service",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			rootDir, ok := fs.LookupRoot(cfg.Fs(), cfg.CurrentDir())
+			if !ok {
+				return errors.New("geneate command should execut inside a grapi applicaiton directory")
+			}
+
 			// github.com/foo/bar
-			importPath, err := fs.GetImportPath(cfg.RootDir())
+			importPath, err := fs.GetImportPath(rootDir)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -85,7 +90,7 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 				"pbgoPackageName": pbgoPackageName,
 				"protoPackage":    protoPackage,
 			}
-			return generate.NewGenerator(cfg.Fs(), ui, cfg.RootDir(), template.Service).Run(data)
+			return generate.NewGenerator(cfg.Fs(), ui, rootDir, template.Service).Run(data)
 		},
 	}
 }
@@ -95,10 +100,15 @@ func newGenerateCommandCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 		Use:   "command NAME",
 		Short: "Generate a new command",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			rootDir, ok := fs.LookupRoot(cfg.Fs(), cfg.CurrentDir())
+			if !ok {
+				return errors.New("geneate command should execut inside a grapi applicaiton directory")
+			}
+
 			data := map[string]string{
 				"name": args[0],
 			}
-			return generate.NewGenerator(cfg.Fs(), ui, cfg.RootDir(), template.Command).Run(data)
+			return generate.NewGenerator(cfg.Fs(), ui, rootDir, template.Command).Run(data)
 		},
 	}
 }

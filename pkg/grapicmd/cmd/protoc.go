@@ -21,8 +21,13 @@ func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 		Short:        "Run protoc",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			rootDir, ok := fs.LookupRoot(cfg.Fs(), cfg.CurrentDir())
+			if !ok {
+				return errors.New("protoc command should execut inside a grapi applicaiton directory")
+			}
+
 			// TODO: force rebuild plugins option
-			binDir := filepath.Join(cfg.RootDir(), "bin")
+			binDir := filepath.Join(rootDir, "bin")
 			if err := fs.CreateDirIfNotExists(cfg.Fs(), binDir); err != nil {
 				return errors.WithStack(err)
 			}
@@ -36,7 +41,7 @@ func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 				}
 				ui.PrintInfo(filepath.Base(plugin.Path), "install")
 				c := exec.Command("go", "install", ".")
-				c.Dir = filepath.Join(cfg.RootDir(), plugin.Path)
+				c.Dir = filepath.Join(rootDir, plugin.Path)
 				c.Env = append(c.Env, os.Environ()...)
 				c.Env = append(c.Env, "GOBIN="+binDir)
 				out, err := c.CombinedOutput()
@@ -47,24 +52,24 @@ func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 			}
 			return afero.Walk(
 				cfg.Fs(),
-				filepath.Join(cfg.RootDir(), cfg.ProtocConfig().ProtosDir),
+				filepath.Join(rootDir, cfg.ProtocConfig().ProtosDir),
 				func(path string, info os.FileInfo, err error) error {
 					if err != nil {
 						return errors.WithStack(err)
 					}
 					if !info.IsDir() && filepath.Ext(path) == ".proto" {
-						outDir, err := cfg.ProtocConfig().OutDirOf(cfg.RootDir(), path)
+						outDir, err := cfg.ProtocConfig().OutDirOf(rootDir, path)
 						if err != nil {
 							return errors.WithStack(err)
 						}
 						if err = fs.CreateDirIfNotExists(cfg.Fs(), outDir); err != nil {
 							return errors.WithStack(err)
 						}
-						cmds, err := cfg.ProtocConfig().Commands(cfg.RootDir(), path)
+						cmds, err := cfg.ProtocConfig().Commands(rootDir, path)
 						if err != nil {
 							return errors.WithStack(err)
 						}
-						relPath, _ := filepath.Rel(cfg.RootDir(), path)
+						relPath, _ := filepath.Rel(rootDir, path)
 						ui.PrintInfo(relPath, "protoc")
 						for _, cmd := range cmds {
 							c := exec.Command(cmd[0], cmd[1:]...)
