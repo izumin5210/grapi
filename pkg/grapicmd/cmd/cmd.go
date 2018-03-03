@@ -21,10 +21,10 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	}
 
 	var cfgFile string
-	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
-	cfg.Init(cfgFile)
-
+	cobra.OnInitialize(func() { cfg.Init(cfgFile) })
 	clicontrib.HandleLogFlags(cmd)
+
+	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
 
 	ui := ui.New(cfg.OutWriter())
 
