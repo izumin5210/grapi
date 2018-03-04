@@ -91,7 +91,7 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 				"pbgoPackageName": pbgoPackageName,
 				"protoPackage":    protoPackage,
 			}
-			return generate.NewGenerator(cfg.Fs(), ui, rootDir, template.Service).Run(data)
+			return generate.NewGenerator(cfg.Fs(), ui, rootDir).Run(template.Service, data)
 		},
 	}
 }
@@ -109,7 +109,7 @@ func newGenerateCommandCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 			data := map[string]string{
 				"name": args[0],
 			}
-			return generate.NewGenerator(cfg.Fs(), ui, rootDir, template.Command).Run(data)
+			return generate.NewGenerator(cfg.Fs(), ui, rootDir).Run(template.Command, data)
 		},
 	}
 }

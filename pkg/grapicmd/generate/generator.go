@@ -15,16 +15,15 @@ import (
 
 // Generator is an interface to generate files from template and given params.
 type Generator interface {
-	Run(data interface{}) error
+	Run(tmplFs *assets.FileSystem, data interface{}) error
 }
 
 // NewGenerator createes a new generator instance with specified filessytem and templates.
-func NewGenerator(fs afero.Fs, ui ui.UI, rootPath string, tmplFs *assets.FileSystem) Generator {
+func NewGenerator(fs afero.Fs, ui ui.UI, rootPath string) Generator {
 	return &generator{
 		fs:       fs,
 		ui:       ui,
 		rootPath: rootPath,
-		tmplFs:   tmplFs,
 	}
 }
 
@@ -32,12 +31,11 @@ type generator struct {
 	fs       afero.Fs
 	ui       ui.UI
 	rootPath string
-	tmplFs   *assets.FileSystem
 }
 
-func (g *generator) Run(data interface{}) error {
-	for _, tmplPath := range g.sortedEntryPaths() {
-		entry := g.tmplFs.Files[tmplPath]
+func (g *generator) Run(tmplFs *assets.FileSystem, data interface{}) error {
+	for _, tmplPath := range g.sortedEntryPaths(tmplFs) {
+		entry := tmplFs.Files[tmplPath]
 		path, err := TemplateString(strings.TrimSuffix(tmplPath, ".tmpl")).Compile(data)
 		if err != nil {
 			return errors.Wrapf(err, "failed to parse path: %s", path)
@@ -89,10 +87,10 @@ func (g *generator) Run(data interface{}) error {
 	return nil
 }
 
-func (g *generator) sortedEntryPaths() []string {
-	rootFiles := make([]string, 0, len(g.tmplFs.Files))
-	tmplPaths := make([]string, 0, len(g.tmplFs.Files))
-	for path, entry := range g.tmplFs.Files {
+func (g *generator) sortedEntryPaths(tmplFs *assets.FileSystem) []string {
+	rootFiles := make([]string, 0, len(tmplFs.Files))
+	tmplPaths := make([]string, 0, len(tmplFs.Files))
+	for path, entry := range tmplFs.Files {
 		if entry.IsDir() {
 			continue
 		}
