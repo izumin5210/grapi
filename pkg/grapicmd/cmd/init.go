@@ -48,7 +48,7 @@ func newInitCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 		},
 	}
 
-	cmd.PersistentFlags().BoolVarP(&depSkipped, "skip-dep", "D", false, "Don't run `dep ensure`")
+	cmd.PersistentFlags().BoolVarP(&depSkipped, "skip-dep", "D", false, "Don't run dep ensure")
 
 	return cmd
 }
