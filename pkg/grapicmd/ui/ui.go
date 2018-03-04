@@ -120,37 +120,52 @@ func New(out io.Writer) UI {
 }
 
 type uiImpl struct {
-	out io.Writer
+	out       io.Writer
+	inSection bool
 }
 
 func (u *uiImpl) Output(msg string) {
+	u.inSection = true
 	fmt.Fprintf(u.out, "    %s\n", msg)
 }
 
 func (u *uiImpl) Section(msg string) {
+	if u.inSection {
+		fmt.Fprintln(u.out)
+		u.inSection = false
+	}
 	printTypeSection.Fprintln(u.out, msg)
 }
 
 func (u *uiImpl) Subsection(msg string) {
+	if u.inSection {
+		fmt.Fprintln(u.out)
+		u.inSection = false
+	}
 	printTypeSubsection.Fprintln(u.out, msg)
 }
 
 func (u *uiImpl) Warn(msg string) {
+	u.inSection = true
 	printTypeWarn.Fprintln(u.out, msg)
 }
 
 func (u *uiImpl) Error(msg string) {
+	u.inSection = true
 	printTypeError.Fprintln(u.out, msg)
 }
 
 func (u *uiImpl) ItemSuccess(msg string) {
+	u.inSection = true
 	printTypeItemSuccess.Fprintln(u.out, msg)
 }
 
 func (u *uiImpl) ItemSkipped(msg string) {
+	u.inSection = true
 	printTypeItemSkipped.Fprintln(u.out, msg)
 }
 
 func (u *uiImpl) ItemFailure(msg string) {
+	u.inSection = true
 	printTypeItemFailure.Fprintln(u.out, msg)
 }
