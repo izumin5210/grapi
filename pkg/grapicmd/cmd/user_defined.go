@@ -17,7 +17,9 @@ func newUserDefinedCommand(cfg grapicmd.Config, rootDir, entryPath string) *cobr
 	binDir := filepath.Join(rootDir, "bin")
 	binPath := filepath.Join(binDir, name)
 	return &cobra.Command{
-		Use: name,
+		Use:           name,
+		SilenceErrors: true,
+		SilenceUsage:  true,
 		RunE: func(c *cobra.Command, args []string) error {
 			err := fs.CreateDirIfNotExists(cfg.Fs(), binDir)
 			if err != nil {
