@@ -8,13 +8,18 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"{{ .importPath }}/{{ .pbgoPackagePath }}"
+  {{ .pbgoPackageName }} "{{ .importPath }}/{{ .pbgoPackagePath }}"
+)
+
+var (
+	// Register{{ .serviceName }}ServiceHandler is a function to register card service handler to gRPC Gateway's mux.
+	Register{{ .serviceName }}ServiceHandler = {{ .pbgoPackageName }}.Register{{ .serviceName }}ServiceHandler
 )
 
 // Register{{ .serviceName }}ServiceServerFactory creates a function to register card service server impl to grpc.Server.
 func Register{{ .serviceName }}ServiceServerFactory() func(s *grpc.Server) {
 	return func(s *grpc.Server) {
-		{{ .packageName }}.Register{{ .serviceName }}ServiceServer(s, New())
+		{{ .pbgoPackageName }}.Register{{ .serviceName }}ServiceServer(s, New())
 	}
 }
 

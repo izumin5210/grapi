@@ -58,10 +58,10 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 			// qux
 			packageName := filepath.Base(packagePath)
 
-			// baz/qux_pb
-			pbgoPackagePath := packagePath + "_pb"
+			// api/baz/qux
+			pbgoPackagePath := filepath.Join("api", packagePath)
 			// qux_pb
-			pbgoPackageName := filepath.Base(pbgoPackagePath)
+			pbgoPackageName := filepath.Base(pbgoPackagePath) + "_pb"
 
 			if packagePath == "." {
 				packagePath = "server"
