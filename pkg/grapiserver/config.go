@@ -42,20 +42,18 @@ type Address struct {
 }
 
 func (a *Address) createListener() (net.Listener, error) {
-	lis, err := net.Listen(a.Network, a.Addr)
 	if a.Network == "unix" {
 		dir := filepath.Dir(a.Addr)
 		f, err := os.Stat(dir)
 		if err != nil {
-			err = os.MkdirAll(dir, 0755)
-		}
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to create the directory")
-		}
-		if !f.IsDir() {
+			if err = os.MkdirAll(dir, 0755); err != nil {
+				return nil, errors.Wrap(err, "failed to create the directory")
+			}
+		} else if !f.IsDir() {
 			return nil, errors.Errorf("file %q already exists", dir)
 		}
 	}
+	lis, err := net.Listen(a.Network, a.Addr)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to listen %s %s", a.Network, a.Addr)
 	}
