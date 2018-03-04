@@ -36,37 +36,37 @@ const (
 
 var (
 	configByPrintType = map[printType]printConfig{
-		printTypeSection: printConfig{
+		printTypeSection: {
 			prefix:     "➜",
 			colorAttrs: []color.Attribute{color.FgYellow},
 			allColor:   true,
 		},
-		printTypeSubsection: printConfig{
+		printTypeSubsection: {
 			prefix:     "▸",
 			colorAttrs: []color.Attribute{color.FgBlue},
 			allColor:   true,
 		},
-		printTypeWarn: printConfig{
+		printTypeWarn: {
 			prefix:     "⚠",
 			colorAttrs: []color.Attribute{color.FgHiYellow},
 			allColor:   true,
 		},
-		printTypeError: printConfig{
+		printTypeError: {
 			prefix:     "☓",
 			colorAttrs: []color.Attribute{color.FgHiRed},
 			allColor:   true,
 		},
-		printTypeItemSuccess: printConfig{
+		printTypeItemSuccess: {
 			prefix:     "✔",
 			colorAttrs: []color.Attribute{color.Bold, color.FgGreen},
 			indent:     indentSizeItem,
 		},
-		printTypeItemSkipped: printConfig{
+		printTypeItemSkipped: {
 			prefix:     "╌",
 			colorAttrs: []color.Attribute{color.Bold, color.FgBlue},
 			indent:     indentSizeItem,
 		},
-		printTypeItemFailure: printConfig{
+		printTypeItemFailure: {
 			prefix:     "✗",
 			colorAttrs: []color.Attribute{color.Bold, color.FgRed},
 			indent:     indentSizeItem,
