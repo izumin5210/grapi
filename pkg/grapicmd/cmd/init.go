@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
@@ -19,7 +20,11 @@ var (
 )
 
 func newInitCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
-	return &cobra.Command{
+	var (
+		depSkipped bool
+	)
+
+	cmd := &cobra.Command{
 		Use:           "init [name]",
 		Short:         "Initialize a grapi application",
 		SilenceErrors: true,
@@ -44,9 +49,29 @@ func newInitCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 				return errors.Errorf("invalid argument count: want 0 or 1, got %d", argCnt)
 			}
 
-			return errors.WithStack(initProject(cfg.Fs(), ui, root))
+			ui.Section("Initialize project")
+			err = initProject(cfg.Fs(), ui, root)
+			if err != nil {
+				return errors.Wrap(err, "failed to initialize project")
+			}
+
+			if !depSkipped {
+				ui.Subsection("Install dependencies")
+				cmdExecutor := command.NewExecutor(root, cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
+				_, err = cmdExecutor.Exec(
+					[]string{"dep", "ensure", "-v"},
+					command.WithIOConnected(),
+				)
+				err = errors.Wrapf(err, "failed to execute `dep ensure`")
+			}
+
+			return err
 		},
 	}
+
+	cmd.PersistentFlags().BoolVarP(&depSkipped, "skip-dep", "D", false, "Don't run `dep ensure`")
+
+	return cmd
 }
 
 func initProject(afs afero.Fs, ui ui.UI, rootPath string) error {
