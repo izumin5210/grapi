@@ -1,9 +1,12 @@
 package protoc
 
 import (
+	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/spf13/afero"
 )
 
 // Config stores setting params related protoc.
@@ -14,10 +17,29 @@ type Config struct {
 	Plugins    []*Plugin
 }
 
+// ProtoFiles returns .proto file paths.
+func (c *Config) ProtoFiles(fs afero.Fs, rootDir string) ([]string, error) {
+	paths := []string{}
+	protosDir := filepath.Join(rootDir, c.ProtosDir)
+	err := afero.Walk(fs, protosDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		if !info.IsDir() && filepath.Ext(path) == ".proto" {
+			paths = append(paths, path)
+		}
+		return nil
+	})
+	return paths, errors.WithStack(err)
+}
+
 // OutDirOf returns a directory path of protoc result output path for given proto file.
 func (c *Config) OutDirOf(rootDir string, protoPath string) (string, error) {
 	protosDir := filepath.Join(rootDir, c.ProtosDir)
 	relProtoDir, err := filepath.Rel(protosDir, filepath.Dir(protoPath))
+	if strings.Contains(relProtoDir, "..") {
+		return "", errors.Errorf(".proto files should be included in %s", c.ProtosDir)
+	}
 	if err != nil {
 		return "", errors.Wrapf(err, ".proto files should be included in %s", c.ProtosDir)
 	}
@@ -28,25 +50,21 @@ func (c *Config) OutDirOf(rootDir string, protoPath string) (string, error) {
 // Commands returns protoc command and arguments for given proto file.
 func (c *Config) Commands(rootDir, protoPath string) ([][]string, error) {
 	cmds := make([][]string, 0, len(c.Plugins))
-	relOutDir, err := c.OutDirOf(rootDir, protoPath)
+	relProtoPath, _ := filepath.Rel(rootDir, protoPath)
+
+	outDir, err := c.OutDirOf(rootDir, protoPath)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	outDir := filepath.Join(rootDir, relOutDir)
-
 	for _, p := range c.Plugins {
 		args := []string{}
-		args = append(args, "-I", filepath.Dir(protoPath))
+		args = append(args, "-I", filepath.Dir(relProtoPath))
 		for _, dir := range c.ImportDirs {
-			absDir := dir
-			if !filepath.IsAbs(absDir) {
-				absDir = filepath.Join(rootDir, absDir)
-			}
-			args = append(args, "-I", absDir)
+			args = append(args, "-I", dir)
 		}
 		args = append(args, p.toProtocArg(outDir))
-		args = append(args, protoPath)
+		args = append(args, relProtoPath)
 		cmds = append(cmds, append([]string{"protoc"}, args...))
 	}
 
