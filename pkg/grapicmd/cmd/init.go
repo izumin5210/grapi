@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
+	"github.com/izumin5210/clicontrib/clog"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
@@ -32,6 +33,7 @@ func newInitCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 			if err != nil {
 				return errors.WithStack(err)
 			}
+			clog.Debug("parseInitArgs", "root", root)
 
 			creator := project.NewCreator(
 				ui,
@@ -67,7 +69,7 @@ func parseInitArgs(cfg grapicmd.Config, args []string) (root string, err error) 
 	}
 	root = arg
 	if !filepath.IsAbs(arg) {
-		root = filepath.Join(root, arg)
+		root = filepath.Join(cfg.CurrentDir(), arg)
 	}
 	return
 }
