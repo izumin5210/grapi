@@ -1,41 +1,28 @@
 package cmd
 
 import (
-	"fmt"
-	"path/filepath"
-
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/command"
-	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal"
+	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 )
 
-func newUserDefinedCommand(cfg grapicmd.Config, rootDir, entryPath string) *cobra.Command {
-	name := filepath.Base(filepath.Dir(entryPath))
-	binDir := filepath.Join(rootDir, "bin")
-	binPath := filepath.Join(binDir, name)
+func newUserDefinedCommand(ui ui.UI, script internal.Script) *cobra.Command {
 	return &cobra.Command{
-		Use:           name,
+		Use:           script.Name(),
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		RunE: func(c *cobra.Command, args []string) error {
-			executor := command.NewExecutor(rootDir, cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
-
-			err := fs.CreateDirIfNotExists(cfg.Fs(), binDir)
+		RunE: func(c *cobra.Command, args []string) (err error) {
+			ui.Section(script.Name())
+			ui.Subsection("Building...")
+			err = errors.WithStack(script.Build())
 			if err != nil {
-				return errors.WithStack(err)
+				return
 			}
 
-			out, err := executor.Exec([]string{"go", "build", "-v", "-o=" + binPath, entryPath})
-			if err != nil {
-				fmt.Println(string(out))
-				return errors.Wrapf(err, "failed to build %q", entryPath)
-			}
-
-			_, err = executor.Exec([]string{binPath}, command.WithIOConnected())
-			return errors.WithStack(err)
+			ui.Subsection("Starting...")
+			return errors.WithStack(script.Run())
 		},
 	}
 }
