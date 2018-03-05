@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/command"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal"
 	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
@@ -38,10 +40,15 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	udCmds := make([]*cobra.Command, 0)
 	rootDir, ok := fs.LookupRoot(cfg.Fs(), cfg.CurrentDir())
 	if ok {
+		scriptFactory := internal.NewScriptFactory(
+			cfg.Fs(),
+			command.NewExecutor(rootDir, cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader()),
+			rootDir,
+		)
 		paths, err := afero.Glob(cfg.Fs(), filepath.Join(rootDir, "cmd/*/run.go"))
 		if err == nil {
 			for _, path := range paths {
-				udCmds = append(udCmds, newUserDefinedCommand(cfg, rootDir, path))
+				udCmds = append(udCmds, newUserDefinedCommand(ui, scriptFactory.Create(path)))
 			}
 		}
 	}
