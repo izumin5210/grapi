@@ -3,10 +3,11 @@ package internal
 import (
 	"path/filepath"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/command"
-	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
+
+	"github.com/izumin5210/grapi/pkg/grapicmd/command"
+	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 // Script represents an user-defined command.
