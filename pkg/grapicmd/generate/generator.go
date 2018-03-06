@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/clicontrib/clog"
 	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
@@ -68,8 +69,14 @@ func (g *generator) Run(tmplFs *assets.FileSystem, data interface{}) error {
 			if string(existedBody) == body {
 				st = statusIdentical
 			} else {
-				// TODO: ask to overwrite
-				st = statusConflicted
+				st = statusSkipped
+				g.ui.ItemFailure(path[1:] + " is conflicted.")
+				if ok, err := g.ui.Confirm("Overwite it?"); err != nil {
+					clog.Error("failed to confirm to apply", "error", err)
+					return errors.WithStack(err)
+				} else if ok {
+					st = statusCreate
+				}
 			}
 		}
 
