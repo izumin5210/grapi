@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd/protoc"
+	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 // Config stores general setting params and provides accessors for them.
@@ -14,6 +15,8 @@ type Config interface {
 	Init(cfgFile string)
 	Fs() afero.Fs
 	CurrentDir() string
+	RootDir() string
+	IsInsideApp() bool
 	AppName() string
 	Version() string
 	Revision() string
@@ -30,10 +33,14 @@ func NewConfig(
 	in io.Reader,
 	out, err io.Writer,
 ) Config {
+	afs := afero.NewOsFs()
+	rootDir, insideApp := fs.LookupRoot(afs, currentDir)
 	return &config{
 		v:          viper.New(),
-		fs:         afero.NewOsFs(),
+		fs:         afs,
 		currentDir: currentDir,
+		rootDir:    rootDir,
+		insideApp:  insideApp,
 		appName:    appName,
 		version:    version,
 		revision:   revision,
@@ -47,7 +54,8 @@ type config struct {
 	cfgFile                    string
 	v                          *viper.Viper
 	fs                         afero.Fs
-	currentDir                 string
+	currentDir, rootDir        string
+	insideApp                  bool
 	appName, version, revision string
 	in                         io.Reader
 	out, err                   io.Writer
@@ -66,6 +74,14 @@ func (c *config) Fs() afero.Fs {
 
 func (c *config) CurrentDir() string {
 	return c.currentDir
+}
+
+func (c *config) RootDir() string {
+	return c.rootDir
+}
+
+func (c *config) IsInsideApp() bool {
+	return c.insideApp
 }
 
 func (c *config) AppName() string {

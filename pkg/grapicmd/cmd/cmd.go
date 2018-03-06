@@ -11,7 +11,6 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal"
 	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
-	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 // NewGrapiCommand creates a new command object.
@@ -29,11 +28,10 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	clicontrib.HandleLogFlags(cmd)
 
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
-	rootDir, inProj := fs.LookupRoot(cfg.Fs(), cfg.CurrentDir())
 	scriptFactory := internal.NewScriptFactory(
 		cfg.Fs(),
-		command.NewExecutor(rootDir, cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader()),
-		rootDir,
+		command.NewExecutor(cfg.RootDir(), cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader()),
+		cfg.RootDir(),
 	)
 
 	ui := ui.New(cfg.OutWriter(), cfg.InReader())
@@ -45,8 +43,8 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	cmd.AddCommand(newVersionCommand(cfg))
 
 	udCmds := make([]*cobra.Command, 0)
-	if inProj {
-		paths, err := afero.Glob(cfg.Fs(), filepath.Join(rootDir, "cmd/*/run.go"))
+	if cfg.IsInsideApp() {
+		paths, err := afero.Glob(cfg.Fs(), filepath.Join(cfg.RootDir(), "cmd/*/run.go"))
 		if err == nil {
 			for _, path := range paths {
 				udCmds = append(udCmds, newUserDefinedCommand(ui, scriptFactory.Create(path)))

@@ -22,21 +22,20 @@ func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			rootDir, ok := fs.LookupRoot(cfg.Fs(), cfg.CurrentDir())
-			if !ok {
+			if !cfg.IsInsideApp() {
 				return errors.New("protoc command should be execute inside a grapi applicaiton directory")
 			}
-			executor := command.NewExecutor(rootDir, cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
+			executor := command.NewExecutor(cfg.RootDir(), cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
 
 			// TODO: force rebuild plugins option
-			binDir := filepath.Join(rootDir, "bin")
+			binDir := filepath.Join(cfg.RootDir(), "bin")
 			if err := fs.CreateDirIfNotExists(cfg.Fs(), binDir); err != nil {
 				return errors.WithStack(err)
 			}
 			ui.Section("Install plugins")
 			var errs []error
 			for _, plugin := range cfg.ProtocConfig().Plugins {
-				ok, err := installPlugin(cfg.Fs(), executor, plugin, rootDir, binDir)
+				ok, err := installPlugin(cfg.Fs(), executor, plugin, cfg.RootDir(), binDir)
 				if err != nil {
 					errs = append(errs, err)
 					ui.ItemFailure(plugin.BinName())
@@ -54,13 +53,13 @@ func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 			}
 
 			ui.Section("Execute protoc")
-			protoFiles, err := cfg.ProtocConfig().ProtoFiles(cfg.Fs(), rootDir)
+			protoFiles, err := cfg.ProtocConfig().ProtoFiles(cfg.Fs(), cfg.RootDir())
 			if err != nil {
 				return errors.WithStack(err)
 			}
 			for _, path := range protoFiles {
-				err = executeProtoc(cfg.Fs(), executor, cfg.ProtocConfig(), rootDir, binDir, path)
-				relPath, _ := filepath.Rel(rootDir, path)
+				err = executeProtoc(cfg.Fs(), executor, cfg.ProtocConfig(), cfg.RootDir(), binDir, path)
+				relPath, _ := filepath.Rel(cfg.RootDir(), path)
 				if err == nil {
 					ui.ItemSuccess(relPath)
 				} else {
