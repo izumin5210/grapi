@@ -74,6 +74,8 @@ func (u *generateServiceUsecase) Perform(path string) error {
 	// com.github.foo.bar.baz.qux
 	protoPackage := strings.Join(protoPackageChunks, ".")
 
+	u.ui.Section("Generate service")
+
 	data := map[string]interface{}{
 		"importPath":      importPath,
 		"path":            path,

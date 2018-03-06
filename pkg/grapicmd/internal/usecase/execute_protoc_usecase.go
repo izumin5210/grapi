@@ -40,10 +40,13 @@ func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui ui.UI, executor
 }
 
 func (u *executeProtocUsecase) Perform() error {
+	u.ui.Section("Execute protoc")
+	u.ui.Subsection("Install plugins")
 	err := errors.WithStack(u.InstallPlugins())
 	if err != nil {
 		return err
 	}
+	u.ui.Subsection("Execute protoc")
 	return errors.WithStack(u.ExecuteProtoc())
 }
 
@@ -51,7 +54,6 @@ func (u *executeProtocUsecase) InstallPlugins() error {
 	if err := fs.CreateDirIfNotExists(u.fs, u.binDir); err != nil {
 		return errors.WithStack(err)
 	}
-	u.ui.Section("Install plugins")
 	var errs []error
 	for _, plugin := range u.cfg.Plugins {
 		ok, err := u.installPlugin(plugin)
@@ -74,7 +76,6 @@ func (u *executeProtocUsecase) InstallPlugins() error {
 }
 
 func (u *executeProtocUsecase) ExecuteProtoc() error {
-	u.ui.Section("Execute protoc")
 	protoFiles, err := u.cfg.ProtoFiles(u.fs, u.rootDir)
 	if err != nil {
 		return errors.WithStack(err)
