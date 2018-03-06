@@ -6,11 +6,11 @@ import (
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/command"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 )
 
-func newProtocCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
+func newProtocCommand(cfg grapicmd.Config, ui module.UI) *cobra.Command {
 	return &cobra.Command{
 		Use:           "protoc",
 		Short:         "Run protoc",

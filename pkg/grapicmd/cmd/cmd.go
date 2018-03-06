@@ -10,7 +10,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/ui"
 )
 
 // NewGrapiCommand creates a new command object.

@@ -4,12 +4,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/command"
-	"github.com/izumin5210/grapi/pkg/grapicmd/protoc"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
-	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
+
+	"github.com/izumin5210/grapi/pkg/grapicmd/command"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/izumin5210/grapi/pkg/grapicmd/protoc"
+	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 // ExecuteProtocUsecase is an useecase interface for executing protoc command.
@@ -22,13 +23,13 @@ type ExecuteProtocUsecase interface {
 type executeProtocUsecase struct {
 	cfg             *protoc.Config
 	fs              afero.Fs
-	ui              ui.UI
+	ui              module.UI
 	executor        command.Executor
 	rootDir, binDir string
 }
 
 // NewExecuteProtocUsecase returns an new ExecuteProtocUsecase implementation instance.
-func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui ui.UI, executor command.Executor, rootDir string) ExecuteProtocUsecase {
+func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui module.UI, executor command.Executor, rootDir string) ExecuteProtocUsecase {
 	return &executeProtocUsecase{
 		cfg:      cfg,
 		fs:       fs,

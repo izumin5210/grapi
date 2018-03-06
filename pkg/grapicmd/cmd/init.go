@@ -10,15 +10,15 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/project"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 )
 
 var (
 	tmplPaths []string
 )
 
-func newInitCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
+func newInitCommand(cfg grapicmd.Config, ui module.UI) *cobra.Command {
 	var (
 		depSkipped bool
 	)

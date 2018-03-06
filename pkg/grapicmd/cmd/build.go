@@ -3,15 +3,16 @@ package cmd
 import (
 	"path/filepath"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+
+	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
-func newBuildCommand(cfg grapicmd.Config, ui ui.UI, scriptFactory internal.ScriptFactory) *cobra.Command {
+func newBuildCommand(cfg grapicmd.Config, ui module.UI, scriptFactory internal.ScriptFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:           "build [TARGET]...",
 		Short:         "Build commands",

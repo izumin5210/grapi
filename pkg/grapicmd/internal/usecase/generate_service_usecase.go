@@ -9,7 +9,7 @@ import (
 
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -19,13 +19,13 @@ type GenerateServiceUsecase interface {
 }
 
 type generateServiceUsecase struct {
-	ui        ui.UI
+	ui        module.UI
 	generator generate.Generator
 	rootDir   string
 }
 
 // NewGenerateServiceUsecase returns an new GenerateServiceUsecase implementation instance.
-func NewGenerateServiceUsecase(ui ui.UI, generator generate.Generator, rootDir string) GenerateServiceUsecase {
+func NewGenerateServiceUsecase(ui module.UI, generator generate.Generator, rootDir string) GenerateServiceUsecase {
 	return &generateServiceUsecase{
 		ui:        ui,
 		generator: generator,

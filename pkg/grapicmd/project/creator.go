@@ -7,7 +7,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -24,7 +24,7 @@ type Config struct {
 }
 
 // NewCreator creates a new Creator instance.
-func NewCreator(ui ui.UI, generator generate.Generator, executor command.Executor, cfg *Config) Creator {
+func NewCreator(ui module.UI, generator generate.Generator, executor command.Executor, cfg *Config) Creator {
 	return &creator{
 		ui:        ui,
 		generator: generator,
@@ -35,7 +35,7 @@ func NewCreator(ui ui.UI, generator generate.Generator, executor command.Executo
 
 type creator struct {
 	cfg       *Config
-	ui        ui.UI
+	ui        module.UI
 	generator generate.Generator
 	executor  command.Executor
 }

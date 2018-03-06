@@ -8,11 +8,11 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 )
 
-func newGenerateCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
+func newGenerateCommand(cfg grapicmd.Config, ui module.UI) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "generate GENERATOR",
 		Short:   "Generate new code",
@@ -25,7 +25,7 @@ func newGenerateCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 	return cmd
 }
 
-func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
+func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI) *cobra.Command {
 	return &cobra.Command{
 		Use:           "service NAME",
 		Short:         "Generate a new service",
@@ -50,7 +50,7 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 	}
 }
 
-func newGenerateCommandCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
+func newGenerateCommandCommand(cfg grapicmd.Config, ui module.UI) *cobra.Command {
 	return &cobra.Command{
 		Use:   "command NAME",
 		Short: "Generate a new command",
