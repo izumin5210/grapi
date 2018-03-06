@@ -64,3 +64,7 @@ required = [
 [[constraint]]
   branch = "master"
   name = "golang.org/x/sync"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/tcnksm/go-input"

@@ -187,6 +187,12 @@
   version = "v1.0.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/tcnksm/go-input"
+  packages = ["."]
+  revision = "bbe13e92fa7dda71a4e012e3f427df11866c7651"
+
+[[projects]]
   name = "go.uber.org/atomic"
   packages = ["."]
   revision = "8474b86a5a6f79c443ce4b2992817ff32cf208b8"
@@ -213,6 +219,12 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "91a49db82a88618983a78a06c1cbd4e00ab749ab"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -234,7 +246,10 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix"]
+  packages = [
+    "unix",
+    "windows"
+  ]
   revision = "88d2dcc510266da9f7f8c7f34e1940716cab5f5c"
 
 [[projects]]
@@ -305,6 +320,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d32c5d6e20c1c6c8fab69a34654e8f7b2de7badc8c0514d245d5dc9e7483d909"
+  inputs-digest = "fbeff66fc9726b3ea6b1d3e8ef48e3c9b7462267232fa4d5bfd38a8fd014584c"
   solver-name = "gps-cdcl"
   solver-version = 1

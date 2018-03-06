@@ -6,6 +6,8 @@ import (
 	"strconv"
 
 	"github.com/fatih/color"
+	"github.com/izumin5210/clicontrib/clog"
+	"github.com/tcnksm/go-input"
 )
 
 type fprintFunc func(w io.Writer, msg string)
@@ -110,18 +112,24 @@ type UI interface {
 	ItemSuccess(msg string)
 	ItemSkipped(msg string)
 	ItemFailure(msg string)
+	Confirm(msg string) (bool, error)
 }
 
 // New creates a new UI instance.
-func New(out io.Writer) UI {
+func New(out io.Writer, in io.Reader) UI {
 	return &uiImpl{
 		out: out,
+		inputUI: &input.UI{
+			Reader: in,
+			Writer: out,
+		},
 	}
 }
 
 type uiImpl struct {
 	out       io.Writer
 	inSection bool
+	inputUI   *input.UI
 }
 
 func (u *uiImpl) Output(msg string) {
@@ -168,4 +176,22 @@ func (u *uiImpl) ItemSkipped(msg string) {
 func (u *uiImpl) ItemFailure(msg string) {
 	u.inSection = true
 	printTypeItemFailure.Fprintln(u.out, msg)
+}
+
+func (u *uiImpl) Confirm(msg string) (bool, error) {
+	ans, err := u.inputUI.Ask(fmt.Sprintf("%s [Y/n]", msg), &input.Options{
+		HideOrder: true,
+		Loop:      true,
+		ValidateFunc: func(ans string) error {
+			clog.Debug("receive user input", "query", msg, "input", ans)
+			if ans != "Y" && ans != "n" {
+				return fmt.Errorf("input must be Y or n")
+			}
+			return nil
+		},
+	})
+	if err != nil {
+		return false, err
+	}
+	return ans == "Y", nil
 }
