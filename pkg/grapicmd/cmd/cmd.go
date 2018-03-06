@@ -36,7 +36,7 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 		rootDir,
 	)
 
-	ui := ui.New(cfg.OutWriter())
+	ui := ui.New(cfg.OutWriter(), cfg.InReader())
 
 	cmd.AddCommand(newInitCommand(cfg, ui))
 	cmd.AddCommand(newGenerateCommand(cfg, ui))
