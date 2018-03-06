@@ -5,6 +5,8 @@ import (
 	"errors"
 	"strings"
 	"testing"
+
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
 type errReader struct {
@@ -17,7 +19,7 @@ func (r *errReader) Read(p []byte) (n int, err error) {
 func Test_UI_Confirm(t *testing.T) {
 	type TestContext struct {
 		in, out, err *bytes.Buffer
-		ui           UI
+		ui           module.UI
 	}
 
 	createTestContext := func() *TestContext {
