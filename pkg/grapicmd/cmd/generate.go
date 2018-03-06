@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
@@ -37,7 +38,14 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 
 			generator := generate.NewGenerator(cfg.Fs(), ui, cfg.RootDir())
 			generateUsecase := usecase.NewGenerateServiceUsecase(ui, generator, cfg.RootDir())
-			return errors.WithStack(generateUsecase.Perform(args[0]))
+			err := errors.WithStack(generateUsecase.Perform(args[0]))
+			if err != nil {
+				return err
+			}
+
+			executor := command.NewExecutor(cfg.RootDir(), cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
+			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ui, executor, cfg.RootDir())
+			return errors.WithStack(protocUsecase.Perform())
 		},
 	}
 }
