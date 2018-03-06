@@ -1,18 +1,15 @@
 package cmd
 
 import (
-	"path/filepath"
-	"strings"
-
 	"github.com/pkg/errors"
-	"github.com/serenize/snaker"
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
-	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 func newGenerateCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
@@ -35,63 +32,20 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			rootDir, ok := fs.LookupRoot(cfg.Fs(), cfg.CurrentDir())
-			if !ok {
+			if !cfg.IsInsideApp() {
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
 			}
 
-			// github.com/foo/bar
-			importPath, err := fs.GetImportPath(rootDir)
+			generator := generate.NewGenerator(cfg.Fs(), ui, cfg.RootDir())
+			generateUsecase := usecase.NewGenerateServiceUsecase(ui, generator, cfg.RootDir())
+			err := errors.WithStack(generateUsecase.Perform(args[0]))
 			if err != nil {
-				return errors.WithStack(err)
-			}
-			// baz/qux/quux
-			path := args[0]
-
-			// quux
-			name := filepath.Base(path)
-			// Quux
-			serviceName := snaker.SnakeToCamel(name)
-
-			// baz/qux
-			packagePath := filepath.Dir(path)
-			// qux
-			packageName := filepath.Base(packagePath)
-
-			// api/baz/qux
-			pbgoPackagePath := filepath.Join("api", packagePath)
-			// qux_pb
-			pbgoPackageName := filepath.Base(pbgoPackagePath) + "_pb"
-
-			if packagePath == "." {
-				packagePath = "server"
-				packageName = packagePath
-				pbgoPackagePath = "api_pb"
-				pbgoPackageName = pbgoPackagePath
+				return err
 			}
 
-			protoPackageChunks := []string{}
-			for _, pkg := range strings.Split(filepath.Join(importPath, "api", filepath.Dir(path)), "/") {
-				chunks := strings.Split(pkg, ".")
-				for i := len(chunks) - 1; i >= 0; i-- {
-					protoPackageChunks = append(protoPackageChunks, chunks[i])
-				}
-			}
-			// com.github.foo.bar.baz.qux
-			protoPackage := strings.Join(protoPackageChunks, ".")
-
-			data := map[string]interface{}{
-				"importPath":      importPath,
-				"path":            path,
-				"name":            name,
-				"serviceName":     serviceName,
-				"packagePath":     packagePath,
-				"packageName":     packageName,
-				"pbgoPackagePath": pbgoPackagePath,
-				"pbgoPackageName": pbgoPackageName,
-				"protoPackage":    protoPackage,
-			}
-			return generate.NewGenerator(cfg.Fs(), ui, rootDir).Run(template.Service, data)
+			executor := command.NewExecutor(cfg.RootDir(), cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
+			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ui, executor, cfg.RootDir())
+			return errors.WithStack(protocUsecase.Perform())
 		},
 	}
 }
@@ -101,15 +55,14 @@ func newGenerateCommandCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 		Use:   "command NAME",
 		Short: "Generate a new command",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			rootDir, ok := fs.LookupRoot(cfg.Fs(), cfg.CurrentDir())
-			if !ok {
+			if !cfg.IsInsideApp() {
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
 			}
 
 			data := map[string]string{
 				"name": args[0],
 			}
-			return generate.NewGenerator(cfg.Fs(), ui, rootDir).Run(template.Command, data)
+			return generate.NewGenerator(cfg.Fs(), ui, cfg.RootDir()).Run(template.Command, data)
 		},
 	}
 }
