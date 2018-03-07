@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/serenize/snaker"
 
+	"github.com/izumin5210/clicontrib/clog"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
@@ -43,7 +44,7 @@ func (u *generateServiceUsecase) Perform(path string) error {
 	// path => baz/qux/quux
 
 	// quux
-	name := filepath.Base(path)
+	name := strings.Replace(filepath.Base(path), "-", "_", -1)
 	// Quux
 	serviceName := snaker.SnakeToCamel(name)
 
@@ -66,7 +67,7 @@ func (u *generateServiceUsecase) Perform(path string) error {
 
 	protoPackageChunks := []string{}
 	for _, pkg := range strings.Split(filepath.Join(importPath, "api", filepath.Dir(path)), "/") {
-		chunks := strings.Split(pkg, ".")
+		chunks := strings.Split(strings.Replace(pkg, "-", "_", -1), ".")
 		for i := len(chunks) - 1; i >= 0; i-- {
 			protoPackageChunks = append(protoPackageChunks, chunks[i])
 		}
@@ -87,5 +88,6 @@ func (u *generateServiceUsecase) Perform(path string) error {
 		"pbgoPackageName": pbgoPackageName,
 		"protoPackage":    protoPackage,
 	}
+	clog.Debug("Generate service", "params", data)
 	return u.generator.Run(template.Service, data)
 }
