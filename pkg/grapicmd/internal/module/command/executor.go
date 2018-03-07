@@ -2,6 +2,7 @@ package command
 
 import (
 	"io"
+	"os"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
@@ -34,6 +35,7 @@ func (f *factory) Create(nameAndArgs []string) module.Command {
 	return &command{
 		name:      name,
 		args:      args,
+		env:       os.Environ(),
 		outWriter: f.outWriter,
 		errWriter: f.errWriter,
 		inReader:  f.inReader,
