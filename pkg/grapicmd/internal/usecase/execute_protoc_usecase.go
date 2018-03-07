@@ -7,13 +7,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/protoc"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
-// ExecuteProtocUsecase is an useecase interface for executing protoc command.
+// ExecuteProtocUsecase is an useecase interface for executing protoc module.
 type ExecuteProtocUsecase interface {
 	Perform() error
 	InstallPlugins() error
@@ -24,19 +23,19 @@ type executeProtocUsecase struct {
 	cfg             *protoc.Config
 	fs              afero.Fs
 	ui              module.UI
-	executor        command.Executor
+	commandFactory  module.CommandFactory
 	rootDir, binDir string
 }
 
 // NewExecuteProtocUsecase returns an new ExecuteProtocUsecase implementation instance.
-func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui module.UI, executor command.Executor, rootDir string) ExecuteProtocUsecase {
+func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui module.UI, commandFactory module.CommandFactory, rootDir string) ExecuteProtocUsecase {
 	return &executeProtocUsecase{
-		cfg:      cfg,
-		fs:       fs,
-		ui:       ui,
-		executor: executor,
-		rootDir:  rootDir,
-		binDir:   filepath.Join(rootDir, "bin"),
+		cfg:            cfg,
+		fs:             fs,
+		ui:             ui,
+		commandFactory: commandFactory,
+		rootDir:        rootDir,
+		binDir:         filepath.Join(rootDir, "bin"),
 	}
 }
 
@@ -112,13 +111,10 @@ func (u *executeProtocUsecase) installPlugin(plugin *protoc.Plugin) (bool, error
 	if ok, _ := afero.DirExists(u.fs, dir); !ok {
 		return false, errors.Errorf("%s is not found", plugin.Path)
 	}
-	out, err := u.executor.Exec(
-		[]string{"go", "install", "."},
-		command.WithDir(dir),
-		command.WithEnv("GOBIN", u.binDir),
-	)
+	cmd := u.commandFactory.Create([]string{"go", "install", "."})
+	out, err := cmd.SetDir(dir).AddEnv("GOBIN", u.binDir).Exec()
 	if err != nil {
-		return false, errors.Wrapf(err, "failed to execute command: %s", string(out))
+		return false, errors.Wrapf(err, "failed to execute module: %s", string(out))
 	}
 	return true, nil
 }
@@ -136,9 +132,9 @@ func (u *executeProtocUsecase) executeProtoc(protoPath string) error {
 		return errors.WithStack(err)
 	}
 	for _, cmd := range cmds {
-		out, err := u.executor.Exec(cmd, command.WithEnv("PATH", u.binDir+":"+os.Getenv("PATH")))
+		out, err := u.commandFactory.Create(cmd).AddEnv("PATH", u.binDir+":"+os.Getenv("PATH")).SetDir(u.rootDir).Exec()
 		if err != nil {
-			return errors.Wrapf(err, "failed to execute command: %s", string(out))
+			return errors.Wrapf(err, "failed to execute module: %s", string(out))
 		}
 	}
 	return nil

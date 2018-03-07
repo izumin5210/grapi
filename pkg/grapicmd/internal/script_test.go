@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -52,8 +51,6 @@ func Test_Script(t *testing.T) {
 	if err != nil {
 		t.Errorf("Build() returned an error %v", err)
 	}
-
-	fmt.Println(testCtx.executions)
 
 	if got, want := testCtx.executions[0], []string{"go", "build", "-v", "-o=" + bin, entry}; !reflect.DeepEqual(got, want) {
 		t.Errorf("Build() executed %v, want %v", got, want)

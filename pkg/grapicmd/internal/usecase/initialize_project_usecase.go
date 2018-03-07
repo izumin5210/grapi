@@ -3,7 +3,6 @@ package usecase
 import (
 	"github.com/pkg/errors"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
@@ -18,18 +17,18 @@ type InitializeProjectUsecase interface {
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui module.UI, generator generate.Generator, executor command.Executor) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui module.UI, generator generate.Generator, commandFactory module.CommandFactory) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
-		ui:        ui,
-		generator: generator,
-		executor:  executor,
+		ui:             ui,
+		generator:      generator,
+		commandFactory: commandFactory,
 	}
 }
 
 type initializeProjectUsecase struct {
-	ui        module.UI
-	generator generate.Generator
-	executor  command.Executor
+	ui             module.UI
+	generator      generate.Generator
+	commandFactory module.CommandFactory
 }
 
 func (u *initializeProjectUsecase) Perform(rootDir string, depSkipped bool) error {
@@ -64,10 +63,7 @@ func (u *initializeProjectUsecase) GenerateProject(rootDir string) error {
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string) error {
-	_, err := u.executor.Exec(
-		[]string{"dep", "ensure", "-v"},
-		command.WithIOConnected(),
-		command.WithDir(rootDir),
-	)
+	cmd := u.commandFactory.Create([]string{"dep", "ensure", "-v"})
+	_, err := cmd.ConnectIO().SetDir(rootDir).Exec()
 	return errors.WithStack(err)
 }

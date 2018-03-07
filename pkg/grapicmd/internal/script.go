@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/command"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -23,32 +23,32 @@ type ScriptFactory interface {
 }
 
 // NewScriptFactory creates a new ScriptFactory instance.
-func NewScriptFactory(fs afero.Fs, executor command.Executor, rootDir string) ScriptFactory {
+func NewScriptFactory(fs afero.Fs, commandFactory module.CommandFactory, rootDir string) ScriptFactory {
 	return &scriptFactory{
-		fs:       fs,
-		executor: executor,
-		rootDir:  rootDir,
+		fs:             fs,
+		commandFactory: commandFactory,
+		rootDir:        rootDir,
 	}
 }
 
 type scriptFactory struct {
-	fs       afero.Fs
-	executor command.Executor
-	rootDir  string
+	fs             afero.Fs
+	commandFactory module.CommandFactory
+	rootDir        string
 }
 
 func (f *scriptFactory) Create(entryFilePath string) Script {
 	return &script{
-		fs:            f.fs,
-		executor:      f.executor,
-		rootDir:       f.rootDir,
-		entryFilePath: entryFilePath,
+		fs:             f.fs,
+		commandFactory: f.commandFactory,
+		rootDir:        f.rootDir,
+		entryFilePath:  entryFilePath,
 	}
 }
 
 type script struct {
 	fs                       afero.Fs
-	executor                 command.Executor
+	commandFactory           module.CommandFactory
 	rootDir                  string
 	entryFilePath            string
 	binName, binDir, binPath string
@@ -64,10 +64,8 @@ func (s *script) Build() error {
 		return errors.WithStack(err)
 	}
 
-	_, err = s.executor.Exec(
-		[]string{"go", "build", "-v", "-o=" + s.getBinPath(), s.entryFilePath},
-		command.WithIOConnected(),
-	)
+	cmd := s.commandFactory.Create([]string{"go", "build", "-v", "-o=" + s.getBinPath(), s.entryFilePath})
+	_, err = cmd.ConnectIO().SetDir(s.rootDir).Exec()
 	if err != nil {
 		return errors.Wrapf(err, "failed to build %q", s.entryFilePath)
 	}
@@ -76,7 +74,8 @@ func (s *script) Build() error {
 }
 
 func (s *script) Run() error {
-	_, err := s.executor.Exec([]string{s.getBinPath()}, command.WithIOConnected())
+	cmd := s.commandFactory.Create([]string{s.getBinPath()})
+	_, err := cmd.ConnectIO().SetDir(s.rootDir).Exec()
 	return errors.WithStack(err)
 }
 

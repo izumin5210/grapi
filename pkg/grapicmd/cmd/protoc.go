@@ -5,12 +5,11 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
-func newProtocCommand(cfg grapicmd.Config, ui module.UI) *cobra.Command {
+func newProtocCommand(cfg grapicmd.Config, ui module.UI, commandFactory module.CommandFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:           "protoc",
 		Short:         "Run protoc",
@@ -20,8 +19,7 @@ func newProtocCommand(cfg grapicmd.Config, ui module.UI) *cobra.Command {
 			if !cfg.IsInsideApp() {
 				return errors.New("protoc command should be execute inside a grapi applicaiton directory")
 			}
-			executor := command.NewExecutor(cfg.RootDir(), cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
-			u := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ui, executor, cfg.RootDir())
+			u := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ui, commandFactory, cfg.RootDir())
 			return errors.WithStack(u.Perform())
 		},
 	}
