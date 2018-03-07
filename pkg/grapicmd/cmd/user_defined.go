@@ -5,10 +5,10 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
-func newUserDefinedCommand(ui ui.UI, script internal.Script) *cobra.Command {
+func newUserDefinedCommand(ui module.UI, script internal.Script) *cobra.Command {
 	return &cobra.Command{
 		Use:           script.Name(),
 		SilenceErrors: true,

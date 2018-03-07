@@ -5,27 +5,26 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
 )
 
-func newGenerateCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
+func newGenerateCommand(cfg grapicmd.Config, ui module.UI, commandFactory module.CommandFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "generate GENERATOR",
 		Short:   "Generate new code",
 		Aliases: []string{"g", "gen"},
 	}
 
-	cmd.AddCommand(newGenerateServiceCommand(cfg, ui))
+	cmd.AddCommand(newGenerateServiceCommand(cfg, ui, commandFactory))
 	cmd.AddCommand(newGenerateCommandCommand(cfg, ui))
 
 	return cmd
 }
 
-func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
+func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, commandFactory module.CommandFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:           "service NAME",
 		Short:         "Generate a new service",
@@ -43,14 +42,13 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
 				return err
 			}
 
-			executor := command.NewExecutor(cfg.RootDir(), cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
-			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ui, executor, cfg.RootDir())
+			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ui, commandFactory, cfg.RootDir())
 			return errors.WithStack(protocUsecase.Perform())
 		},
 	}
 }
 
-func newGenerateCommandCommand(cfg grapicmd.Config, ui ui.UI) *cobra.Command {
+func newGenerateCommandCommand(cfg grapicmd.Config, ui module.UI) *cobra.Command {
 	return &cobra.Command{
 		Use:   "command NAME",
 		Short: "Generate a new command",

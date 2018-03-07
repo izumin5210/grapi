@@ -1,6 +1,6 @@
 package generate
 
-import "github.com/izumin5210/grapi/pkg/grapicmd/ui"
+import "github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 
 type status int
 
@@ -20,7 +20,7 @@ var (
 	}
 )
 
-func (s status) Fprint(ui ui.UI, msg string) {
+func (s status) Fprint(ui module.UI, msg string) {
 	switch s {
 	case statusCreate, statusForce:
 		ui.ItemSuccess(msg)

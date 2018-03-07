@@ -8,9 +8,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/command"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/ui"
 )
 
 // NewGrapiCommand creates a new command object.
@@ -28,17 +28,14 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	clicontrib.HandleLogFlags(cmd)
 
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
-	scriptFactory := internal.NewScriptFactory(
-		cfg.Fs(),
-		command.NewExecutor(cfg.RootDir(), cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader()),
-		cfg.RootDir(),
-	)
+	commandFactory := command.NewFactory(cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
+	scriptFactory := internal.NewScriptFactory(cfg.Fs(), commandFactory, cfg.RootDir())
 
 	ui := ui.New(cfg.OutWriter(), cfg.InReader())
 
-	cmd.AddCommand(newInitCommand(cfg, ui))
-	cmd.AddCommand(newGenerateCommand(cfg, ui))
-	cmd.AddCommand(newProtocCommand(cfg, ui))
+	cmd.AddCommand(newInitCommand(cfg, ui, commandFactory))
+	cmd.AddCommand(newGenerateCommand(cfg, ui, commandFactory))
+	cmd.AddCommand(newProtocCommand(cfg, ui, commandFactory))
 	cmd.AddCommand(newBuildCommand(cfg, ui, scriptFactory))
 	cmd.AddCommand(newVersionCommand(cfg))
 

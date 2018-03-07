@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/afero"
 
 	"github.com/izumin5210/clicontrib/clog"
-	"github.com/izumin5210/grapi/pkg/grapicmd/ui"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -20,7 +20,7 @@ type Generator interface {
 }
 
 // NewGenerator createes a new generator instance with specified filessytem and templates.
-func NewGenerator(fs afero.Fs, ui ui.UI, rootPath string) Generator {
+func NewGenerator(fs afero.Fs, ui module.UI, rootPath string) Generator {
 	return &generator{
 		fs:       fs,
 		ui:       ui,
@@ -30,7 +30,7 @@ func NewGenerator(fs afero.Fs, ui ui.UI, rootPath string) Generator {
 
 type generator struct {
 	fs       afero.Fs
-	ui       ui.UI
+	ui       module.UI
 	rootPath string
 }
 
