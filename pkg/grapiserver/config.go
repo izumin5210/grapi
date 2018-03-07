@@ -70,6 +70,7 @@ type Config struct {
 	GrpcServerStreamInterceptors    []grpc.StreamServerInterceptor
 	GatewayServerUnaryInterceptors  []grpc.UnaryClientInterceptor
 	GatewayServerStreamInterceptors []grpc.StreamClientInterceptor
+	GatewayMuxOptions               []runtime.ServeMuxOption
 	MaxConcurrentStreams            uint32
 	Logger                          Logger
 	HTTPHeaderMappingConfig         *HTTPHeaderMappingConfig
