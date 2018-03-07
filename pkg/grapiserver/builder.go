@@ -1,6 +1,7 @@
 package grapiserver
 
 import (
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 )
@@ -15,6 +16,7 @@ type Builder interface {
 	AddGatewayServerStreamInterceptors(interceptors ...grpc.StreamClientInterceptor) Builder
 	AddRegisterGrpcServerImplFuncs(registerFuncs ...RegisterGrpcServerImplFunc) Builder
 	AddRegisterGatewayHandlerFuncs(registerFuncs ...RegisterGatewayHandlerFunc) Builder
+	AddGatewayMuxOptions(opts ...runtime.ServeMuxOption) Builder
 	SetLogger(l Logger) Builder
 	SetHTTPHeaderMapping(deciderFunc func(string) bool, mappingFunc func(string) string) Builder
 	Validate() error
@@ -76,6 +78,11 @@ func (b *builder) AddRegisterGrpcServerImplFuncs(registerFuncs ...RegisterGrpcSe
 
 func (b *builder) AddRegisterGatewayHandlerFuncs(registerFuncs ...RegisterGatewayHandlerFunc) Builder {
 	b.c.RegisterGatewayHandlerFuncs = append(b.c.RegisterGatewayHandlerFuncs, registerFuncs...)
+	return b
+}
+
+func (b *builder) AddGatewayMuxOptions(opts ...runtime.ServeMuxOption) Builder {
+	b.c.GatewayMuxOptions = append(b.c.GatewayMuxOptions, opts...)
 	return b
 }
 
