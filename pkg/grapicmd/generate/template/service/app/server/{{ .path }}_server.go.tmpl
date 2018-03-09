@@ -2,7 +2,6 @@ package {{ .packageName }}
 
 import (
 	"context"
-	"fmt"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -32,5 +31,6 @@ type {{ .name }}ServiceServerImpl struct {
 }
 
 func (s *{{ .name }}ServiceServerImpl) Get{{ .serviceName }}(ctx context.Context, req *{{ .pbgoPackageName }}.Get{{ .serviceName }}Request) (*{{ .pbgoPackageName }}.Get{{ .serviceName }}Response, error) {
-	return nil, status.Error(codes.Unimplemented, "not yet implemented")
+	// TODO: Not yet implemented.
+	return nil, status.Error(codes.Unimplemented, "TODO: You should implement it!")
 }
