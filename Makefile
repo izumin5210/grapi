@@ -4,7 +4,7 @@ SRC_FILES := $(shell git ls-files --cached --others --exclude-standard | grep -E
 ROOT_PKG := github.com/izumin5210/grapi
 GOFMT_TARGET := $(filter-out pkg/grapicmd/generate/template/%,$(SRC_FILES))
 GOLINT_TARGET := $(shell go list ./... | grep -v -E "$(ROOT_PKG)/pkg/grapicmd/generate/template")
-VERSION := 0.1.1
+VERSION := 0.1.2
 REVISION := $(shell git describe --always)
 
 GO_BUILD_FLAGS := -v
