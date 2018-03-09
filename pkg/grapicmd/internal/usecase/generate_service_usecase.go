@@ -61,8 +61,8 @@ func (u *generateServiceUsecase) Perform(path string) error {
 	if packagePath == "." {
 		packagePath = "server"
 		packageName = packagePath
-		pbgoPackagePath = "api_pb"
-		pbgoPackageName = pbgoPackagePath
+		pbgoPackagePath = "api"
+		pbgoPackageName = pbgoPackagePath + "_pb"
 	}
 
 	protoPackageChunks := []string{}
