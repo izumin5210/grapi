@@ -9,8 +9,8 @@ import (
 
 // InitializeProjectUsecase is an interface to create a new grapi project.
 type InitializeProjectUsecase interface {
-	Perform(rootDir string, depSkipped bool) error
-	GenerateProject(rootDir string) error
+	Perform(rootDir string, depSkipped, headUsed bool) error
+	GenerateProject(rootDir string, headUsed bool) error
 	InstallDeps(rootDir string) error
 }
 
@@ -31,11 +31,11 @@ type initializeProjectUsecase struct {
 	version        string
 }
 
-func (u *initializeProjectUsecase) Perform(rootDir string, depSkipped bool) error {
+func (u *initializeProjectUsecase) Perform(rootDir string, depSkipped, headUsed bool) error {
 	u.ui.Section("Initialize project")
 
 	var err error
-	err = u.GenerateProject(rootDir)
+	err = u.GenerateProject(rootDir, headUsed)
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize project")
 	}
@@ -51,14 +51,15 @@ func (u *initializeProjectUsecase) Perform(rootDir string, depSkipped bool) erro
 	return nil
 }
 
-func (u *initializeProjectUsecase) GenerateProject(rootDir string) error {
+func (u *initializeProjectUsecase) GenerateProject(rootDir string, headUsed bool) error {
 	importPath, err := fs.GetImportPath(rootDir)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	data := map[string]string{
+	data := map[string]interface{}{
 		"importPath": importPath,
 		"version":    u.version,
+		"headUsed":   headUsed,
 	}
 	return errors.WithStack(u.generator.Exec(rootDir, data))
 }

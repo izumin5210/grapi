@@ -19,6 +19,7 @@ var (
 func newInitCommand(cfg grapicmd.Config, ui module.UI, generatorFactory module.GeneratorFactory, commandFactory module.CommandFactory) *cobra.Command {
 	var (
 		depSkipped bool
+		headUsed   bool
 	)
 
 	cmd := &cobra.Command{
@@ -40,11 +41,12 @@ func newInitCommand(cfg grapicmd.Config, ui module.UI, generatorFactory module.G
 				cfg.Version(),
 			)
 
-			return errors.WithStack(u.Perform(root, depSkipped))
+			return errors.WithStack(u.Perform(root, depSkipped, headUsed))
 		},
 	}
 
 	cmd.PersistentFlags().BoolVarP(&depSkipped, "skip-dep", "D", false, "Don't run dep ensure")
+	cmd.PersistentFlags().BoolVar(&headUsed, "HEAD", false, "Use HEAD grapi")
 
 	return cmd
 }
