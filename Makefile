@@ -13,9 +13,11 @@ ORG := github.com/izumin5210
 PROJECT := grapi
 ROOT_PKG ?= $(ORG)/$(PROJECT)
 
+TEMPLATE_PKG := pkg/grapicmd/internal/module/generator/template
+
 SRC_FILES := $(shell git ls-files --cached --others --exclude-standard | grep -E "\.go$$")
-GOFMT_TARGET := $(filter-out pkg/grapicmd/generate/template/%,$(SRC_FILES))
-GOLINT_TARGET := $(shell go list ./... | grep -v -E "$(ROOT_PKG)/pkg/grapicmd/generate/template")
+GOFMT_TARGET := $(filter-out $(TEMPLATE_PKG)/%,$(SRC_FILES))
+GOLINT_TARGET := $(shell go list ./... | grep -v -E "$(ROOT_PKG)/$(TEMPLATE_PKG)")
 
 GO_BUILD_FLAGS := -v
 GO_TEST_FLAGS := -v
