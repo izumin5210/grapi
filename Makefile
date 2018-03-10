@@ -1,11 +1,21 @@
 .DEFAULT_GOAL := all
 
+VERSION_MAJOR ?= 0
+VERSION_MINOR ?= 1
+VERSION_BUILD ?= 2
+
+VERSION ?= v$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_BUILD)
+REVISION ?= $(shell git describe --always)
+BUILD_DATE ?= $(shell date +'%Y-%m-%dT%H:%M:%SZ')
+RELEASE_TYPE ?= $(if $(shell git tag --contains $(REVISION) | grep $(VERSION)),stable,canary)
+
+ORG := github.com/izumin5210
+PROJECT := grapi
+ROOT_PKG ?= $(ORG)/$(PROJECT)
+
 SRC_FILES := $(shell git ls-files --cached --others --exclude-standard | grep -E "\.go$$")
-ROOT_PKG := github.com/izumin5210/grapi
 GOFMT_TARGET := $(filter-out pkg/grapicmd/generate/template/%,$(SRC_FILES))
 GOLINT_TARGET := $(shell go list ./... | grep -v -E "$(ROOT_PKG)/pkg/grapicmd/generate/template")
-VERSION := 0.1.2
-REVISION := $(shell git describe --always)
 
 GO_BUILD_FLAGS := -v
 GO_TEST_FLAGS := -v
@@ -42,7 +52,7 @@ $(foreach src,$(DEP_SRCS),$(eval $(call dep-bin-tmpl,$(src))))
 #  App
 #----------------------------------------------------------------
 BIN_DIR := ./bin/
-PACKAGES_DIR := ./dist
+OUT_DIR := ./dist
 GENERATED_BINS :=
 PACKAGES :=
 CMDS := $(wildcard ./cmd/*)
@@ -51,7 +61,7 @@ define cmd-tmpl
 
 $(eval NAME := $(notdir $(1)))
 $(eval OUT := $(addprefix $(BIN_DIR),$(NAME)))
-$(eval LDFLAGS := -ldflags "-X main.Name=$(NAME) -X main.Version=$(VERSION) -X main.Revision=$(REVISION)")
+$(eval LDFLAGS := -ldflags "-X main.name=$(NAME) -X main.version=$(VERSION) -X main.revision=$(REVISION) -X main.buildDate=$(BUILD_DATE) -X main.releaseType=$(RELEASE_TYPE)")
 $(eval GENERATED_BINS += $(OUT))
 $(OUT): $(SRC_FILES)
 	$(call section,Building $(OUT))
@@ -66,10 +76,9 @@ $(eval PACKAGES += $(NAME)-package)
 $(NAME)-package: $(NAME)
 	@PATH=$(shell pwd)/$(DEP_BIN_DIR):$$$$PATH gox \
 		$(LDFLAGS) \
-		-parallel=5 \
 		-os="$(XC_OS)" \
 		-arch="$(XC_ARCH)" \
-		-output="$(PACKAGES_DIR)/{{.Dir}}_$(VERSION)_{{.OS}}_{{.Arch}}/$(NAME)" \
+		-output="$(OUT_DIR)/$(NAME)_{{.OS}}_{{.Arch}}" \
 		$(1)
 endef
 
@@ -119,7 +128,3 @@ cover:
 
 .PHONY: packages
 packages: $(PACKAGES)
-	@for pkg in $(PACKAGES_DIR)/* ;do \
-		tar zcf $$pkg.tar.gz $$pkg; \
-		rm -r $$pkg; \
-	done

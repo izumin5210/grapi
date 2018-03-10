@@ -14,7 +14,7 @@ func newVersionCommand(cfg grapicmd.Config) *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Run: func(cmd *cobra.Command, _ []string) {
-			cmd.Printf("%s %s (%s)\n", cfg.AppName(), cfg.Version(), cfg.Revision())
+			cmd.Printf("%s %s %s (%s %s)\n", cfg.AppName(), cfg.Version(), cfg.ReleaseType(), cfg.BuildDate(), cfg.Revision())
 		},
 	}
 }

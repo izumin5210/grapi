@@ -20,6 +20,8 @@ type Config interface {
 	AppName() string
 	Version() string
 	Revision() string
+	BuildDate() string
+	ReleaseType() string
 	InReader() io.Reader
 	OutWriter() io.Writer
 	ErrWriter() io.Writer
@@ -30,23 +32,26 @@ type Config interface {
 func NewConfig(
 	currentDir string,
 	appName, version, revision string,
+	buildDate, releaseType string,
 	in io.Reader,
 	out, err io.Writer,
 ) Config {
 	afs := afero.NewOsFs()
 	rootDir, insideApp := fs.LookupRoot(afs, currentDir)
 	return &config{
-		v:          viper.New(),
-		fs:         afs,
-		currentDir: currentDir,
-		rootDir:    rootDir,
-		insideApp:  insideApp,
-		appName:    appName,
-		version:    version,
-		revision:   revision,
-		in:         in,
-		out:        out,
-		err:        err,
+		v:           viper.New(),
+		fs:          afs,
+		currentDir:  currentDir,
+		rootDir:     rootDir,
+		insideApp:   insideApp,
+		appName:     appName,
+		version:     version,
+		revision:    revision,
+		buildDate:   buildDate,
+		releaseType: releaseType,
+		in:          in,
+		out:         out,
+		err:         err,
 	}
 }
 
@@ -57,6 +62,7 @@ type config struct {
 	currentDir, rootDir        string
 	insideApp                  bool
 	appName, version, revision string
+	buildDate, releaseType     string
 	in                         io.Reader
 	out, err                   io.Writer
 	readConfigErr              error
@@ -94,6 +100,14 @@ func (c *config) Version() string {
 
 func (c *config) Revision() string {
 	return c.revision
+}
+
+func (c *config) BuildDate() string {
+	return c.buildDate
+}
+
+func (c *config) ReleaseType() string {
+	return c.releaseType
 }
 
 func (c *config) InReader() io.Reader {
