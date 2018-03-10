@@ -5,7 +5,7 @@ go: "1.10"
 env:
   global:
   - DEP_VERSION="0.4.1"
-  - FILE_TO_DEPLOY="dist/*.tar.gz"
+  - FILE_TO_DEPLOY="dist/*"
   - CANARY_TAG="canary"
 
   # GITHUB_TOKEN
@@ -60,6 +60,7 @@ deploy:
   prerelease: true
   overwrite: true
   name: canary
+  body: canary build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built by Travis CI on $(date +'%F %T %Z').
   target_commitish: $TRAVIS_COMMIT
   on:
     branch: master
