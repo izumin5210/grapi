@@ -1,12 +1,13 @@
-package internal
+package script
 
 import (
 	"path/filepath"
 	"reflect"
 	"testing"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/spf13/afero"
+
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
 func Test_Script(t *testing.T) {
@@ -16,7 +17,7 @@ func Test_Script(t *testing.T) {
 		connected   bool
 	}
 	type testContext struct {
-		factory    ScriptFactory
+		factory    module.ScriptFactory
 		fs         afero.Fs
 		rootDir    string
 		executions []*execution
@@ -44,7 +45,7 @@ func Test_Script(t *testing.T) {
 			},
 		}
 
-		ctx.factory = NewScriptFactory(ctx.fs, commandFactory, ctx.rootDir)
+		ctx.factory = NewFactory(ctx.fs, commandFactory, ctx.rootDir)
 
 		return ctx
 	}

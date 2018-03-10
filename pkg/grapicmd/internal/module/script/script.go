@@ -1,4 +1,4 @@
-package internal
+package script
 
 import (
 	"path/filepath"
@@ -9,42 +9,6 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
-
-// Script represents an user-defined command.
-type Script interface {
-	Name() string
-	Build() error
-	Run() error
-}
-
-// ScriptFactory is a factory object for creating Script objects.
-type ScriptFactory interface {
-	Create(entryFilePath string) Script
-}
-
-// NewScriptFactory creates a new ScriptFactory instance.
-func NewScriptFactory(fs afero.Fs, commandFactory module.CommandFactory, rootDir string) ScriptFactory {
-	return &scriptFactory{
-		fs:             fs,
-		commandFactory: commandFactory,
-		rootDir:        rootDir,
-	}
-}
-
-type scriptFactory struct {
-	fs             afero.Fs
-	commandFactory module.CommandFactory
-	rootDir        string
-}
-
-func (f *scriptFactory) Create(entryFilePath string) Script {
-	return &script{
-		fs:             f.fs,
-		commandFactory: f.commandFactory,
-		rootDir:        f.rootDir,
-		entryFilePath:  entryFilePath,
-	}
-}
 
 type script struct {
 	fs                       afero.Fs
