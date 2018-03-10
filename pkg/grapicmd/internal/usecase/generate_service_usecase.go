@@ -8,8 +8,6 @@ import (
 	"github.com/serenize/snaker"
 
 	"github.com/izumin5210/clicontrib/clog"
-	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
-	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
@@ -21,12 +19,12 @@ type GenerateServiceUsecase interface {
 
 type generateServiceUsecase struct {
 	ui        module.UI
-	generator generate.Generator
+	generator module.Generator
 	rootDir   string
 }
 
 // NewGenerateServiceUsecase returns an new GenerateServiceUsecase implementation instance.
-func NewGenerateServiceUsecase(ui module.UI, generator generate.Generator, rootDir string) GenerateServiceUsecase {
+func NewGenerateServiceUsecase(ui module.UI, generator module.Generator, rootDir string) GenerateServiceUsecase {
 	return &generateServiceUsecase{
 		ui:        ui,
 		generator: generator,
@@ -89,5 +87,5 @@ func (u *generateServiceUsecase) Perform(path string) error {
 		"protoPackage":    protoPackage,
 	}
 	clog.Debug("Generate service", "params", data)
-	return u.generator.Run(template.Service, data)
+	return u.generator.Exec(u.rootDir, data)
 }

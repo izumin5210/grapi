@@ -3,8 +3,6 @@ package usecase
 import (
 	"github.com/pkg/errors"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
-	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
@@ -17,7 +15,7 @@ type InitializeProjectUsecase interface {
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui module.UI, generator generate.Generator, commandFactory module.CommandFactory) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui module.UI, generator module.Generator, commandFactory module.CommandFactory) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
 		ui:             ui,
 		generator:      generator,
@@ -27,7 +25,7 @@ func NewInitializeProjectUsecase(ui module.UI, generator generate.Generator, com
 
 type initializeProjectUsecase struct {
 	ui             module.UI
-	generator      generate.Generator
+	generator      module.Generator
 	commandFactory module.CommandFactory
 }
 
@@ -59,7 +57,7 @@ func (u *initializeProjectUsecase) GenerateProject(rootDir string) error {
 	data := map[string]string{
 		"importPath": importPath,
 	}
-	return errors.WithStack(u.generator.Run(template.Init, data))
+	return errors.WithStack(u.generator.Exec(rootDir, data))
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string) error {

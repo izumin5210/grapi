@@ -10,6 +10,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/command"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/generator"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/ui"
 )
 
@@ -32,9 +33,10 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	scriptFactory := internal.NewScriptFactory(cfg.Fs(), commandFactory, cfg.RootDir())
 
 	ui := ui.New(cfg.OutWriter(), cfg.InReader())
+	generatorFactory := generator.NewFactory(cfg.Fs(), ui)
 
-	cmd.AddCommand(newInitCommand(cfg, ui, commandFactory))
-	cmd.AddCommand(newGenerateCommand(cfg, ui, commandFactory))
+	cmd.AddCommand(newInitCommand(cfg, ui, generatorFactory, commandFactory))
+	cmd.AddCommand(newGenerateCommand(cfg, ui, generatorFactory, commandFactory))
 	cmd.AddCommand(newProtocCommand(cfg, ui, commandFactory))
 	cmd.AddCommand(newBuildCommand(cfg, ui, scriptFactory))
 	cmd.AddCommand(newVersionCommand(cfg))
