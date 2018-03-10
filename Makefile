@@ -14,14 +14,19 @@ PROJECT := grapi
 ROOT_PKG ?= $(ORG)/$(PROJECT)
 
 TEMPLATE_PKG := pkg/grapicmd/internal/module/generator/template
+MOCK_PKG := pkg/grapicmd/internal/module/testing
+GENERATED_PKGS := $(TEMPLATE_PKG)
+GENERATED_PKGS += $(MOCK_PKG)
 
 SRC_FILES := $(shell git ls-files --cached --others --exclude-standard | grep -E "\.go$$")
-GOFMT_TARGET := $(filter-out $(TEMPLATE_PKG)/%,$(SRC_FILES))
-GOLINT_TARGET := $(shell go list ./... | grep -v -E "$(ROOT_PKG)/$(TEMPLATE_PKG)")
+GOFMT_TARGET := $(SRC_FILES)
+$(foreach pkg,$(GENERATED_PKGS),$(eval GOFMT_TARGET := $(filter-out $(pkg)/%,$(GOFMT_TARGET))))
+GOLINT_TARGET := $(shell go list ./...)
+$(foreach pkg,$(GENERATED_PKGS),$(eval GOLINT_TARGET := $(filter-out $(ROOT_PKG)/$(pkg)/%,$(GOLINT_TARGET))))
 
 GO_BUILD_FLAGS := -v
 GO_TEST_FLAGS := -v
-GO_COVER_FLAGS := -coverpkg ./... -coverprofile coverage.txt -covermode atomic
+GO_COVER_FLAGS := -coverpkg $(shell echo $(GOLINT_TARGET) | tr ' ' ',') -coverprofile coverage.txt -covermode atomic
 
 XC_ARCH := 386 amd64
 XC_OS := darwin linux windows
