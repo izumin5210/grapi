@@ -42,7 +42,7 @@ func (s *GatewayServer) Serve(l net.Listener, wg *sync.WaitGroup) {
 		return
 	}
 
-	s.Logger.Info("gRPC Gateway server is starting", LogFields{})
+	s.Logger.Info("gRPC Gateway server is starting", LogFields{"network": s.GatewayAddr.Network, "addr": s.GatewayAddr.Addr})
 	err = s.server.Serve(l)
 	s.Logger.Info("Stopped taking more httr(s) requests", LogFields{"error": err})
 }
