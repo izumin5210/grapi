@@ -37,6 +37,7 @@ func newInitCommand(cfg grapicmd.Config, ui module.UI, generatorFactory module.G
 				ui,
 				generatorFactory.Project(),
 				commandFactory,
+				cfg.Version(),
 			)
 
 			return errors.WithStack(u.Perform(root, depSkipped))

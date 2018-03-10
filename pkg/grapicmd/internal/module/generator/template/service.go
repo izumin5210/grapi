@@ -11,39 +11,39 @@ var _Serviceade68dff2f92354600e62afbe061cceb4a0e52a6 = "package {{ .packageName 
 
 // Service returns go-assets FileSystem
 var Service = assets.NewFileSystem(map[string][]string{"/": []string{}, "/api": []string{}, "/api/protos": []string{"{{ .path }}.proto.tmpl"}, "/app": []string{}, "/app/server": []string{"{{ .path }}_server.go.tmpl"}}, map[string]*assets.File{
-	"/api/protos": &assets.File{
-		Path:     "/api/protos",
-		FileMode: 0x800001ed,
-		Mtime:    time.Unix(1519554903, 1519554903000000000),
-		Data:     nil,
-	}, "/api/protos/{{ .path }}.proto.tmpl": &assets.File{
-		Path:     "/api/protos/{{ .path }}.proto.tmpl",
-		FileMode: 0x1a4,
-		Mtime:    time.Unix(1519554903, 1519554903000000000),
-		Data:     []byte(_Service571266c56494500f3fd0d44c295886b67f7792c6),
-	}, "/app": &assets.File{
-		Path:     "/app",
-		FileMode: 0x800001ed,
-		Mtime:    time.Unix(1519541622, 1519541622000000000),
-		Data:     nil,
-	}, "/app/server": &assets.File{
-		Path:     "/app/server",
-		FileMode: 0x800001ed,
-		Mtime:    time.Unix(1520591323, 1520591323000000000),
-		Data:     nil,
-	}, "/app/server/{{ .path }}_server.go.tmpl": &assets.File{
-		Path:     "/app/server/{{ .path }}_server.go.tmpl",
-		FileMode: 0x1a4,
-		Mtime:    time.Unix(1520591323, 1520591323000000000),
-		Data:     []byte(_Serviceade68dff2f92354600e62afbe061cceb4a0e52a6),
-	}, "/": &assets.File{
+	"/": &assets.File{
 		Path:     "/",
 		FileMode: 0x800001ed,
-		Mtime:    time.Unix(1519541622, 1519541622000000000),
+		Mtime:    time.Unix(1520680416, 1520680416000000000),
 		Data:     nil,
 	}, "/api": &assets.File{
 		Path:     "/api",
 		FileMode: 0x800001ed,
-		Mtime:    time.Unix(1519541622, 1519541622000000000),
+		Mtime:    time.Unix(1520680416, 1520680416000000000),
 		Data:     nil,
+	}, "/api/protos": &assets.File{
+		Path:     "/api/protos",
+		FileMode: 0x800001ed,
+		Mtime:    time.Unix(1520680416, 1520680416000000000),
+		Data:     nil,
+	}, "/api/protos/{{ .path }}.proto.tmpl": &assets.File{
+		Path:     "/api/protos/{{ .path }}.proto.tmpl",
+		FileMode: 0x1a4,
+		Mtime:    time.Unix(1520680416, 1520680416000000000),
+		Data:     []byte(_Service571266c56494500f3fd0d44c295886b67f7792c6),
+	}, "/app": &assets.File{
+		Path:     "/app",
+		FileMode: 0x800001ed,
+		Mtime:    time.Unix(1520680416, 1520680416000000000),
+		Data:     nil,
+	}, "/app/server": &assets.File{
+		Path:     "/app/server",
+		FileMode: 0x800001ed,
+		Mtime:    time.Unix(1520680416, 1520680416000000000),
+		Data:     nil,
+	}, "/app/server/{{ .path }}_server.go.tmpl": &assets.File{
+		Path:     "/app/server/{{ .path }}_server.go.tmpl",
+		FileMode: 0x1a4,
+		Mtime:    time.Unix(1520680416, 1520680416000000000),
+		Data:     []byte(_Serviceade68dff2f92354600e62afbe061cceb4a0e52a6),
 	}}, "")

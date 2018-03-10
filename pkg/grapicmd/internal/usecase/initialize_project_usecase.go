@@ -15,11 +15,12 @@ type InitializeProjectUsecase interface {
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui module.UI, generator module.Generator, commandFactory module.CommandFactory) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui module.UI, generator module.Generator, commandFactory module.CommandFactory, version string) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
 		ui:             ui,
 		generator:      generator,
 		commandFactory: commandFactory,
+		version:        version,
 	}
 }
 
@@ -27,6 +28,7 @@ type initializeProjectUsecase struct {
 	ui             module.UI
 	generator      module.Generator
 	commandFactory module.CommandFactory
+	version        string
 }
 
 func (u *initializeProjectUsecase) Perform(rootDir string, depSkipped bool) error {
@@ -56,6 +58,7 @@ func (u *initializeProjectUsecase) GenerateProject(rootDir string) error {
 	}
 	data := map[string]string{
 		"importPath": importPath,
+		"version":    u.version,
 	}
 	return errors.WithStack(u.generator.Exec(rootDir, data))
 }
