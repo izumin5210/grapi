@@ -5,26 +5,24 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
-	"github.com/izumin5210/grapi/pkg/grapicmd/generate/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
-func newGenerateCommand(cfg grapicmd.Config, ui module.UI, commandFactory module.CommandFactory) *cobra.Command {
+func newGenerateCommand(cfg grapicmd.Config, ui module.UI, generatorFactory module.GeneratorFactory, commandFactory module.CommandFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "generate GENERATOR",
 		Short:   "Generate new code",
 		Aliases: []string{"g", "gen"},
 	}
 
-	cmd.AddCommand(newGenerateServiceCommand(cfg, ui, commandFactory))
-	cmd.AddCommand(newGenerateCommandCommand(cfg, ui))
+	cmd.AddCommand(newGenerateServiceCommand(cfg, ui, generatorFactory.Service(), commandFactory))
+	cmd.AddCommand(newGenerateCommandCommand(cfg, ui, generatorFactory.Command()))
 
 	return cmd
 }
 
-func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, commandFactory module.CommandFactory) *cobra.Command {
+func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator module.Generator, commandFactory module.CommandFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:           "service NAME",
 		Short:         "Generate a new service",
@@ -35,7 +33,6 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, commandFactory
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
 			}
 
-			generator := generate.NewGenerator(cfg.Fs(), ui, cfg.RootDir())
 			generateUsecase := usecase.NewGenerateServiceUsecase(ui, generator, cfg.RootDir())
 			err := errors.WithStack(generateUsecase.Perform(args[0]))
 			if err != nil {
@@ -48,7 +45,7 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, commandFactory
 	}
 }
 
-func newGenerateCommandCommand(cfg grapicmd.Config, ui module.UI) *cobra.Command {
+func newGenerateCommandCommand(cfg grapicmd.Config, ui module.UI, generator module.Generator) *cobra.Command {
 	return &cobra.Command{
 		Use:   "command NAME",
 		Short: "Generate a new command",
@@ -60,7 +57,7 @@ func newGenerateCommandCommand(cfg grapicmd.Config, ui module.UI) *cobra.Command
 			data := map[string]string{
 				"name": args[0],
 			}
-			return generate.NewGenerator(cfg.Fs(), ui, cfg.RootDir()).Run(template.Command, data)
+			return errors.WithStack(generator.Exec(cfg.RootDir(), data))
 		},
 	}
 }

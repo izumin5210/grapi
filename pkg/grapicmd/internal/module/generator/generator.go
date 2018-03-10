@@ -1,47 +1,33 @@
-package generate
+package generator
 
 import (
 	"path/filepath"
 	"sort"
 	"strings"
 
+	"github.com/izumin5210/clicontrib/clog"
 	assets "github.com/jessevdk/go-assets"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/clicontrib/clog"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
-// Generator is an interface to generate files from template and given params.
-type Generator interface {
-	Run(tmplFs *assets.FileSystem, data interface{}) error
-}
-
-// NewGenerator createes a new generator instance with specified filessytem and templates.
-func NewGenerator(fs afero.Fs, ui module.UI, rootPath string) Generator {
-	return &generator{
-		fs:       fs,
-		ui:       ui,
-		rootPath: rootPath,
-	}
-}
-
 type generator struct {
-	fs       afero.Fs
-	ui       module.UI
-	rootPath string
+	tmplFs *assets.FileSystem
+	fs     afero.Fs
+	ui     module.UI
 }
 
-func (g *generator) Run(tmplFs *assets.FileSystem, data interface{}) error {
-	for _, tmplPath := range g.sortedEntryPaths(tmplFs) {
-		entry := tmplFs.Files[tmplPath]
+func (g *generator) Exec(dir string, data interface{}) error {
+	for _, tmplPath := range g.sortedEntryPaths() {
+		entry := g.tmplFs.Files[tmplPath]
 		path, err := TemplateString(strings.TrimSuffix(tmplPath, ".tmpl")).Compile(data)
 		if err != nil {
 			return errors.Wrapf(err, "failed to parse path: %s", path)
 		}
-		absPath := filepath.Join(g.rootPath, path)
+		absPath := filepath.Join(dir, path)
 		dirPath := filepath.Dir(absPath)
 
 		// create directory if not exists
@@ -94,10 +80,10 @@ func (g *generator) Run(tmplFs *assets.FileSystem, data interface{}) error {
 	return nil
 }
 
-func (g *generator) sortedEntryPaths(tmplFs *assets.FileSystem) []string {
-	rootFiles := make([]string, 0, len(tmplFs.Files))
-	tmplPaths := make([]string, 0, len(tmplFs.Files))
-	for path, entry := range tmplFs.Files {
+func (g *generator) sortedEntryPaths() []string {
+	rootFiles := make([]string, 0, len(g.tmplFs.Files))
+	tmplPaths := make([]string, 0, len(g.tmplFs.Files))
+	for path, entry := range g.tmplFs.Files {
 		if entry.IsDir() {
 			continue
 		}

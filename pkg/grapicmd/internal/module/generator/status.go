@@ -1,4 +1,4 @@
-package generate
+package generator
 
 import "github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 

@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/generate"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
@@ -17,7 +16,7 @@ var (
 	tmplPaths []string
 )
 
-func newInitCommand(cfg grapicmd.Config, ui module.UI, commandFactory module.CommandFactory) *cobra.Command {
+func newInitCommand(cfg grapicmd.Config, ui module.UI, generatorFactory module.GeneratorFactory, commandFactory module.CommandFactory) *cobra.Command {
 	var (
 		depSkipped bool
 	)
@@ -36,7 +35,7 @@ func newInitCommand(cfg grapicmd.Config, ui module.UI, commandFactory module.Com
 
 			u := usecase.NewInitializeProjectUsecase(
 				ui,
-				generate.NewGenerator(cfg.Fs(), ui, root),
+				generatorFactory.Project(),
 				commandFactory,
 			)
 
