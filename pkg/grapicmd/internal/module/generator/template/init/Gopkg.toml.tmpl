@@ -14,5 +14,10 @@ required = [
     unused-packages = false
 
 [[constraint]]
+{{- if .headUsed }}
   branch = "master"
+{{- end }}
   name = "github.com/izumin5210/grapi"
+{{- if not .headUsed }}
+  version = "{{ .version }}"
+{{- end }}
