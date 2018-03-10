@@ -25,6 +25,7 @@
 #   unused-packages = true
 
 required = [
+  "github.com/golang/mock/mockgen",
   "github.com/jessevdk/go-assets-builder",
   "github.com/mitchellh/gox",
 ]
@@ -68,3 +69,7 @@ required = [
 [[constraint]]
   branch = "master"
   name = "github.com/tcnksm/go-input"
+
+[[constraint]]
+  name = "github.com/golang/mock"
+  version = "1.0.0"

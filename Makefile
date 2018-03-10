@@ -36,6 +36,7 @@ endef
 #----------------------------------------------------------------
 DEP_BIN_DIR := ./vendor/.bin/
 DEP_SRCS := \
+	github.com/golang/mock/mockgen \
 	github.com/jessevdk/go-assets-builder \
 	github.com/mitchellh/gox
 
