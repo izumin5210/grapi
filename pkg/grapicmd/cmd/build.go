@@ -8,11 +8,10 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
-func newBuildCommand(cfg grapicmd.Config, ui module.UI, scriptFactory internal.ScriptFactory) *cobra.Command {
+func newBuildCommand(cfg grapicmd.Config, ui module.UI, scriptFactory module.ScriptFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:           "build [TARGET]...",
 		Short:         "Build commands",

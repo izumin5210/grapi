@@ -8,9 +8,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/generator"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/script"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/ui"
 )
 
@@ -30,7 +30,7 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
 	commandFactory := command.NewFactory(cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
-	scriptFactory := internal.NewScriptFactory(cfg.Fs(), commandFactory, cfg.RootDir())
+	scriptFactory := script.NewFactory(cfg.Fs(), commandFactory, cfg.RootDir())
 
 	ui := ui.New(cfg.OutWriter(), cfg.InReader())
 	generatorFactory := generator.NewFactory(cfg.Fs(), ui)
