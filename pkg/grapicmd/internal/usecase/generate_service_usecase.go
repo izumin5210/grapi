@@ -40,9 +40,10 @@ func (u *generateServiceUsecase) Perform(path string) error {
 	}
 
 	// path => baz/qux/quux
+	path = strings.Replace(path, "-", "_", -1)
 
 	// quux
-	name := strings.Replace(filepath.Base(path), "-", "_", -1)
+	name := filepath.Base(path)
 	// Quux
 	serviceName := snaker.SnakeToCamel(name)
 

@@ -10,9 +10,18 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+var (
+	// BuildContext is a build context object.
+	BuildContext build.Context
+)
+
+func init() {
+	BuildContext = build.Default
+}
+
 // GetImportPath creates the golang package path from the given path.
 func GetImportPath(rootPath string) (importPath string, err error) {
-	for _, gopath := range filepath.SplitList(build.Default.GOPATH) {
+	for _, gopath := range filepath.SplitList(BuildContext.GOPATH) {
 		prefix := filepath.Join(gopath, "src") + "/"
 		// FIXME: should not use strings.HasPrefix
 		if strings.HasPrefix(rootPath, prefix) {
