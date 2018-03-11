@@ -18,7 +18,7 @@ type Builder interface {
 	AddRegisterGatewayHandlerFuncs(registerFuncs ...RegisterGatewayHandlerFunc) Builder
 	AddGatewayMuxOptions(opts ...runtime.ServeMuxOption) Builder
 	AddGatewayServerMiddleware(middlewares ...HTTPServerMiddleware) Builder
-	AddPassedHeaderDecider(decider PassedHeaderDeciderFunc) Builder
+	AddPassedHeader(decider PassedHeaderDeciderFunc) Builder
 	SetLogger(l Logger) Builder
 	Validate() error
 	Build() (*Engine, error)
@@ -92,7 +92,7 @@ func (b *builder) AddGatewayServerMiddleware(middlewares ...HTTPServerMiddleware
 	return b
 }
 
-func (b *builder) AddPassedHeaderDecider(decider PassedHeaderDeciderFunc) Builder {
+func (b *builder) AddPassedHeader(decider PassedHeaderDeciderFunc) Builder {
 	return b.AddGatewayServerMiddleware(createPassingHeaderMiddleware(decider))
 }
 
