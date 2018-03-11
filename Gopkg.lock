@@ -39,6 +39,17 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/google/go-cmp"
+  packages = [
+    "cmp",
+    "cmp/internal/diff",
+    "cmp/internal/function",
+    "cmp/internal/value"
+  ]
+  revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
+  version = "v0.2.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/grpc-ecosystem/go-grpc-middleware"
   packages = ["."]
@@ -330,6 +341,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "28dac86af662ccc22d159cefd8a1ec68439ec90d8b4ee3afc459a4981d9f632d"
+  inputs-digest = "994a6f8bc7bdad57d90c8290a0ca397f7af112f9f42f962aabc895d5952a7ab8"
   solver-name = "gps-cdcl"
   solver-version = 1

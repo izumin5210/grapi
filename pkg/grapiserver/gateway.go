@@ -87,9 +87,8 @@ func (s *GatewayServer) createServer(conn *grpc.ClientConn) (*http.Server, error
 
 	var handler http.Handler = mux
 
-	if s.HTTPHeaderMappingConfig != nil {
-		mapper := newHTTPHeaderMapper(s.HTTPHeaderMappingConfig)
-		handler = mapper.wrap(handler)
+	for i := len(s.GatewayServerMiddlewares) - 1; i >= 0; i-- {
+		handler = (s.GatewayServerMiddlewares[i])(handler)
 	}
 
 	return &http.Server{
