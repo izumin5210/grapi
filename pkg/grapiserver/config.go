@@ -74,6 +74,7 @@ type Config struct {
 	MaxConcurrentStreams            uint32
 	Logger                          Logger
 	HTTPHeaderMappingConfig         *HTTPHeaderMappingConfig
+	GatewayServerMiddlewares        []HTTPServerMiddleware
 }
 
 func (c *Config) serverOptions() []grpc.ServerOption {

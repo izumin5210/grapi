@@ -17,6 +17,7 @@ type Builder interface {
 	AddRegisterGrpcServerImplFuncs(registerFuncs ...RegisterGrpcServerImplFunc) Builder
 	AddRegisterGatewayHandlerFuncs(registerFuncs ...RegisterGatewayHandlerFunc) Builder
 	AddGatewayMuxOptions(opts ...runtime.ServeMuxOption) Builder
+	AddGatewayServerMiddleware(middlewares ...HTTPServerMiddleware) Builder
 	SetLogger(l Logger) Builder
 	SetHTTPHeaderMapping(deciderFunc func(string) bool, mappingFunc func(string) string) Builder
 	Validate() error
@@ -86,8 +87,8 @@ func (b *builder) AddGatewayMuxOptions(opts ...runtime.ServeMuxOption) Builder {
 	return b
 }
 
-func (b *builder) SetLogger(l Logger) Builder {
-	b.c.Logger = l
+func (b *builder) AddGatewayServerMiddleware(middlewares ...HTTPServerMiddleware) Builder {
+	b.c.GatewayServerMiddlewares = append(b.c.GatewayServerMiddlewares, middlewares...)
 	return b
 }
 
@@ -96,6 +97,9 @@ func (b *builder) SetHTTPHeaderMapping(deciderFunc func(string) bool, mappingFun
 		DeciderFunc: deciderFunc,
 		MapperFunc:  mappingFunc,
 	}
+
+func (b *builder) SetLogger(l Logger) Builder {
+	b.c.Logger = l
 	return b
 }
 
