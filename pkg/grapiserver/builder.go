@@ -18,8 +18,8 @@ type Builder interface {
 	AddRegisterGatewayHandlerFuncs(registerFuncs ...RegisterGatewayHandlerFunc) Builder
 	AddGatewayMuxOptions(opts ...runtime.ServeMuxOption) Builder
 	AddGatewayServerMiddleware(middlewares ...HTTPServerMiddleware) Builder
+	AddPassedHeaderDecider(decider PassedHeaderDeciderFunc) Builder
 	SetLogger(l Logger) Builder
-	SetHTTPHeaderMapping(deciderFunc func(string) bool, mappingFunc func(string) string) Builder
 	Validate() error
 	Build() (*Engine, error)
 	Serve() error
@@ -92,11 +92,9 @@ func (b *builder) AddGatewayServerMiddleware(middlewares ...HTTPServerMiddleware
 	return b
 }
 
-func (b *builder) SetHTTPHeaderMapping(deciderFunc func(string) bool, mappingFunc func(string) string) Builder {
-	b.c.HTTPHeaderMappingConfig = &HTTPHeaderMappingConfig{
-		DeciderFunc: deciderFunc,
-		MapperFunc:  mappingFunc,
-	}
+func (b *builder) AddPassedHeaderDecider(decider PassedHeaderDeciderFunc) Builder {
+	return b.AddGatewayServerMiddleware(createPassingHeaderMiddleware(decider))
+}
 
 func (b *builder) SetLogger(l Logger) Builder {
 	b.c.Logger = l
