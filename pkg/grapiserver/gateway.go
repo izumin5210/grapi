@@ -2,6 +2,7 @@ package grapiserver
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"sync"
@@ -76,6 +77,7 @@ func (s *GatewayServer) createServer(conn *grpc.ClientConn) (*http.Server, error
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 
+	s.Logger.Info(fmt.Sprintf("Register %d server handlers to gRPC Gateway", len(s.RegisterGatewayHandlerFuncs)), LogFields{})
 	for _, register := range s.RegisterGatewayHandlerFuncs {
 		err := register(ctx, mux, conn)
 		if err != nil {

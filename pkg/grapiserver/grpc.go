@@ -1,6 +1,7 @@
 package grapiserver
 
 import (
+	"fmt"
 	"net"
 	"sync"
 
@@ -18,6 +19,7 @@ type GrpcServer struct {
 func NewGrpcServer(c *Config) Server {
 	s := grpc.NewServer(c.serverOptions()...)
 	reflection.Register(s)
+	c.Logger.Info(fmt.Sprintf("Register %d server impls to gRPC server", len(c.RegisterGrpcServerImplFuncs)), LogFields{})
 	for _, register := range c.RegisterGrpcServerImplFuncs {
 		register(s)
 	}
