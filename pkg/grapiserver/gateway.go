@@ -2,6 +2,7 @@ package grapiserver
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"sync"
@@ -42,7 +43,7 @@ func (s *GatewayServer) Serve(l net.Listener, wg *sync.WaitGroup) {
 		return
 	}
 
-	s.Logger.Info("gRPC Gateway server is starting", LogFields{})
+	s.Logger.Info("gRPC Gateway server is starting", LogFields{"network": s.GatewayAddr.Network, "addr": s.GatewayAddr.Addr})
 	err = s.server.Serve(l)
 	s.Logger.Info("Stopped taking more httr(s) requests", LogFields{"error": err})
 }
@@ -76,6 +77,7 @@ func (s *GatewayServer) createServer(conn *grpc.ClientConn) (*http.Server, error
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 
+	s.Logger.Info(fmt.Sprintf("Register %d server handlers to gRPC Gateway", len(s.RegisterGatewayHandlerFuncs)), LogFields{})
 	for _, register := range s.RegisterGatewayHandlerFuncs {
 		err := register(ctx, mux, conn)
 		if err != nil {
