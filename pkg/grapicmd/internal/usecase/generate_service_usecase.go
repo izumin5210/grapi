@@ -88,5 +88,5 @@ func (u *generateServiceUsecase) Perform(path string) error {
 		"protoPackage":    protoPackage,
 	}
 	clog.Debug("Generate service", "params", data)
-	return u.generator.Exec(u.rootDir, data)
+	return u.generator.Generate(u.rootDir, data)
 }

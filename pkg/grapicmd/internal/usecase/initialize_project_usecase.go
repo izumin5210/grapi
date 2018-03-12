@@ -61,7 +61,7 @@ func (u *initializeProjectUsecase) GenerateProject(rootDir string, headUsed bool
 		"version":    u.version,
 		"headUsed":   headUsed,
 	}
-	return errors.WithStack(u.generator.Exec(rootDir, data))
+	return errors.WithStack(u.generator.Generate(rootDir, data))
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string) error {

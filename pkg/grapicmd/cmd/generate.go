@@ -57,7 +57,7 @@ func newGenerateCommandCommand(cfg grapicmd.Config, ui module.UI, generator modu
 			data := map[string]string{
 				"name": args[0],
 			}
-			return errors.WithStack(generator.Exec(cfg.RootDir(), data))
+			return errors.WithStack(generator.Generate(cfg.RootDir(), data))
 		},
 	}
 }

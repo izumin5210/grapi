@@ -20,7 +20,7 @@ type generator struct {
 	ui     module.UI
 }
 
-func (g *generator) Exec(dir string, data interface{}) error {
+func (g *generator) Generate(dir string, data interface{}) error {
 	for _, tmplPath := range g.sortedEntryPaths() {
 		entry := g.tmplFs.Files[tmplPath]
 		path, err := TemplateString(strings.TrimSuffix(tmplPath, ".tmpl")).Compile(data)
