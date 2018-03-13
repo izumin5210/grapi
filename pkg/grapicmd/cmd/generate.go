@@ -34,7 +34,7 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 			}
 
 			generateUsecase := usecase.NewGenerateServiceUsecase(ui, generator, cfg.RootDir())
-			err := errors.WithStack(generateUsecase.Perform(args[0]))
+			err := errors.WithStack(generateUsecase.Generate(args[0]))
 			if err != nil {
 				return err
 			}

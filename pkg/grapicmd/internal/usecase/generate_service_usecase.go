@@ -14,7 +14,7 @@ import (
 
 // GenerateServiceUsecase is an useecase interface for geenrating .proto file and its implementation skeleton.
 type GenerateServiceUsecase interface {
-	Perform(path string) error
+	Generate(path string) error
 }
 
 type generateServiceUsecase struct {
@@ -32,7 +32,7 @@ func NewGenerateServiceUsecase(ui module.UI, generator module.Generator, rootDir
 	}
 }
 
-func (u *generateServiceUsecase) Perform(path string) error {
+func (u *generateServiceUsecase) Generate(path string) error {
 	// github.com/foo/bar
 	importPath, err := fs.GetImportPath(u.rootDir)
 	if err != nil {
