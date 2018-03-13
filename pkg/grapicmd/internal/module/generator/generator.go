@@ -80,6 +80,44 @@ func (g *generator) Generate(dir string, data interface{}) error {
 	return nil
 }
 
+func (g *generator) Destroy(dir string, data interface{}) error {
+	for _, tmplPath := range g.sortedEntryPaths() {
+		path, err := TemplateString(strings.TrimSuffix(tmplPath, ".tmpl")).Compile(data)
+		if err != nil {
+			return errors.Wrapf(err, "failed to parse path: %s", path)
+		}
+		absPath := filepath.Join(dir, path)
+
+		st := statusSkipped
+		if ok, err := afero.Exists(g.fs, absPath); err != nil {
+			g.ui.ItemFailure("failed to get " + path[1:])
+			return errors.WithStack(err)
+		} else if !ok {
+			err = g.fs.Remove(absPath)
+			if err != nil {
+				g.ui.ItemFailure("failed to remove " + path[1:])
+				return errors.WithStack(err)
+			}
+			st = statusDelete
+		}
+
+		st.Fprint(g.ui, path[1:])
+
+		dirPath := filepath.Dir(path)
+		absDirPath := filepath.Dir(absPath)
+		if r, err := afero.Glob(g.fs, filepath.Join(absDirPath, "*")); err != nil && len(r) == 0 {
+			err = g.fs.Remove(absDirPath)
+			if err != nil {
+				g.ui.ItemFailure("failed to remove " + dirPath[1:])
+				return errors.WithStack(err)
+			}
+			statusDelete.Fprint(g.ui, dirPath[1:])
+		}
+	}
+
+	return nil
+}
+
 func (g *generator) sortedEntryPaths() []string {
 	rootFiles := make([]string, 0, len(g.tmplFs.Files))
 	tmplPaths := make([]string, 0, len(g.tmplFs.Files))
