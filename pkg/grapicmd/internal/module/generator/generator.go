@@ -92,7 +92,7 @@ func (g *generator) Destroy(dir string, data interface{}) error {
 		if ok, err := afero.Exists(g.fs, absPath); err != nil {
 			g.ui.ItemFailure("failed to get " + path[1:])
 			return errors.WithStack(err)
-		} else if !ok {
+		} else if ok {
 			err = g.fs.Remove(absPath)
 			if err != nil {
 				g.ui.ItemFailure("failed to remove " + path[1:])
@@ -105,7 +105,7 @@ func (g *generator) Destroy(dir string, data interface{}) error {
 
 		dirPath := filepath.Dir(path)
 		absDirPath := filepath.Dir(absPath)
-		if r, err := afero.Glob(g.fs, filepath.Join(absDirPath, "*")); err != nil && len(r) == 0 {
+		if r, err := afero.Glob(g.fs, filepath.Join(absDirPath, "*")); err == nil && len(r) == 0 {
 			err = g.fs.Remove(absDirPath)
 			if err != nil {
 				g.ui.ItemFailure("failed to remove " + dirPath[1:])
