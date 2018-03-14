@@ -37,6 +37,7 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 
 	cmd.AddCommand(newInitCommand(cfg, ui, generatorFactory, commandFactory))
 	cmd.AddCommand(newGenerateCommand(cfg, ui, generatorFactory, commandFactory))
+	cmd.AddCommand(newDestroyCommand(cfg, ui, generatorFactory))
 	cmd.AddCommand(newProtocCommand(cfg, ui, commandFactory))
 	cmd.AddCommand(newBuildCommand(cfg, ui, scriptFactory))
 	cmd.AddCommand(newVersionCommand(cfg))

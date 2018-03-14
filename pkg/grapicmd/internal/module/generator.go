@@ -9,5 +9,6 @@ type GeneratorFactory interface {
 
 // Generator creates files from templates and given params.
 type Generator interface {
-	Exec(dir string, data interface{}) error
+	Generate(dir string, data interface{}) error
+	Destroy(dir string, data interface{}) error
 }

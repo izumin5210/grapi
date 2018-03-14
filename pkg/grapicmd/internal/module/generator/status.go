@@ -6,6 +6,7 @@ type status int
 
 const (
 	statusCreate status = iota
+	statusDelete
 	statusExist
 	statusIdentical
 	statusConflicted
@@ -22,7 +23,7 @@ var (
 
 func (s status) Fprint(ui module.UI, msg string) {
 	switch s {
-	case statusCreate, statusForce:
+	case statusCreate, statusForce, statusDelete:
 		ui.ItemSuccess(msg)
 	case statusConflicted:
 		ui.ItemFailure(msg)

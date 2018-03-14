@@ -91,14 +91,26 @@ func (_m *MockGenerator) EXPECT() *MockGeneratorMockRecorder {
 	return _m.recorder
 }
 
-// Exec mocks base method
-func (_m *MockGenerator) Exec(dir string, data interface{}) error {
-	ret := _m.ctrl.Call(_m, "Exec", dir, data)
+// Generate mocks base method
+func (_m *MockGenerator) Generate(dir string, data interface{}) error {
+	ret := _m.ctrl.Call(_m, "Generate", dir, data)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Exec indicates an expected call of Exec
-func (_mr *MockGeneratorMockRecorder) Exec(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "Exec", reflect.TypeOf((*MockGenerator)(nil).Exec), arg0, arg1)
+// Generate indicates an expected call of Generate
+func (_mr *MockGeneratorMockRecorder) Generate(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "Generate", reflect.TypeOf((*MockGenerator)(nil).Generate), arg0, arg1)
+}
+
+// Destroy mocks base method
+func (_m *MockGenerator) Destroy(dir string, data interface{}) error {
+	ret := _m.ctrl.Call(_m, "Destroy", dir, data)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Destroy indicates an expected call of Destroy
+func (_mr *MockGeneratorMockRecorder) Destroy(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "Destroy", reflect.TypeOf((*MockGenerator)(nil).Destroy), arg0, arg1)
 }

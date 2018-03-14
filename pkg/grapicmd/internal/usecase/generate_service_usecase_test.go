@@ -116,7 +116,7 @@ func Test_GenerateServiceUsecase(t *testing.T) {
 		ui.EXPECT().Subsection(gomock.Any()).AnyTimes()
 
 		generator := moduletesting.NewMockGenerator(ctrl)
-		generator.EXPECT().Exec(rootDir, map[string]interface{}{
+		generator.EXPECT().Generate(rootDir, map[string]interface{}{
 			"importPath":      c.importPath,
 			"path":            c.path,
 			"name":            c.name,
@@ -129,7 +129,7 @@ func Test_GenerateServiceUsecase(t *testing.T) {
 		})
 
 		usecase := NewGenerateServiceUsecase(ui, generator, rootDir)
-		err := usecase.Perform(c.input)
+		err := usecase.Generate(c.input)
 
 		if err != nil {
 			t.Errorf("Perform() returned an error %v", err)

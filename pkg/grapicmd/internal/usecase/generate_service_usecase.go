@@ -14,7 +14,8 @@ import (
 
 // GenerateServiceUsecase is an useecase interface for geenrating .proto file and its implementation skeleton.
 type GenerateServiceUsecase interface {
-	Perform(path string) error
+	Generate(path string) error
+	Destroy(path string) error
 }
 
 type generateServiceUsecase struct {
@@ -32,11 +33,33 @@ func NewGenerateServiceUsecase(ui module.UI, generator module.Generator, rootDir
 	}
 }
 
-func (u *generateServiceUsecase) Perform(path string) error {
+func (u *generateServiceUsecase) Generate(path string) error {
+	data, err := u.createParams(path)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	u.ui.Section("Generate service")
+	clog.Debug("Generate service", "params", data)
+	return u.generator.Generate(u.rootDir, data)
+}
+
+func (u *generateServiceUsecase) Destroy(path string) error {
+	data, err := u.createParams(path)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	u.ui.Section("Destroy service")
+	clog.Debug("Destroy service", "params", data)
+	return u.generator.Destroy(u.rootDir, data)
+}
+
+func (u *generateServiceUsecase) createParams(path string) (map[string]interface{}, error) {
 	// github.com/foo/bar
 	importPath, err := fs.GetImportPath(u.rootDir)
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	// path => baz/qux/quux
@@ -74,9 +97,7 @@ func (u *generateServiceUsecase) Perform(path string) error {
 	// com.github.foo.bar.baz.qux
 	protoPackage := strings.Join(protoPackageChunks, ".")
 
-	u.ui.Section("Generate service")
-
-	data := map[string]interface{}{
+	return map[string]interface{}{
 		"importPath":      importPath,
 		"path":            path,
 		"name":            name,
@@ -86,7 +107,5 @@ func (u *generateServiceUsecase) Perform(path string) error {
 		"pbgoPackagePath": pbgoPackagePath,
 		"pbgoPackageName": pbgoPackageName,
 		"protoPackage":    protoPackage,
-	}
-	clog.Debug("Generate service", "params", data)
-	return u.generator.Exec(u.rootDir, data)
+	}, nil
 }
