@@ -15,6 +15,7 @@ import (
 // GenerateServiceUsecase is an useecase interface for geenrating .proto file and its implementation skeleton.
 type GenerateServiceUsecase interface {
 	Generate(path string) error
+	Destroy(path string) error
 }
 
 type generateServiceUsecase struct {
