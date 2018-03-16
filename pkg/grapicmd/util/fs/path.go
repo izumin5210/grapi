@@ -76,3 +76,9 @@ func LookupRoot(fs afero.Fs, dir string) (string, bool) {
 
 	return LookupRoot(fs, filepath.Dir(dir))
 }
+
+// FindMainPackagesAndSources returns go source file names by main package directories.
+func FindMainPackagesAndSources(fs afero.Fs, dir string) (map[string][]string, error) {
+	out := make(map[string][]string)
+	return out, nil
+}
