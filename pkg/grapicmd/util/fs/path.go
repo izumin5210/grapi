@@ -2,6 +2,9 @@ package fs
 
 import (
 	"go/build"
+	"go/parser"
+	"go/token"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -80,5 +83,30 @@ func LookupRoot(fs afero.Fs, dir string) (string, bool) {
 // FindMainPackagesAndSources returns go source file names by main package directories.
 func FindMainPackagesAndSources(fs afero.Fs, dir string) (map[string][]string, error) {
 	out := make(map[string][]string)
+	fset := token.NewFileSet()
+	err := afero.Walk(fs, dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		if info.IsDir() || filepath.Ext(info.Name()) != ".go" || strings.HasSuffix(info.Name(), "_test.go") {
+			return nil
+		}
+		data, err := afero.ReadFile(fs, path)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		f, err := parser.ParseFile(fset, "", data, parser.PackageClauseOnly)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		if f.Package.IsValid() && f.Name.Name == "main" {
+			dir := filepath.Dir(path)
+			out[dir] = append(out[dir], info.Name())
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
 	return out, nil
 }
