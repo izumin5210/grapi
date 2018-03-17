@@ -53,6 +53,7 @@ func (c *command) Exec() (out []byte, err error) {
 		defer wg.Done()
 		defer recover()
 		for sig := range sigCh {
+			clog.Debug("signal received", "signal", sig)
 			if !cmd.ProcessState.Exited() {
 				cmd.Process.Signal(sig)
 			}

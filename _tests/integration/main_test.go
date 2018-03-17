@@ -47,7 +47,7 @@ func Test_Integration(t *testing.T) {
 		t.Fatalf("%s does not exist: %v", rootPath, err)
 	}
 
-	cmd = exec.Command(bin, "g", "service", "foo")
+	cmd = exec.Command(bin, "--debug", "g", "service", "foo")
 	cmd.Dir = rootPath
 	cmd.Env = append(os.Environ(), "GOPATH="+gopath)
 	out, err = cmd.CombinedOutput()
@@ -65,7 +65,7 @@ func Test_Integration(t *testing.T) {
 	updateRun(t, fs, rootPath, port)
 	updateServerImpl(t, fs, rootPath)
 
-	cmd = exec.Command(bin, "server")
+	cmd = exec.Command(bin, "--debug", "server")
 	cmd.Dir = rootPath
 	cmd.Env = append(os.Environ(), "GOPATH="+gopath)
 	cmd.Stdout = os.Stdout
