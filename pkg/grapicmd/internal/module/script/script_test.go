@@ -97,16 +97,16 @@ func Test_Script(t *testing.T) {
 		t.Errorf("script.Name() returned %v, want %v", got, want)
 	}
 
-	err = s.Run()
 	if err != nil {
 		t.Errorf("script.Build() returned an error %v", err)
 	}
 
+	err = s.Build("-v")
 	binPath := filepath.Join(ctx.rootDir, "bin", ctx.binName)
 	exec := ctx.executions[0]
 
 	srcs := ctx.srcsByBinName[ctx.binName]
-	if got, want := exec.nameAndArgs, append([]string{"go", "build", "-v", "-o=" + binPath}, srcs...); !reflect.DeepEqual(got, want) {
+	if got, want := exec.nameAndArgs, append([]string{"go", "build", "-o=" + binPath, "-v"}, srcs...); !reflect.DeepEqual(got, want) {
 		t.Errorf("Build() executed %v, want %v", got, want)
 	}
 
@@ -118,9 +118,10 @@ func Test_Script(t *testing.T) {
 		t.Errorf("Run() returned an error %v", err)
 	}
 
+	err = s.Run("-v")
 	exec = ctx.executions[1]
 
-	if got, want := exec.nameAndArgs, []string{binPath}; !reflect.DeepEqual(got, want) {
+	if got, want := exec.nameAndArgs, []string{binPath, "-v"}; !reflect.DeepEqual(got, want) {
 		t.Errorf("Run() executed %v, want %v", got, want)
 	}
 

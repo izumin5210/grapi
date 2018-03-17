@@ -10,7 +10,7 @@ import (
 
 func newBuildCommand(cfg grapicmd.Config, ui module.UI, scriptLoader module.ScriptLoader) *cobra.Command {
 	return &cobra.Command{
-		Use:           "build [TARGET]...",
+		Use:           "build [TARGET]... [-- BUILD_OPTIONS]",
 		Short:         "Build commands",
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -29,7 +29,7 @@ func newBuildCommand(cfg grapicmd.Config, ui module.UI, scriptLoader module.Scri
 				script, ok := scriptLoader.Get(name)
 				if ok && (isAll || nameSet[script.Name()]) {
 					ui.Subsection("Building " + script.Name())
-					err := script.Build()
+					err := script.Build(args...)
 					if err != nil {
 						return errors.WithStack(err)
 					}

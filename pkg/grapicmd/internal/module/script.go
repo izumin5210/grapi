@@ -3,8 +3,8 @@ package module
 // Script represents an user-defined command.
 type Script interface {
 	Name() string
-	Build() error
-	Run() error
+	Build(args ...string) error
+	Run(args ...string) error
 }
 
 // ScriptLoader is a factory object for creating Script objects.
