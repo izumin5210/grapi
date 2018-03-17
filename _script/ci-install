@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -eu
+set -o pipefail
+
+BIN_DIR=$HOME/bin
+
+section() {
+  printf "\e[34m--> $1\e[0m\n"
+}
+
+install_protoc() {
+  section "Installing protoc"
+
+  if [ ! -d "${BIN_DIR}/protoc" ]; then
+    curl -L -s https://github.com/google/protobuf/releases/download/v$PROTOBUF_VERSION/protoc-$PROTOBUF_VERSION-linux-x86_64.zip -o protoc-$PROTOBUF_VERSION.zip
+    unzip -o protoc-$PROTOBUF_VERSION.zip -d $HOME
+  else
+    echo "skipped"
+  fi
+
+  protoc  --version
+}
+
+install_dep() {
+  section "Installing dep"
+
+  if [ ! -d "${BIN_DIR}/dep" ]; then
+    curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o ${BIN_DIR}/dep
+    chmod +x ${BIN_DIR}/dep
+  else
+    echo "skipped"
+  fi
+
+  dep version
+}
+
+main() {
+  install_protoc
+  install_dep
+}
+
+main
