@@ -39,7 +39,7 @@ func createTestContext(t *testing.T) *testContext {
 	}
 
 	srcsByBinName := map[string][]string{
-		binName: []string{"bar.go", "foo.go", "main.go"},
+		binName: {"bar.go", "foo.go", "main.go"},
 	}
 
 	for binName, srcs := range srcsByBinName {
