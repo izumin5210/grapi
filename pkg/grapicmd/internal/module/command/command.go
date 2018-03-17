@@ -51,6 +51,7 @@ func (c *command) Exec() (out []byte, err error) {
 
 	go func() {
 		defer wg.Done()
+		defer recover()
 		for sig := range sigCh {
 			if !cmd.ProcessState.Exited() {
 				cmd.Process.Signal(sig)
