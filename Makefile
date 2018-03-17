@@ -134,5 +134,10 @@ cover:
 	$(call section,Testing with coverage)
 	@go test $(GO_TEST_FLAGS) $(GO_COVER_FLAGS) ./...
 
+.PHONY: test-integration
+test-integration:
+	$(call section,Integration Testing)
+	cd _tests && go test $(GO_TEST_FLAGS) ./...
+
 .PHONY: packages
 packages: $(PACKAGES)
