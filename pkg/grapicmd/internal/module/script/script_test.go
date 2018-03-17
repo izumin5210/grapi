@@ -5,70 +5,108 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/spf13/afero"
-
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/spf13/afero"
 )
 
+type execution struct {
+	nameAndArgs []string
+	dir         string
+	connected   bool
+}
+
+type testContext struct {
+	fs            afero.Fs
+	executions    []*execution
+	loader        module.ScriptLoader
+	binName       string
+	rootDir       string
+	cmdDir        string
+	srcsByBinName map[string][]string
+}
+
+func createTestContext(t *testing.T) *testContext {
+	fs := afero.NewMemMapFs()
+	rootDir := "/home/app"
+	binName := "bar"
+	ctx := &testContext{
+		fs:            fs,
+		binName:       binName,
+		rootDir:       rootDir,
+		cmdDir:        filepath.Join(rootDir, "cmd"),
+		executions:    []*execution{},
+		srcsByBinName: map[string][]string{},
+	}
+
+	srcsByBinName := map[string][]string{
+		binName: []string{"bar.go", "foo.go", "main.go"},
+	}
+
+	for binName, srcs := range srcsByBinName {
+		dir := filepath.Join(ctx.cmdDir, binName)
+		err := fs.MkdirAll(dir, 0755)
+		if err != nil {
+			t.Fatalf("Unexpected error: %v", err)
+		}
+		srcPaths := make([]string, 0, len(srcs))
+		for _, src := range srcs {
+			path := filepath.Join(dir, src)
+			err = afero.WriteFile(fs, path, []byte("package main"), 0644)
+			if err != nil {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+			srcPaths = append(srcPaths, path)
+		}
+		ctx.srcsByBinName[binName] = srcPaths
+	}
+
+	commandFactory := &fakeCommandFactory{
+		fakeCreate: func(nameAndArgs []string) module.Command {
+			c := &fakeCommand{}
+			c.fakeExec = func() ([]byte, error) {
+				ctx.executions = append(ctx.executions, &execution{
+					nameAndArgs: nameAndArgs,
+					dir:         c.dir,
+					connected:   c.ioConnected,
+				})
+				return []byte{}, nil
+			}
+			return c
+		},
+	}
+
+	ctx.loader = NewLoader(fs, commandFactory, rootDir)
+
+	return ctx
+}
+
 func Test_Script(t *testing.T) {
-	type execution struct {
-		nameAndArgs []string
-		dir         string
-		connected   bool
-	}
-	type testContext struct {
-		factory    module.ScriptFactory
-		fs         afero.Fs
-		rootDir    string
-		executions []*execution
-	}
+	ctx := createTestContext(t)
 
-	createTestContext := func(t *testing.T) *testContext {
-		ctx := &testContext{
-			fs:         afero.NewMemMapFs(),
-			rootDir:    "/home/app",
-			executions: []*execution{},
-		}
-
-		commandFactory := &fakeCommandFactory{
-			fakeCreate: func(nameAndArgs []string) module.Command {
-				c := &fakeCommand{}
-				c.fakeExec = func() ([]byte, error) {
-					ctx.executions = append(ctx.executions, &execution{
-						nameAndArgs: nameAndArgs,
-						dir:         c.dir,
-						connected:   c.ioConnected,
-					})
-					return []byte{}, nil
-				}
-				return c
-			},
-		}
-
-		ctx.factory = NewFactory(ctx.fs, commandFactory, ctx.rootDir)
-
-		return ctx
-	}
-
-	testCtx := createTestContext(t)
-
-	name := "bar"
-	entry := filepath.Join(testCtx.rootDir, "cmd", name, "run.go")
-	bin := filepath.Join(testCtx.rootDir, "bin", name)
-	s := testCtx.factory.Create(entry)
-
-	if got, want := s.Name(), name; got != want {
-		t.Errorf("Name() returned %v, want %v", got, want)
-	}
-
-	err := s.Build()
+	err := ctx.loader.Load(ctx.cmdDir)
 	if err != nil {
-		t.Errorf("Build() returned an error %v", err)
+		t.Errorf("loader.Load() returned an error %v", err)
 	}
 
-	exec := testCtx.executions[0]
+	s, ok := ctx.loader.Get(ctx.binName)
+	if got, want := ok, true; got != want {
+		t.Errorf("loader.Get() returned %t, want %t", got, want)
+	}
 
-	if got, want := exec.nameAndArgs, []string{"go", "build", "-v", "-o=" + bin, entry}; !reflect.DeepEqual(got, want) {
+	if got, want := s.Name(), ctx.binName; got != want {
+		t.Errorf("script.Name() returned %v, want %v", got, want)
+	}
+
+	err = s.Run()
+	if err != nil {
+		t.Errorf("script.Build() returned an error %v", err)
+	}
+
+	binPath := filepath.Join(ctx.rootDir, "bin", ctx.binName)
+	exec := ctx.executions[0]
+
+	srcs := ctx.srcsByBinName[ctx.binName]
+	if got, want := exec.nameAndArgs, append([]string{"go", "build", "-v", "-o=" + binPath}, srcs...); !reflect.DeepEqual(got, want) {
 		t.Errorf("Build() executed %v, want %v", got, want)
 	}
 
@@ -76,14 +114,13 @@ func Test_Script(t *testing.T) {
 		t.Errorf("Build() executed a command in %v, want %v", got, want)
 	}
 
-	err = s.Run()
 	if err != nil {
 		t.Errorf("Run() returned an error %v", err)
 	}
 
-	exec = testCtx.executions[1]
+	exec = ctx.executions[1]
 
-	if got, want := exec.nameAndArgs, []string{bin}; !reflect.DeepEqual(got, want) {
+	if got, want := exec.nameAndArgs, []string{binPath}; !reflect.DeepEqual(got, want) {
 		t.Errorf("Run() executed %v, want %v", got, want)
 	}
 
