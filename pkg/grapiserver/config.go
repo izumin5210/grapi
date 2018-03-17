@@ -70,6 +70,8 @@ type Config struct {
 	GrpcServerStreamInterceptors    []grpc.StreamServerInterceptor
 	GatewayServerUnaryInterceptors  []grpc.UnaryClientInterceptor
 	GatewayServerStreamInterceptors []grpc.StreamClientInterceptor
+	GrpcServerOption                []grpc.ServerOption
+	GatewayDialOption               []grpc.DialOption
 	GatewayMuxOptions               []runtime.ServeMuxOption
 	MaxConcurrentStreams            uint32
 	Logger                          Logger
@@ -77,24 +79,30 @@ type Config struct {
 }
 
 func (c *Config) serverOptions() []grpc.ServerOption {
-	return []grpc.ServerOption{
-		grpc_middleware.WithUnaryServerChain(c.GrpcServerUnaryInterceptors...),
-		grpc_middleware.WithStreamServerChain(c.GrpcServerStreamInterceptors...),
-		grpc.MaxConcurrentStreams(c.MaxConcurrentStreams),
-	}
+	return append(
+		[]grpc.ServerOption{
+			grpc_middleware.WithUnaryServerChain(c.GrpcServerUnaryInterceptors...),
+			grpc_middleware.WithStreamServerChain(c.GrpcServerStreamInterceptors...),
+			grpc.MaxConcurrentStreams(c.MaxConcurrentStreams),
+		},
+		c.GrpcServerOption...,
+	)
 }
 
 func (c *Config) clientOptions() []grpc.DialOption {
-	return []grpc.DialOption{
-		grpc.WithInsecure(),
-		grpc.WithDialer(func(a string, t time.Duration) (net.Conn, error) {
-			return net.Dial(c.GrpcInternalAddr.Network, a)
-		}),
-		grpc.WithUnaryInterceptor(
-			grpc_middleware.ChainUnaryClient(c.GatewayServerUnaryInterceptors...),
-		),
-		grpc.WithStreamInterceptor(
-			grpc_middleware.ChainStreamClient(c.GatewayServerStreamInterceptors...),
-		),
-	}
+	return append(
+		[]grpc.DialOption{
+			grpc.WithInsecure(),
+			grpc.WithDialer(func(a string, t time.Duration) (net.Conn, error) {
+				return net.Dial(c.GrpcInternalAddr.Network, a)
+			}),
+			grpc.WithUnaryInterceptor(
+				grpc_middleware.ChainUnaryClient(c.GatewayServerUnaryInterceptors...),
+			),
+			grpc.WithStreamInterceptor(
+				grpc_middleware.ChainStreamClient(c.GatewayServerStreamInterceptors...),
+			),
+		},
+		c.GatewayDialOption...,
+	)
 }

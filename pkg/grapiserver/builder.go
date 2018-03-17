@@ -16,6 +16,8 @@ type Builder interface {
 	AddGatewayServerStreamInterceptors(interceptors ...grpc.StreamClientInterceptor) Builder
 	AddRegisterGrpcServerImplFuncs(registerFuncs ...RegisterGrpcServerImplFunc) Builder
 	AddRegisterGatewayHandlerFuncs(registerFuncs ...RegisterGatewayHandlerFunc) Builder
+	AddGrpcServerOptions(opts ...grpc.ServerOption) Builder
+	AddGatewayDialOptions(opts ...grpc.DialOption) Builder
 	AddGatewayMuxOptions(opts ...runtime.ServeMuxOption) Builder
 	AddGatewayServerMiddleware(middlewares ...HTTPServerMiddleware) Builder
 	AddPassedHeader(decider PassedHeaderDeciderFunc) Builder
@@ -79,6 +81,16 @@ func (b *builder) AddRegisterGrpcServerImplFuncs(registerFuncs ...RegisterGrpcSe
 
 func (b *builder) AddRegisterGatewayHandlerFuncs(registerFuncs ...RegisterGatewayHandlerFunc) Builder {
 	b.c.RegisterGatewayHandlerFuncs = append(b.c.RegisterGatewayHandlerFuncs, registerFuncs...)
+	return b
+}
+
+func (b *builder) AddGrpcServerOptions(opts ...grpc.ServerOption) Builder {
+	b.c.GrpcServerOption = append(b.c.GrpcServerOption, opts...)
+	return b
+}
+
+func (b *builder) AddGatewayDialOptions(opts ...grpc.DialOption) Builder {
+	b.c.GatewayDialOption = append(b.c.GatewayDialOption, opts...)
 	return b
 }
 
