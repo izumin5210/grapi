@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/izumin5210/clicontrib"
-	"github.com/spf13/afero"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
@@ -16,12 +16,17 @@ import (
 
 // NewGrapiCommand creates a new command object.
 func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
+	var err error
+
 	cmd := &cobra.Command{
 		Use:           cfg.AppName(),
 		Short:         "JSON API framework implemented with gRPC and Gateway",
 		Long:          "",
 		SilenceErrors: true,
 		SilenceUsage:  true,
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return err
+		},
 	}
 
 	var cfgFile string
@@ -29,30 +34,32 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	clicontrib.HandleLogFlags(cmd)
 
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
-	commandFactory := command.NewFactory(cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
-	scriptFactory := script.NewFactory(cfg.Fs(), commandFactory, cfg.RootDir())
 
 	ui := ui.New(cfg.OutWriter(), cfg.InReader())
 	generatorFactory := generator.NewFactory(cfg.Fs(), ui)
+	commandFactory := command.NewFactory(cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
+	scriptLoader := script.NewLoader(cfg.Fs(), commandFactory, cfg.RootDir())
 
 	cmd.AddCommand(newInitCommand(cfg, ui, generatorFactory, commandFactory))
 	cmd.AddCommand(newGenerateCommand(cfg, ui, generatorFactory, commandFactory))
 	cmd.AddCommand(newDestroyCommand(cfg, ui, generatorFactory))
 	cmd.AddCommand(newProtocCommand(cfg, ui, commandFactory))
-	cmd.AddCommand(newBuildCommand(cfg, ui, scriptFactory))
+	cmd.AddCommand(newBuildCommand(cfg, ui, scriptLoader))
 	cmd.AddCommand(newVersionCommand(cfg))
 
-	udCmds := make([]*cobra.Command, 0)
 	if cfg.IsInsideApp() {
-		paths, err := afero.Glob(cfg.Fs(), filepath.Join(cfg.RootDir(), "cmd/*/run.go"))
-		if err == nil {
-			for _, path := range paths {
-				udCmds = append(udCmds, newUserDefinedCommand(ui, scriptFactory.Create(path)))
-			}
+		err = scriptLoader.Load(filepath.Join(cfg.RootDir(), "cmd"))
+		if err != nil {
+			err = errors.Wrap(err, "failed to load user-defined commands")
 		}
-	}
-	if len(udCmds) > 0 {
-		cmd.AddCommand(udCmds...)
+
+		udCmds := make([]*cobra.Command, 0)
+		for _, name := range scriptLoader.Names() {
+			udCmds = append(udCmds, newUserDefinedCommand(ui, scriptLoader, name))
+		}
+		if len(udCmds) > 0 {
+			cmd.AddCommand(udCmds...)
+		}
 	}
 
 	return cmd

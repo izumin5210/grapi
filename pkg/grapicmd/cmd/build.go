@@ -1,17 +1,14 @@
 package cmd
 
 import (
-	"path/filepath"
-
 	"github.com/pkg/errors"
-	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
-func newBuildCommand(cfg grapicmd.Config, ui module.UI, scriptFactory module.ScriptFactory) *cobra.Command {
+func newBuildCommand(cfg grapicmd.Config, ui module.UI, scriptLoader module.ScriptLoader) *cobra.Command {
 	return &cobra.Command{
 		Use:           "build [TARGET]...",
 		Short:         "Build commands",
@@ -28,10 +25,9 @@ func newBuildCommand(cfg grapicmd.Config, ui module.UI, scriptFactory module.Scr
 			}
 			isAll := len(args) == 0
 
-			paths, err := afero.Glob(cfg.Fs(), filepath.Join(cfg.RootDir(), "cmd/*/run.go"))
-			for _, path := range paths {
-				script := scriptFactory.Create(path)
-				if isAll || nameSet[script.Name()] {
+			for _, name := range scriptLoader.Names() {
+				script, ok := scriptLoader.Get(name)
+				if ok && (isAll || nameSet[script.Name()]) {
 					ui.Subsection("Building " + script.Name())
 					err := script.Build()
 					if err != nil {
