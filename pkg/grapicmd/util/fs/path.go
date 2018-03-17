@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"golang.org/x/sync/errgroup"
@@ -93,11 +94,13 @@ func FindMainPackagesAndSources(fs afero.Fs, dir string) (map[string][]string, e
 		}
 		data, err := afero.ReadFile(fs, path)
 		if err != nil {
-			return errors.WithStack(err)
+			clog.Warn("failed to read a file", "error", err, "path", path)
+			return nil
 		}
 		f, err := parser.ParseFile(fset, "", data, parser.PackageClauseOnly)
 		if err != nil {
-			return errors.WithStack(err)
+			clog.Warn("failed to parse a file", "error", err, "path", path, "body", string(data))
+			return nil
 		}
 		if f.Package.IsValid() && f.Name.Name == "main" {
 			dir := filepath.Dir(path)
