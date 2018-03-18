@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"os/signal"
 	"sync"
-	"syscall"
 
 	"github.com/izumin5210/clicontrib/clog"
 	"github.com/pkg/errors"
@@ -55,12 +54,10 @@ func (c *command) Exec() (out []byte, err error) {
 		defer recover()
 		for sig := range sigCh {
 			clog.Debug("signal received", "signal", sig)
-			if sig == syscall.SIGCHLD {
+			if cmd.ProcessState == nil || cmd.ProcessState.Exited() {
 				break
 			}
-			if !cmd.ProcessState.Exited() {
-				cmd.Process.Signal(sig)
-			}
+			cmd.Process.Signal(sig)
 		}
 	}()
 
