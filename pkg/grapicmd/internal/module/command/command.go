@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"os/signal"
 	"sync"
-	"syscall"
 
 	"github.com/izumin5210/clicontrib/clog"
 	"github.com/pkg/errors"
@@ -47,7 +46,7 @@ func (c *command) Exec() (out []byte, err error) {
 	cmd := c.build()
 
 	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh)
+	signal.Notify(sigCh, propagatableSignals...)
 	wg.Add(1)
 
 	go func() {
