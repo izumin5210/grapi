@@ -7,7 +7,6 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -99,12 +98,9 @@ func Test_Integration(t *testing.T) {
 		t.Fatalf("Unexpected error (retry count: %d): %v", retryCnt, err)
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
+	if got, want := resp.StatusCode, 200; got != want {
+		t.Errorf("Response status is %d, want %d", got, want)
 	}
-	fmt.Println(string(data))
 
 	err = cmd.Process.Signal(os.Interrupt)
 	if err != nil {
