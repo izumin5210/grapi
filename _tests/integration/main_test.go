@@ -14,7 +14,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
-	"syscall"
 	"testing"
 	"time"
 
@@ -107,7 +106,7 @@ func Test_Integration(t *testing.T) {
 	}
 	fmt.Println(string(data))
 
-	err = cmd.Process.Signal(syscall.SIGTERM)
+	err = cmd.Process.Signal(os.Interrupt)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
