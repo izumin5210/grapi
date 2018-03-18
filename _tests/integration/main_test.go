@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"go/ast"
 	"go/format"
@@ -44,6 +45,7 @@ func Test_Integration(t *testing.T) {
 	if ok, err := afero.DirExists(fs, rootPath); err != nil || !ok {
 		t.Fatalf("%s does not exist: %v", rootPath, err)
 	}
+	t.Log("Initialize a project successfully")
 
 	cmd = exec.Command(bin, "--debug", "g", "service", "foo")
 	cmd.Dir = rootPath
@@ -57,13 +59,16 @@ func Test_Integration(t *testing.T) {
 	if ok, err := afero.Exists(fs, svrPath); err != nil || !ok {
 		t.Fatalf("%s does not exist: %v", svrPath, err)
 	}
+	t.Log("Generate a service successfully")
 
 	port := 15261
 
 	updateRun(t, fs, rootPath, port)
 	updateServerImpl(t, fs, rootPath)
 
-	cmd = exec.Command(bin, "--debug", "server")
+	t.Log("Start the server")
+	svrCtx, cancel := context.WithCancel(context.Background())
+	cmd = exec.CommandContext(svrCtx, bin, "--debug", "server")
 	cmd.Dir = rootPath
 	cmd.Env = append(os.Environ(), "GOPATH="+gopath)
 	cmd.Stdout = os.Stdout
@@ -102,9 +107,16 @@ func Test_Integration(t *testing.T) {
 		t.Errorf("Response status is %d, want %d", got, want)
 	}
 
-	err = cmd.Process.Signal(os.Interrupt)
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
+	t.Log("HTTP Request successfully")
+
+	cancel()
+	toCtx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	select {
+	case <-svrCtx.Done():
+		t.Log("Shutdown server successfully")
+	case <-toCtx.Done():
+		t.Log("Deadline exceeded stopping server")
+		cmd.Process.Signal(os.Kill)
 	}
 	err = cmd.Wait()
 }
