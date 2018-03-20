@@ -21,7 +21,6 @@ type Builder interface {
 	AddGatewayMuxOptions(opts ...runtime.ServeMuxOption) Builder
 	AddGatewayServerMiddleware(middlewares ...HTTPServerMiddleware) Builder
 	AddPassedHeader(decider PassedHeaderDeciderFunc) Builder
-	SetLogger(l Logger) Builder
 	Validate() error
 	Build() (*Engine, error)
 	Serve() error
@@ -106,11 +105,6 @@ func (b *builder) AddGatewayServerMiddleware(middlewares ...HTTPServerMiddleware
 
 func (b *builder) AddPassedHeader(decider PassedHeaderDeciderFunc) Builder {
 	return b.AddGatewayServerMiddleware(createPassingHeaderMiddleware(decider))
-}
-
-func (b *builder) SetLogger(l Logger) Builder {
-	b.c.Logger = l
-	return b
 }
 
 func (b *builder) Validate() error {
