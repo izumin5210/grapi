@@ -25,7 +25,6 @@ var (
 			Addr:    ":3000",
 		},
 		MaxConcurrentStreams: 1000,
-		Logger:               DefaultLogger,
 	}
 )
 
@@ -74,7 +73,6 @@ type Config struct {
 	GatewayDialOption               []grpc.DialOption
 	GatewayMuxOptions               []runtime.ServeMuxOption
 	MaxConcurrentStreams            uint32
-	Logger                          Logger
 	GatewayServerMiddlewares        []HTTPServerMiddleware
 }
 

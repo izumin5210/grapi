@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/grpclog"
 )
 
 // Engine is the framework instance.
@@ -51,7 +52,7 @@ func (e *Engine) watchShutdownSignal(wg *sync.WaitGroup, servers ...Server) {
 	defer close(sdCh)
 	signal.Notify(sdCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-sdCh
-	e.Logger.Info("Terminating now...", LogFields{"signal": sig})
+	grpclog.Infof("terminating now...: %v", sig)
 	for _, svr := range servers {
 		svr.Shutdown()
 	}
