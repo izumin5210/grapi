@@ -2,7 +2,6 @@ package grapiserver
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 	"sync"
@@ -11,6 +10,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/grpclog"
 )
 
 // NewGatewayServer creates GrpcServer instance.
@@ -32,20 +32,20 @@ func (s *GatewayServer) Serve(l net.Listener, wg *sync.WaitGroup) {
 
 	conn, err := s.createConn()
 	if err != nil {
-		s.Logger.Error("failed to create connection with gRPC server", LogFields{"error": err})
+		grpclog.Errorf("failed to create connection with gRPC server: %v", err)
 		return
 	}
 	defer conn.Close()
 
 	s.server, err = s.createServer(conn)
 	if err != nil {
-		s.Logger.Error("failed to create gRPC Gateway server", LogFields{"error": err})
+		grpclog.Errorf("failed to create gRPC Gateway server: %v", err)
 		return
 	}
 
-	s.Logger.Info("gRPC Gateway server is starting", LogFields{"network": s.GatewayAddr.Network, "addr": s.GatewayAddr.Addr})
+	grpclog.Infof("gRPC Gateway server is starting: %s://%s", s.GatewayAddr.Network, s.GatewayAddr.Addr)
 	err = s.server.Serve(l)
-	s.Logger.Info("Stopped taking more httr(s) requests", LogFields{"error": err})
+	grpclog.Infof("stopped taking more httr(s) requests: %v", err)
 }
 
 // Shutdown implements Server.Shutdown
@@ -53,9 +53,9 @@ func (s *GatewayServer) Shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	err := s.server.Shutdown(ctx)
-	s.Logger.Info("All http(s) requets finished", LogFields{})
+	grpclog.Info("All http(s) requets finished")
 	if err != nil {
-		s.Logger.Error("Failed to shutdown gRPC Gateway server", LogFields{"error": err})
+		grpclog.Errorf("failed to shutdown gRPC Gateway server: %v", err)
 	}
 }
 
@@ -77,7 +77,7 @@ func (s *GatewayServer) createServer(conn *grpc.ClientConn) (*http.Server, error
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 
-	s.Logger.Info(fmt.Sprintf("Register %d server handlers to gRPC Gateway", len(s.RegisterGatewayHandlerFuncs)), LogFields{})
+	grpclog.Infof("register %d server handlers to gRPC Gateway", len(s.RegisterGatewayHandlerFuncs))
 	for _, register := range s.RegisterGatewayHandlerFuncs {
 		err := register(ctx, mux, conn)
 		if err != nil {
