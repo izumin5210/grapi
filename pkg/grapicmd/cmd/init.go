@@ -16,7 +16,7 @@ var (
 	tmplPaths []string
 )
 
-func newInitCommand(cfg grapicmd.Config, ui module.UI, generatorFactory module.GeneratorFactory, commandFactory module.CommandFactory) *cobra.Command {
+func newInitCommand(cfg grapicmd.Config, ui module.UI, generator module.ProjectGenerator, commandFactory module.CommandFactory) *cobra.Command {
 	var (
 		depSkipped bool
 		headUsed   bool
@@ -36,7 +36,7 @@ func newInitCommand(cfg grapicmd.Config, ui module.UI, generatorFactory module.G
 
 			u := usecase.NewInitializeProjectUsecase(
 				ui,
-				generatorFactory.Project(),
+				generator,
 				commandFactory,
 				cfg.Version(),
 			)

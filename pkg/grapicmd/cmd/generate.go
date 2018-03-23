@@ -9,20 +9,20 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
-func newGenerateCommand(cfg grapicmd.Config, ui module.UI, generatorFactory module.GeneratorFactory, commandFactory module.CommandFactory) *cobra.Command {
+func newGenerateCommand(cfg grapicmd.Config, ui module.UI, generator module.Generator, commandFactory module.CommandFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "generate GENERATOR",
 		Short:   "Generate new code",
 		Aliases: []string{"g", "gen"},
 	}
 
-	cmd.AddCommand(newGenerateServiceCommand(cfg, ui, generatorFactory.Service(), commandFactory))
-	cmd.AddCommand(newGenerateCommandCommand(cfg, ui, generatorFactory.Command()))
+	cmd.AddCommand(newGenerateServiceCommand(cfg, ui, generator, commandFactory))
+	cmd.AddCommand(newGenerateCommandCommand(cfg, generator))
 
 	return cmd
 }
 
-func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator module.Generator, commandFactory module.CommandFactory) *cobra.Command {
+func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator module.ServiceGenerator, commandFactory module.CommandFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:           "service NAME",
 		Short:         "Generate a new service",
@@ -33,8 +33,7 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
 			}
 
-			generateUsecase := usecase.NewGenerateServiceUsecase(ui, generator, cfg.RootDir())
-			err := errors.WithStack(generateUsecase.Generate(args[0]))
+			err := errors.WithStack(generator.GenerateService(args[0]))
 			if err != nil {
 				return err
 			}
@@ -45,7 +44,7 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 	}
 }
 
-func newGenerateCommandCommand(cfg grapicmd.Config, ui module.UI, generator module.Generator) *cobra.Command {
+func newGenerateCommandCommand(cfg grapicmd.Config, generator module.CommandGenerator) *cobra.Command {
 	return &cobra.Command{
 		Use:   "command NAME",
 		Short: "Generate a new command",
@@ -54,10 +53,7 @@ func newGenerateCommandCommand(cfg grapicmd.Config, ui module.UI, generator modu
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
 			}
 
-			data := map[string]string{
-				"name": args[0],
-			}
-			return errors.WithStack(generator.Generate(cfg.RootDir(), data))
+			return errors.WithStack(generator.GenerateCommand(args[0]))
 		},
 	}
 }

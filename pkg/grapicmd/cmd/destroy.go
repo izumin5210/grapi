@@ -6,23 +6,22 @@ import (
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
-func newDestroyCommand(cfg grapicmd.Config, ui module.UI, generatorFactory module.GeneratorFactory) *cobra.Command {
+func newDestroyCommand(cfg grapicmd.Config, generator module.Generator) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "destroy GENERATOR",
 		Short:   "Destroy codes",
 		Aliases: []string{"d"},
 	}
 
-	cmd.AddCommand(newDestroyServiceCommand(cfg, ui, generatorFactory.Service()))
-	cmd.AddCommand(newDestroyCommandCommand(cfg, ui, generatorFactory.Command()))
+	cmd.AddCommand(newDestroyServiceCommand(cfg, generator))
+	cmd.AddCommand(newDestroyCommandCommand(cfg, generator))
 
 	return cmd
 }
 
-func newDestroyServiceCommand(cfg grapicmd.Config, ui module.UI, generator module.Generator) *cobra.Command {
+func newDestroyServiceCommand(cfg grapicmd.Config, generator module.ServiceGenerator) *cobra.Command {
 	return &cobra.Command{
 		Use:           "service NAME",
 		Short:         "Destroy a service",
@@ -33,13 +32,12 @@ func newDestroyServiceCommand(cfg grapicmd.Config, ui module.UI, generator modul
 				return errors.New("destroy command should execute inside a grapi applicaiton directory")
 			}
 
-			u := usecase.NewGenerateServiceUsecase(ui, generator, cfg.RootDir())
-			return errors.WithStack(errors.WithStack(u.Destroy(args[0])))
+			return errors.WithStack(errors.WithStack(generator.DestroyService(args[0])))
 		},
 	}
 }
 
-func newDestroyCommandCommand(cfg grapicmd.Config, ui module.UI, generator module.Generator) *cobra.Command {
+func newDestroyCommandCommand(cfg grapicmd.Config, generator module.CommandGenerator) *cobra.Command {
 	return &cobra.Command{
 		Use:   "command NAME",
 		Short: "Destroy a command",
@@ -48,10 +46,7 @@ func newDestroyCommandCommand(cfg grapicmd.Config, ui module.UI, generator modul
 				return errors.New("destroy command should execute inside a grapi applicaiton directory")
 			}
 
-			data := map[string]string{
-				"name": args[0],
-			}
-			return errors.WithStack(generator.Destroy(cfg.RootDir(), data))
+			return errors.WithStack(generator.DestroyCommand(args[0]))
 		},
 	}
 }
