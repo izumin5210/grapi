@@ -1,16 +1,18 @@
-package usecase
+package generator
 
 import (
 	"go/build"
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/google/go-cmp/cmp"
+	"github.com/spf13/afero"
 
 	moduletesting "github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
-func Test_GenerateServiceUsecase(t *testing.T) {
+func Test_SErviceGenerator_createParam(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -112,11 +114,17 @@ func Test_GenerateServiceUsecase(t *testing.T) {
 
 	for _, c := range cases {
 		ui := moduletesting.NewMockUI(ctrl)
-		ui.EXPECT().Section(gomock.Any()).AnyTimes()
-		ui.EXPECT().Subsection(gomock.Any()).AnyTimes()
+		fs := afero.NewMemMapFs()
 
-		generator := moduletesting.NewMockGenerator(ctrl)
-		generator.EXPECT().Generate(rootDir, map[string]interface{}{
+		generator := newServiceGenerator(fs, ui, rootDir).(*serviceGenerator)
+
+		got, err := generator.createParams(c.input)
+
+		if err != nil {
+			t.Errorf("Perform() returned an error %v", err)
+		}
+
+		want := map[string]interface{}{
 			"importPath":      c.importPath,
 			"path":            c.path,
 			"name":            c.name,
@@ -126,13 +134,10 @@ func Test_GenerateServiceUsecase(t *testing.T) {
 			"pbgoPackagePath": c.pbgoPackagePath,
 			"pbgoPackageName": c.pbgoPackageName,
 			"protoPackage":    c.protoPackage,
-		})
+		}
 
-		usecase := NewGenerateServiceUsecase(ui, generator, rootDir)
-		err := usecase.Generate(c.input)
-
-		if err != nil {
-			t.Errorf("Perform() returned an error %v", err)
+		if diff := cmp.Diff(got, want); diff != "" {
+			t.Errorf("Received params differs: (-got +want)\n%s", diff)
 		}
 	}
 }

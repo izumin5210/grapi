@@ -1,14 +1,25 @@
 package module
 
-// GeneratorFactory is an interface for creating Generator instance.
-type GeneratorFactory interface {
-	Project() Generator
-	Service() Generator
-	Command() Generator
-}
-
 // Generator creates files from templates and given params.
 type Generator interface {
-	Generate(dir string, data interface{}) error
-	Destroy(dir string, data interface{}) error
+	ProjectGenerator
+	ServiceGenerator
+	CommandGenerator
+}
+
+// ProjectGenerator is an interface to build a new project.
+type ProjectGenerator interface {
+	GenerateProject(rootDir string, useHead bool) error
+}
+
+// ServiceGenerator is an interface to create or destroy gRPC services and implementations.
+type ServiceGenerator interface {
+	GenerateService(name string) error
+	DestroyService(name string) error
+}
+
+// CommandGenerator is an interface to create or destroy user-defined command tempates.
+type CommandGenerator interface {
+	GenerateCommand(name string) error
+	DestroyCommand(name string) error
 }

@@ -1,4 +1,4 @@
-package usecase
+package generator
 
 import (
 	"path/filepath"
@@ -6,58 +6,44 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/serenize/snaker"
+	"github.com/spf13/afero"
 
-	"github.com/izumin5210/clicontrib/clog"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/generator/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
-// GenerateServiceUsecase is an useecase interface for geenrating .proto file and its implementation skeleton.
-type GenerateServiceUsecase interface {
-	Generate(path string) error
-	Destroy(path string) error
+type serviceGenerator struct {
+	baseGenerator
+	rootDir string
 }
 
-type generateServiceUsecase struct {
-	ui        module.UI
-	generator module.Generator
-	rootDir   string
-}
-
-// NewGenerateServiceUsecase returns an new GenerateServiceUsecase implementation instance.
-func NewGenerateServiceUsecase(ui module.UI, generator module.Generator, rootDir string) GenerateServiceUsecase {
-	return &generateServiceUsecase{
-		ui:        ui,
-		generator: generator,
-		rootDir:   rootDir,
+func newServiceGenerator(fs afero.Fs, ui module.UI, rootDir string) module.ServiceGenerator {
+	return &serviceGenerator{
+		baseGenerator: newBaseGenerator(template.Service, fs, ui),
+		rootDir:       rootDir,
 	}
 }
 
-func (u *generateServiceUsecase) Generate(path string) error {
-	data, err := u.createParams(path)
+func (g *serviceGenerator) GenerateService(name string) error {
+	data, err := g.createParams(name)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
-	u.ui.Section("Generate service")
-	clog.Debug("Generate service", "params", data)
-	return u.generator.Generate(u.rootDir, data)
+	return g.Generate(g.rootDir, data)
 }
 
-func (u *generateServiceUsecase) Destroy(path string) error {
-	data, err := u.createParams(path)
+func (g *serviceGenerator) DestroyService(name string) error {
+	data, err := g.createParams(name)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
-	u.ui.Section("Destroy service")
-	clog.Debug("Destroy service", "params", data)
-	return u.generator.Destroy(u.rootDir, data)
+	return g.Destroy(g.rootDir, data)
 }
 
-func (u *generateServiceUsecase) createParams(path string) (map[string]interface{}, error) {
+func (g *serviceGenerator) createParams(path string) (map[string]interface{}, error) {
 	// github.com/foo/bar
-	importPath, err := fs.GetImportPath(u.rootDir)
+	importPath, err := fs.GetImportPath(g.rootDir)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

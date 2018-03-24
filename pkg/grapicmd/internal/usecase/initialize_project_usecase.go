@@ -4,7 +4,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
-	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 // InitializeProjectUsecase is an interface to create a new grapi project.
@@ -15,7 +14,7 @@ type InitializeProjectUsecase interface {
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui module.UI, generator module.Generator, commandFactory module.CommandFactory, version string) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui module.UI, generator module.ProjectGenerator, commandFactory module.CommandFactory, version string) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
 		ui:             ui,
 		generator:      generator,
@@ -26,7 +25,7 @@ func NewInitializeProjectUsecase(ui module.UI, generator module.Generator, comma
 
 type initializeProjectUsecase struct {
 	ui             module.UI
-	generator      module.Generator
+	generator      module.ProjectGenerator
 	commandFactory module.CommandFactory
 	version        string
 }
@@ -52,16 +51,7 @@ func (u *initializeProjectUsecase) Perform(rootDir string, depSkipped, headUsed 
 }
 
 func (u *initializeProjectUsecase) GenerateProject(rootDir string, headUsed bool) error {
-	importPath, err := fs.GetImportPath(rootDir)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	data := map[string]interface{}{
-		"importPath": importPath,
-		"version":    u.version,
-		"headUsed":   headUsed,
-	}
-	return errors.WithStack(u.generator.Generate(rootDir, data))
+	return errors.WithStack(u.generator.GenerateProject(rootDir, headUsed))
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string) error {
