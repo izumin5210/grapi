@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/izumin5210/grapi/pkg/grapiserver"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -11,24 +12,25 @@ import (
 	foo_pb "testapp/api/foo"
 )
 
-var (
-	// RegisterBarBazServiceHandler is a function to register card service handler to gRPC Gateway's mux.
-	RegisterBarBazServiceHandler = foo_pb.RegisterBarBazServiceHandler
-)
-
-// RegisterBarBazServiceServerFactory creates a function to register card service server impl to grpc.Server.
-func RegisterBarBazServiceServerFactory() func(s *grpc.Server) {
-	return func(s *grpc.Server) {
-		foo_pb.RegisterBarBazServiceServer(s, New())
-	}
-}
-
 // New creates a new BarBazServiceServer instance.
-func New() foo_pb.BarBazServiceServer {
+func New() interface {
+	foo_pb.BarBazServiceServer
+	grapiserver.Server
+} {
 	return &barBazServiceServerImpl{}
 }
 
 type barBazServiceServerImpl struct {
+}
+
+// RegisterWithServer implements grapiserver.Server.RegisterWithServer.
+func (s *barBazServiceServerImpl) RegisterWithServer(grpcSvr *grpc.Server) {
+	foo_pb.RegisterBarBazServiceServer(grpcSvr, s)
+}
+
+// RegisterWithHandler implements grapiserver.Server.RegisterWithHandler.
+func (s *barBazServiceServerImpl) RegisterWithHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return foo_pb.RegisterBarBazServiceHandler(ctx, mux, conn)
 }
 
 func (s *barBazServiceServerImpl) ListBarBazs(ctx context.Context, req *foo_pb.ListBarBazsRequest) (*foo_pb.ListBarBazsResponse, error) {

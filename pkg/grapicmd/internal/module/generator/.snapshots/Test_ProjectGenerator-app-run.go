@@ -7,10 +7,7 @@ import (
 // Run starts the grapiserver.
 func Run() error {
 	return grapiserver.New().
-		AddRegisterGrpcServerImplFuncs(
-		// TODO
-		).
-		AddRegisterGatewayHandlerFuncs(
+		AddServers(
 		// TODO
 		).
 		Serve()
