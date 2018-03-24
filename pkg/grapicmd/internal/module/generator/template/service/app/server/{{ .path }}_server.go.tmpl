@@ -24,13 +24,13 @@ func Register{{ .serviceName }}ServiceServerFactory() func(s *grpc.Server) {
 
 // New creates a new {{ .serviceName }}ServiceServer instance.
 func New() {{ .pbgoPackageName }}.{{ .serviceName }}ServiceServer {
-	return &{{ .name }}ServiceServerImpl{}
+	return &{{ .localServiceName }}ServiceServerImpl{}
 }
 
-type {{ .name }}ServiceServerImpl struct {
+type {{ .localServiceName }}ServiceServerImpl struct {
 }
 
-func (s *{{ .name }}ServiceServerImpl) Get{{ .serviceName }}(ctx context.Context, req *{{ .pbgoPackageName }}.Get{{ .serviceName }}Request) (*{{ .pbgoPackageName }}.Get{{ .serviceName }}Response, error) {
+func (s *{{ .localServiceName }}ServiceServerImpl) Get{{ .serviceName }}(ctx context.Context, req *{{ .pbgoPackageName }}.Get{{ .serviceName }}Request) (*{{ .pbgoPackageName }}.Get{{ .serviceName }}Response, error) {
 	// TODO: Not yet implemented.
 	return nil, status.Error(codes.Unimplemented, "TODO: You should implement it!")
 }
