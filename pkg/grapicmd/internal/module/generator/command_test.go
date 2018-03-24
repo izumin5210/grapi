@@ -31,25 +31,50 @@ func Test_CommandGenerator(t *testing.T) {
 
 	generator := newCommandGenerator(fs, ui, rootDir)
 
-	err := generator.GenerateCommand("foo")
-
-	if err != nil {
-		t.Errorf("returned an error %v", err)
-	}
-
+	name := "foo"
 	files := []string{
 		"cmd/foo/run.go",
 	}
 
-	for _, file := range files {
-		t.Run(file, func(t *testing.T) {
-			data, err := afero.ReadFile(fs, filepath.Join(rootDir, file))
+	t.Run("Generate", func(t *testing.T) {
+		err := generator.GenerateCommand(name)
 
-			if err != nil {
-				t.Errorf("returned an error %v", err)
-			}
+		if err != nil {
+			t.Errorf("returned an error %v", err)
+		}
 
-			cupaloy.SnapshotT(t, string(data))
-		})
-	}
+		for _, file := range files {
+			t.Run(file, func(t *testing.T) {
+				data, err := afero.ReadFile(fs, filepath.Join(rootDir, file))
+
+				if err != nil {
+					t.Errorf("returned an error %v", err)
+				}
+
+				cupaloy.SnapshotT(t, string(data))
+			})
+		}
+	})
+
+	t.Run("Destroy", func(t *testing.T) {
+		err := generator.DestroyCommand(name)
+
+		if err != nil {
+			t.Errorf("returned an error %v", err)
+		}
+
+		for _, file := range files {
+			t.Run(file, func(t *testing.T) {
+				ok, err := afero.Exists(fs, filepath.Join(rootDir, file))
+
+				if err != nil {
+					t.Errorf("Exists(fs, %q) returned an error %v", file, err)
+				}
+
+				if ok {
+					t.Errorf("%q should not exist", file)
+				}
+			})
+		}
+	})
 }

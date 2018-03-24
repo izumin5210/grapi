@@ -31,26 +31,51 @@ func Test_ServiceGenerator(t *testing.T) {
 
 	generator := newServiceGenerator(fs, ui, rootDir)
 
-	err := generator.GenerateService("foo/bar-baz")
-
-	if err != nil {
-		t.Errorf("returned an error %v", err)
-	}
-
+	name := "foo/bar-baz"
 	files := []string{
 		"api/protos/foo/bar_baz.proto",
 		"app/server/foo/bar_baz_server.go",
 	}
 
-	for _, file := range files {
-		t.Run(file, func(t *testing.T) {
-			data, err := afero.ReadFile(fs, filepath.Join(rootDir, file))
+	t.Run("Generate", func(t *testing.T) {
+		err := generator.GenerateService(name)
 
-			if err != nil {
-				t.Errorf("returned an error %v", err)
-			}
+		if err != nil {
+			t.Errorf("returned an error %v", err)
+		}
 
-			cupaloy.SnapshotT(t, string(data))
-		})
-	}
+		for _, file := range files {
+			t.Run(file, func(t *testing.T) {
+				data, err := afero.ReadFile(fs, filepath.Join(rootDir, file))
+
+				if err != nil {
+					t.Errorf("returned an error %v", err)
+				}
+
+				cupaloy.SnapshotT(t, string(data))
+			})
+		}
+	})
+
+	t.Run("Destroy", func(t *testing.T) {
+		err := generator.DestroyService(name)
+
+		if err != nil {
+			t.Errorf("returned an error %v", err)
+		}
+
+		for _, file := range files {
+			t.Run(file, func(t *testing.T) {
+				ok, err := afero.Exists(fs, filepath.Join(rootDir, file))
+
+				if err != nil {
+					t.Errorf("Exists(fs, %q) returned an error %v", file, err)
+				}
+
+				if ok {
+					t.Errorf("%q should not exist", file)
+				}
+			})
+		}
+	})
 }
