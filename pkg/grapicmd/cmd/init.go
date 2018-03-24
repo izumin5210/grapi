@@ -27,6 +27,7 @@ func newInitCommand(cfg grapicmd.Config, ui module.UI, generator module.ProjectG
 		Short:         "Initialize a grapi application",
 		SilenceErrors: true,
 		SilenceUsage:  true,
+		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := parseInitArgs(cfg, args)
 			if err != nil {

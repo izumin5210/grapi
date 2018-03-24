@@ -27,6 +27,7 @@ func newDestroyServiceCommand(cfg grapicmd.Config, generator module.ServiceGener
 		Short:         "Destroy a service",
 		SilenceErrors: true,
 		SilenceUsage:  true,
+		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !cfg.IsInsideApp() {
 				return errors.New("destroy command should execute inside a grapi applicaiton directory")
@@ -39,8 +40,11 @@ func newDestroyServiceCommand(cfg grapicmd.Config, generator module.ServiceGener
 
 func newDestroyCommandCommand(cfg grapicmd.Config, generator module.CommandGenerator) *cobra.Command {
 	return &cobra.Command{
-		Use:   "command NAME",
-		Short: "Destroy a command",
+		Use:           "command NAME",
+		Short:         "Destroy a command",
+		SilenceErrors: true,
+		SilenceUsage:  true,
+		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !cfg.IsInsideApp() {
 				return errors.New("destroy command should execute inside a grapi applicaiton directory")
