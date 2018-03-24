@@ -6,6 +6,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/izumin5210/grapi/pkg/grapiserver/internal"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/grpclog"
 )
@@ -46,7 +47,7 @@ func (e *Engine) Serve() error {
 	return nil
 }
 
-func (e *Engine) watchShutdownSignal(wg *sync.WaitGroup, servers ...Server) {
+func (e *Engine) watchShutdownSignal(wg *sync.WaitGroup, servers ...internal.Server) {
 	defer wg.Done()
 	sdCh := make(chan os.Signal, 1)
 	defer close(sdCh)

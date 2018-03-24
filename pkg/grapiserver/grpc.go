@@ -7,6 +7,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/reflection"
+
+	"github.com/izumin5210/grapi/pkg/grapiserver/internal"
 )
 
 // GrpcServer wraps grpc.Server setup process.
@@ -16,7 +18,7 @@ type GrpcServer struct {
 }
 
 // NewGrpcServer creates GrpcServer instance.
-func NewGrpcServer(c *Config) Server {
+func NewGrpcServer(c *Config) internal.Server {
 	s := grpc.NewServer(c.serverOptions()...)
 	reflection.Register(s)
 	grpclog.Infof("register %d server impls to gRPC server", len(c.RegisterGrpcServerImplFuncs))
