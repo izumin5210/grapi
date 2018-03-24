@@ -25,7 +25,7 @@ func newServiceGenerator(fs afero.Fs, ui module.UI, rootDir string) module.Servi
 	}
 }
 
-func (g *serviceGenerator) GenerateService(name string) error {
+func (g *serviceGenerator) GenerateService(name string, methods ...string) error {
 	data, err := g.createParams(name)
 	if err != nil {
 		return errors.WithStack(err)

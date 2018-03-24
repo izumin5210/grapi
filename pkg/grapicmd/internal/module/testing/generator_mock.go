@@ -44,15 +44,20 @@ func (_mr *MockGeneratorMockRecorder) GenerateProject(arg0, arg1 interface{}) *g
 }
 
 // GenerateService mocks base method
-func (_m *MockGenerator) GenerateService(name string) error {
-	ret := _m.ctrl.Call(_m, "GenerateService", name)
+func (_m *MockGenerator) GenerateService(name string, methods ...string) error {
+	_s := []interface{}{name}
+	for _, _x := range methods {
+		_s = append(_s, _x)
+	}
+	ret := _m.ctrl.Call(_m, "GenerateService", _s...)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // GenerateService indicates an expected call of GenerateService
-func (_mr *MockGeneratorMockRecorder) GenerateService(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockGenerator)(nil).GenerateService), arg0)
+func (_mr *MockGeneratorMockRecorder) GenerateService(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+	_s := append([]interface{}{arg0}, arg1...)
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockGenerator)(nil).GenerateService), _s...)
 }
 
 // DestroyService mocks base method
@@ -150,15 +155,20 @@ func (_m *MockServiceGenerator) EXPECT() *MockServiceGeneratorMockRecorder {
 }
 
 // GenerateService mocks base method
-func (_m *MockServiceGenerator) GenerateService(name string) error {
-	ret := _m.ctrl.Call(_m, "GenerateService", name)
+func (_m *MockServiceGenerator) GenerateService(name string, methods ...string) error {
+	_s := []interface{}{name}
+	for _, _x := range methods {
+		_s = append(_s, _x)
+	}
+	ret := _m.ctrl.Call(_m, "GenerateService", _s...)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // GenerateService indicates an expected call of GenerateService
-func (_mr *MockServiceGeneratorMockRecorder) GenerateService(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockServiceGenerator)(nil).GenerateService), arg0)
+func (_mr *MockServiceGeneratorMockRecorder) GenerateService(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+	_s := append([]interface{}{arg0}, arg1...)
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockServiceGenerator)(nil).GenerateService), _s...)
 }
 
 // DestroyService mocks base method
