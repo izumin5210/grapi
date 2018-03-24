@@ -5,68 +5,8 @@ package moduletesting
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	. "github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	reflect "reflect"
 )
-
-// MockGeneratorFactory is a mock of GeneratorFactory interface
-type MockGeneratorFactory struct {
-	ctrl     *gomock.Controller
-	recorder *MockGeneratorFactoryMockRecorder
-}
-
-// MockGeneratorFactoryMockRecorder is the mock recorder for MockGeneratorFactory
-type MockGeneratorFactoryMockRecorder struct {
-	mock *MockGeneratorFactory
-}
-
-// NewMockGeneratorFactory creates a new mock instance
-func NewMockGeneratorFactory(ctrl *gomock.Controller) *MockGeneratorFactory {
-	mock := &MockGeneratorFactory{ctrl: ctrl}
-	mock.recorder = &MockGeneratorFactoryMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use
-func (_m *MockGeneratorFactory) EXPECT() *MockGeneratorFactoryMockRecorder {
-	return _m.recorder
-}
-
-// Project mocks base method
-func (_m *MockGeneratorFactory) Project() Generator {
-	ret := _m.ctrl.Call(_m, "Project")
-	ret0, _ := ret[0].(Generator)
-	return ret0
-}
-
-// Project indicates an expected call of Project
-func (_mr *MockGeneratorFactoryMockRecorder) Project() *gomock.Call {
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "Project", reflect.TypeOf((*MockGeneratorFactory)(nil).Project))
-}
-
-// Service mocks base method
-func (_m *MockGeneratorFactory) Service() Generator {
-	ret := _m.ctrl.Call(_m, "Service")
-	ret0, _ := ret[0].(Generator)
-	return ret0
-}
-
-// Service indicates an expected call of Service
-func (_mr *MockGeneratorFactoryMockRecorder) Service() *gomock.Call {
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "Service", reflect.TypeOf((*MockGeneratorFactory)(nil).Service))
-}
-
-// Command mocks base method
-func (_m *MockGeneratorFactory) Command() Generator {
-	ret := _m.ctrl.Call(_m, "Command")
-	ret0, _ := ret[0].(Generator)
-	return ret0
-}
-
-// Command indicates an expected call of Command
-func (_mr *MockGeneratorFactoryMockRecorder) Command() *gomock.Call {
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "Command", reflect.TypeOf((*MockGeneratorFactory)(nil).Command))
-}
 
 // MockGenerator is a mock of Generator interface
 type MockGenerator struct {
@@ -91,26 +31,191 @@ func (_m *MockGenerator) EXPECT() *MockGeneratorMockRecorder {
 	return _m.recorder
 }
 
-// Generate mocks base method
-func (_m *MockGenerator) Generate(dir string, data interface{}) error {
-	ret := _m.ctrl.Call(_m, "Generate", dir, data)
+// GenerateProject mocks base method
+func (_m *MockGenerator) GenerateProject(rootDir string, useHead bool) error {
+	ret := _m.ctrl.Call(_m, "GenerateProject", rootDir, useHead)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Generate indicates an expected call of Generate
-func (_mr *MockGeneratorMockRecorder) Generate(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "Generate", reflect.TypeOf((*MockGenerator)(nil).Generate), arg0, arg1)
+// GenerateProject indicates an expected call of GenerateProject
+func (_mr *MockGeneratorMockRecorder) GenerateProject(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateProject", reflect.TypeOf((*MockGenerator)(nil).GenerateProject), arg0, arg1)
 }
 
-// Destroy mocks base method
-func (_m *MockGenerator) Destroy(dir string, data interface{}) error {
-	ret := _m.ctrl.Call(_m, "Destroy", dir, data)
+// GenerateService mocks base method
+func (_m *MockGenerator) GenerateService(name string) error {
+	ret := _m.ctrl.Call(_m, "GenerateService", name)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Destroy indicates an expected call of Destroy
-func (_mr *MockGeneratorMockRecorder) Destroy(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "Destroy", reflect.TypeOf((*MockGenerator)(nil).Destroy), arg0, arg1)
+// GenerateService indicates an expected call of GenerateService
+func (_mr *MockGeneratorMockRecorder) GenerateService(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockGenerator)(nil).GenerateService), arg0)
+}
+
+// DestroyService mocks base method
+func (_m *MockGenerator) DestroyService(name string) error {
+	ret := _m.ctrl.Call(_m, "DestroyService", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DestroyService indicates an expected call of DestroyService
+func (_mr *MockGeneratorMockRecorder) DestroyService(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "DestroyService", reflect.TypeOf((*MockGenerator)(nil).DestroyService), arg0)
+}
+
+// GenerateCommand mocks base method
+func (_m *MockGenerator) GenerateCommand(name string) error {
+	ret := _m.ctrl.Call(_m, "GenerateCommand", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GenerateCommand indicates an expected call of GenerateCommand
+func (_mr *MockGeneratorMockRecorder) GenerateCommand(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateCommand", reflect.TypeOf((*MockGenerator)(nil).GenerateCommand), arg0)
+}
+
+// DestroyCommand mocks base method
+func (_m *MockGenerator) DestroyCommand(name string) error {
+	ret := _m.ctrl.Call(_m, "DestroyCommand", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DestroyCommand indicates an expected call of DestroyCommand
+func (_mr *MockGeneratorMockRecorder) DestroyCommand(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "DestroyCommand", reflect.TypeOf((*MockGenerator)(nil).DestroyCommand), arg0)
+}
+
+// MockProjectGenerator is a mock of ProjectGenerator interface
+type MockProjectGenerator struct {
+	ctrl     *gomock.Controller
+	recorder *MockProjectGeneratorMockRecorder
+}
+
+// MockProjectGeneratorMockRecorder is the mock recorder for MockProjectGenerator
+type MockProjectGeneratorMockRecorder struct {
+	mock *MockProjectGenerator
+}
+
+// NewMockProjectGenerator creates a new mock instance
+func NewMockProjectGenerator(ctrl *gomock.Controller) *MockProjectGenerator {
+	mock := &MockProjectGenerator{ctrl: ctrl}
+	mock.recorder = &MockProjectGeneratorMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (_m *MockProjectGenerator) EXPECT() *MockProjectGeneratorMockRecorder {
+	return _m.recorder
+}
+
+// GenerateProject mocks base method
+func (_m *MockProjectGenerator) GenerateProject(rootDir string, useHead bool) error {
+	ret := _m.ctrl.Call(_m, "GenerateProject", rootDir, useHead)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GenerateProject indicates an expected call of GenerateProject
+func (_mr *MockProjectGeneratorMockRecorder) GenerateProject(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateProject", reflect.TypeOf((*MockProjectGenerator)(nil).GenerateProject), arg0, arg1)
+}
+
+// MockServiceGenerator is a mock of ServiceGenerator interface
+type MockServiceGenerator struct {
+	ctrl     *gomock.Controller
+	recorder *MockServiceGeneratorMockRecorder
+}
+
+// MockServiceGeneratorMockRecorder is the mock recorder for MockServiceGenerator
+type MockServiceGeneratorMockRecorder struct {
+	mock *MockServiceGenerator
+}
+
+// NewMockServiceGenerator creates a new mock instance
+func NewMockServiceGenerator(ctrl *gomock.Controller) *MockServiceGenerator {
+	mock := &MockServiceGenerator{ctrl: ctrl}
+	mock.recorder = &MockServiceGeneratorMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (_m *MockServiceGenerator) EXPECT() *MockServiceGeneratorMockRecorder {
+	return _m.recorder
+}
+
+// GenerateService mocks base method
+func (_m *MockServiceGenerator) GenerateService(name string) error {
+	ret := _m.ctrl.Call(_m, "GenerateService", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GenerateService indicates an expected call of GenerateService
+func (_mr *MockServiceGeneratorMockRecorder) GenerateService(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockServiceGenerator)(nil).GenerateService), arg0)
+}
+
+// DestroyService mocks base method
+func (_m *MockServiceGenerator) DestroyService(name string) error {
+	ret := _m.ctrl.Call(_m, "DestroyService", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DestroyService indicates an expected call of DestroyService
+func (_mr *MockServiceGeneratorMockRecorder) DestroyService(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "DestroyService", reflect.TypeOf((*MockServiceGenerator)(nil).DestroyService), arg0)
+}
+
+// MockCommandGenerator is a mock of CommandGenerator interface
+type MockCommandGenerator struct {
+	ctrl     *gomock.Controller
+	recorder *MockCommandGeneratorMockRecorder
+}
+
+// MockCommandGeneratorMockRecorder is the mock recorder for MockCommandGenerator
+type MockCommandGeneratorMockRecorder struct {
+	mock *MockCommandGenerator
+}
+
+// NewMockCommandGenerator creates a new mock instance
+func NewMockCommandGenerator(ctrl *gomock.Controller) *MockCommandGenerator {
+	mock := &MockCommandGenerator{ctrl: ctrl}
+	mock.recorder = &MockCommandGeneratorMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (_m *MockCommandGenerator) EXPECT() *MockCommandGeneratorMockRecorder {
+	return _m.recorder
+}
+
+// GenerateCommand mocks base method
+func (_m *MockCommandGenerator) GenerateCommand(name string) error {
+	ret := _m.ctrl.Call(_m, "GenerateCommand", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GenerateCommand indicates an expected call of GenerateCommand
+func (_mr *MockCommandGeneratorMockRecorder) GenerateCommand(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateCommand", reflect.TypeOf((*MockCommandGenerator)(nil).GenerateCommand), arg0)
+}
+
+// DestroyCommand mocks base method
+func (_m *MockCommandGenerator) DestroyCommand(name string) error {
+	ret := _m.ctrl.Call(_m, "DestroyCommand", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DestroyCommand indicates an expected call of DestroyCommand
+func (_mr *MockCommandGeneratorMockRecorder) DestroyCommand(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "DestroyCommand", reflect.TypeOf((*MockCommandGenerator)(nil).DestroyCommand), arg0)
 }
