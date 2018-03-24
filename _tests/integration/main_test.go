@@ -47,7 +47,7 @@ func Test_Integration(t *testing.T) {
 	}
 	t.Log("Initialize a project successfully")
 
-	cmd = exec.Command(bin, "--debug", "g", "service", "foo")
+	cmd = exec.Command(bin, "--debug", "g", "service", "book", "list")
 	cmd.Dir = rootPath
 	cmd.Env = append(os.Environ(), "GOPATH="+gopath)
 	out, err = cmd.CombinedOutput()
@@ -55,7 +55,7 @@ func Test_Integration(t *testing.T) {
 		t.Fatalf("failed to generate service: %v\n%s", err, string(out))
 	}
 
-	svrPath := filepath.Join(rootPath, "app", "server", "foo_server.go")
+	svrPath := filepath.Join(rootPath, "app", "server", "book_server.go")
 	if ok, err := afero.Exists(fs, svrPath); err != nil || !ok {
 		t.Fatalf("%s does not exist: %v", svrPath, err)
 	}
@@ -89,7 +89,7 @@ func Test_Integration(t *testing.T) {
 	for {
 		func() {
 			defer recover()
-			resp, err = http.Get(fmt.Sprintf("http://localhost:%d/foo", port))
+			resp, err = http.Get(fmt.Sprintf("http://localhost:%d/books", port))
 		}()
 		if err != nil && time.Since(startedAt) < 120*time.Second {
 			time.Sleep(5 * time.Second)
@@ -178,13 +178,13 @@ func updateRun(t *testing.T, fs afero.Fs, rootPath string, port int) {
 						n.Args = append(n.Args, &ast.CallExpr{
 							Fun: &ast.SelectorExpr{
 								X:   ast.NewIdent("server"),
-								Sel: ast.NewIdent("RegisterFooServiceServerFactory"),
+								Sel: ast.NewIdent("RegisterBookServiceServerFactory"),
 							},
 						})
 					case "AddRegisterGatewayHandlerFuncs":
 						n.Args = append(n.Args, &ast.SelectorExpr{
 							X:   ast.NewIdent("server"),
-							Sel: ast.NewIdent("RegisterFooServiceHandler"),
+							Sel: ast.NewIdent("RegisterBookServiceHandler"),
 						})
 					}
 				}
@@ -205,7 +205,7 @@ func updateRun(t *testing.T, fs afero.Fs, rootPath string, port int) {
 }
 
 func updateServerImpl(t *testing.T, fs afero.Fs, rootPath string) {
-	data, err := afero.ReadFile(fs, filepath.Join(rootPath, "app", "server", "foo_server.go"))
+	data, err := afero.ReadFile(fs, filepath.Join(rootPath, "app", "server", "book_server.go"))
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -244,7 +244,7 @@ func updateServerImpl(t *testing.T, fs afero.Fs, rootPath string) {
 					}
 				}
 			case *ast.FuncDecl:
-				if n.Name.Name == "GetFoo" {
+				if n.Name.Name == "ListBooks" {
 					n.Body.List = []ast.Stmt{
 						&ast.ReturnStmt{
 							Results: []ast.Expr{
@@ -252,7 +252,7 @@ func updateServerImpl(t *testing.T, fs afero.Fs, rootPath string) {
 									X: &ast.CompositeLit{
 										Type: &ast.SelectorExpr{
 											X:   ast.NewIdent("api_pb"),
-											Sel: ast.NewIdent("GetFooResponse"),
+											Sel: ast.NewIdent("ListBooksResponse"),
 										},
 									},
 									Op: token.AND,
@@ -272,7 +272,7 @@ func updateServerImpl(t *testing.T, fs afero.Fs, rootPath string) {
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	err = afero.WriteFile(fs, filepath.Join(rootPath, "app", "server", "foo_server.go"), buf.Bytes(), 0755)
+	err = afero.WriteFile(fs, filepath.Join(rootPath, "app", "server", "book_server.go"), buf.Bytes(), 0755)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}

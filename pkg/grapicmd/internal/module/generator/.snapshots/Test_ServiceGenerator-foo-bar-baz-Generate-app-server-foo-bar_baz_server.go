@@ -30,8 +30,3 @@ func New() foo_pb.BarBazServiceServer {
 type barBazServiceServerImpl struct {
 }
 
-func (s *barBazServiceServerImpl) GetBarBaz(ctx context.Context, req *foo_pb.GetBarBazRequest) (*foo_pb.GetBarBazResponse, error) {
-	// TODO: Not yet implemented.
-	return nil, status.Error(codes.Unimplemented, "TODO: You should implement it!")
-}
-

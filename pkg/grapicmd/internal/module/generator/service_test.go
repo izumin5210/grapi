@@ -3,6 +3,7 @@ package generator
 import (
 	"go/build"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy"
@@ -33,6 +34,7 @@ func Test_ServiceGenerator(t *testing.T) {
 
 	cases := []struct {
 		name  string
+		args  []string
 		files []string
 	}{
 		{
@@ -63,12 +65,32 @@ func Test_ServiceGenerator(t *testing.T) {
 				"app/server/foo/bar_baz_server.go",
 			},
 		},
+		{
+			name: "foo/bar-baz",
+			args: []string{"list", "create", "delete"},
+			files: []string{
+				"api/protos/foo/bar_baz.proto",
+				"app/server/foo/bar_baz_server.go",
+			},
+		},
+		{
+			name: "foo/bar-baz",
+			args: []string{"list", "create", "rename", "delete", "move_move"},
+			files: []string{
+				"api/protos/foo/bar_baz.proto",
+				"app/server/foo/bar_baz_server.go",
+			},
+		},
 	}
 
 	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
+		test := c.name
+		if len(c.args) > 0 {
+			test += " with " + strings.Join(c.args, ",")
+		}
+		t.Run(test, func(t *testing.T) {
 			t.Run("Generate", func(t *testing.T) {
-				err := generator.GenerateService(c.name)
+				err := generator.GenerateService(c.name, c.args...)
 
 				if err != nil {
 					t.Errorf("returned an error %v", err)

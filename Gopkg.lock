@@ -127,6 +127,12 @@
   version = "v1.3.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  revision = "04140366298a54a039076d798123ffa108fff46c"
+
+[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
@@ -359,6 +365,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b019bb4ae5d603b38fdc64b2c0b74e4ee8d9232af08f80fc0c060d160c3b450b"
+  inputs-digest = "94de7db5801622c5e8775d0c9729b4bad15b044772a59167c9930ed599d23aaa"
   solver-name = "gps-cdcl"
   solver-version = 1

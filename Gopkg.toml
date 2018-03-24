@@ -81,3 +81,7 @@ required = [
 [[constraint]]
   name = "github.com/bradleyjkemp/cupaloy"
   version = "2.0.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/jinzhu/inflection"

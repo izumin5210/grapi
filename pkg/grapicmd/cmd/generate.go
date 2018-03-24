@@ -28,13 +28,13 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 		Short:         "Generate a new service",
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		Args:          cobra.ExactArgs(1),
+		Args:          cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !cfg.IsInsideApp() {
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
 			}
 
-			err := errors.WithStack(generator.GenerateService(args[0]))
+			err := errors.WithStack(generator.GenerateService(args[0], args[1:]...))
 			if err != nil {
 				return err
 			}
