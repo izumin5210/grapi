@@ -134,6 +134,7 @@ type serviceMethodMessageField struct {
 	Name     string
 	Type     string
 	Repeated bool
+	Tag      uint
 }
 
 type serviceMethodHTTPParams struct {
@@ -242,7 +243,7 @@ func (g *serviceGenerator) createMethodParams(name nameParams, methods []string)
 	id := name.singularSnake + "_id"
 	resource := &serviceMethodMessage{
 		Name:   name.singularCamel,
-		Fields: []serviceMethodMessageField{{Name: id, Type: "string"}},
+		Fields: []serviceMethodMessageField{{Name: id, Type: "string", Tag: 1}},
 	}
 
 	basicMethods := [5]*serviceMethodParams{}
@@ -266,7 +267,7 @@ func (g *serviceGenerator) createMethodParams(name nameParams, methods []string)
 			basicMessages[1] = &serviceMethodMessage{Name: reqName}
 			basicMessages[2] = &serviceMethodMessage{
 				Name:   respName,
-				Fields: []serviceMethodMessageField{{Name: name.pluralSnake, Type: name.singularCamel, Repeated: true}},
+				Fields: []serviceMethodMessageField{{Name: name.pluralSnake, Type: name.singularCamel, Repeated: true, Tag: 1}},
 			}
 		case "get":
 			methodName := "Get" + name.singularCamel
@@ -280,7 +281,7 @@ func (g *serviceGenerator) createMethodParams(name nameParams, methods []string)
 			basicMessages[0] = resource
 			basicMessages[3] = &serviceMethodMessage{
 				Name:   reqName,
-				Fields: []serviceMethodMessageField{{Name: id, Type: "string"}},
+				Fields: []serviceMethodMessageField{{Name: id, Type: "string", Tag: 1}},
 			}
 		case "create":
 			methodName := "Create" + name.singularCamel
@@ -294,7 +295,7 @@ func (g *serviceGenerator) createMethodParams(name nameParams, methods []string)
 			basicMessages[0] = resource
 			basicMessages[4] = &serviceMethodMessage{
 				Name:   reqName,
-				Fields: []serviceMethodMessageField{{Name: name.singularSnake, Type: name.singularCamel}},
+				Fields: []serviceMethodMessageField{{Name: name.singularSnake, Type: name.singularCamel, Tag: 1}},
 			}
 		case "update":
 			methodName := "Update" + name.singularCamel
@@ -308,7 +309,7 @@ func (g *serviceGenerator) createMethodParams(name nameParams, methods []string)
 			basicMessages[0] = resource
 			basicMessages[5] = &serviceMethodMessage{
 				Name:   reqName,
-				Fields: []serviceMethodMessageField{{Name: name.singularSnake, Type: name.singularCamel}},
+				Fields: []serviceMethodMessageField{{Name: name.singularSnake, Type: name.singularCamel, Tag: 1}},
 			}
 		case "delete":
 			methodName := "Delete" + name.singularCamel
@@ -322,7 +323,7 @@ func (g *serviceGenerator) createMethodParams(name nameParams, methods []string)
 			}
 			basicMessages[6] = &serviceMethodMessage{
 				Name:   reqName,
-				Fields: []serviceMethodMessageField{{Name: id, Type: "string"}},
+				Fields: []serviceMethodMessageField{{Name: id, Type: "string", Tag: 1}},
 			}
 			params.ProtoImports = append(params.ProtoImports, "google/protobuf/empty.proto")
 			params.GoImports = append(params.GoImports, "github.com/golang/protobuf/ptypes/empty")

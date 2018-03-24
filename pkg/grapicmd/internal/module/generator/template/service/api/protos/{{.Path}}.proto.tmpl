@@ -19,11 +19,11 @@ service {{ .ServiceName }}Service {
 }
 {{range .Proto.Messages}}
 message {{.Name}} {
-  {{- range $i, $f := .Fields}}
+  {{- range .Fields}}
   {{- if .Repeated}}
-  repeated {{$f.Type}} {{$f.Name}} = {{$i}};
+  repeated {{.Type}} {{.Name}} = {{.Tag}};
   {{- else}}
-  {{$f.Type}} {{$f.Name}} = {{$i}};
+  {{.Type}} {{.Name}} = {{.Tag}};
   {{- end}}
   {{- end}}
 }
