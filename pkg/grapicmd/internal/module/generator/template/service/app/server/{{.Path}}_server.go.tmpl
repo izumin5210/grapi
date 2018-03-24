@@ -9,24 +9,25 @@ import (
 	{{.PbGo.PackageName}} "{{ .PbGo.PackagePath }}"
 )
 
-var (
-	// Register{{.ServiceName}}ServiceHandler is a function to register card service handler to gRPC Gateway's mux.
-	Register{{.ServiceName}}ServiceHandler = {{.PbGo.PackageName}}.Register{{.ServiceName}}ServiceHandler
-)
-
-// Register{{.Go.ServerName}}Factory creates a function to register card service server impl to grpc.Server.
-func Register{{.Go.ServerName}}Factory() func(s *grpc.Server) {
-	return func(s *grpc.Server) {
-		{{.PbGo.PackageName}}.Register{{.Go.ServerName}}(s, New())
-	}
-}
-
 // New creates a new {{.Go.ServerName}} instance.
-func New() {{.PbGo.PackageName }}.{{.Go.ServerName}} {
+func New() interface {
+	{{.PbGo.PackageName }}.{{.Go.ServerName}}
+	grapiserver.Server
+} {
 	return &{{.Go.StructName}}{}
 }
 
 type {{.Go.StructName}} struct {
+}
+
+// RegisterWithServer implements grapiserver.Server.RegisterWithServer.
+func (s *{{.Go.StructName}}) RegisterWithServer(grpcSvr *grpc.Server) {
+	{{.PbGo.PackageName}}.Register{{.Go.ServerName}}(grpcSvr, s)
+}
+
+// RegisterWithHandler implements grapiserver.Server.RegisterWithHandler.
+func (s *{{.Go.StructName}}) RegisterWithHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return {{.PbGo.PackageName}}.Register{{.ServiceName}}ServiceHandler(ctx, mux, conn)
 }
 {{$go := .Go -}}
 {{$pbGo := .PbGo -}}
