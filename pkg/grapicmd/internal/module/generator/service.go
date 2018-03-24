@@ -55,6 +55,8 @@ func (g *serviceGenerator) createParams(path string) (map[string]interface{}, er
 	name := filepath.Base(path)
 	// Quux
 	serviceName := snaker.SnakeToCamel(name)
+	// quux
+	localServiceName := strings.ToLower(string(serviceName[0])) + serviceName[1:]
 
 	// baz/qux
 	packagePath := filepath.Dir(path)
@@ -84,14 +86,15 @@ func (g *serviceGenerator) createParams(path string) (map[string]interface{}, er
 	protoPackage := strings.Join(protoPackageChunks, ".")
 
 	return map[string]interface{}{
-		"importPath":      importPath,
-		"path":            path,
-		"name":            name,
-		"serviceName":     serviceName,
-		"packagePath":     packagePath,
-		"packageName":     packageName,
-		"pbgoPackagePath": pbgoPackagePath,
-		"pbgoPackageName": pbgoPackageName,
-		"protoPackage":    protoPackage,
+		"importPath":       importPath,
+		"path":             path,
+		"name":             name,
+		"serviceName":      serviceName,
+		"localServiceName": localServiceName,
+		"packagePath":      packagePath,
+		"packageName":      packageName,
+		"pbgoPackagePath":  pbgoPackagePath,
+		"pbgoPackageName":  pbgoPackageName,
+		"protoPackage":     protoPackage,
 	}, nil
 }

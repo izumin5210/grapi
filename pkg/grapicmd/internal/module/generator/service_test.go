@@ -2,17 +2,18 @@ package generator
 
 import (
 	"go/build"
+	"path/filepath"
 	"testing"
 
+	"github.com/bradleyjkemp/cupaloy"
 	"github.com/golang/mock/gomock"
-	"github.com/google/go-cmp/cmp"
 	"github.com/spf13/afero"
 
 	moduletesting "github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
-func Test_SErviceGenerator_createParam(t *testing.T) {
+func Test_ServiceGenerator(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -22,122 +23,91 @@ func Test_SErviceGenerator_createParam(t *testing.T) {
 		GOPATH: "/home",
 	}
 
-	rootDir := "/home/src/foo"
+	rootDir := "/home/src/testapp"
 
-	type Case struct {
-		input           string
-		importPath      string
-		path            string
-		name            string
-		serviceName     string
-		packagePath     string
-		packageName     string
-		pbgoPackagePath string
-		pbgoPackageName string
-		protoPackage    string
-	}
+	ui := moduletesting.NewMockUI(ctrl)
+	ui.EXPECT().ItemSuccess(gomock.Any()).AnyTimes()
+	fs := afero.NewMemMapFs()
 
-	cases := []Case{
+	generator := newServiceGenerator(fs, ui, rootDir)
+
+	cases := []struct {
+		name  string
+		files []string
+	}{
 		{
-			input:           "bar",
-			importPath:      "foo",
-			path:            "bar",
-			name:            "bar",
-			serviceName:     "Bar",
-			packagePath:     "server",
-			packageName:     "server",
-			pbgoPackagePath: "api",
-			pbgoPackageName: "api_pb",
-			protoPackage:    "foo.api",
+			name: "foo",
+			files: []string{
+				"api/protos/foo.proto",
+				"app/server/foo_server.go",
+			},
 		},
 		{
-			input:           "bar/baz",
-			importPath:      "foo",
-			path:            "bar/baz",
-			name:            "baz",
-			serviceName:     "Baz",
-			packagePath:     "bar",
-			packageName:     "bar",
-			pbgoPackagePath: "api/bar",
-			pbgoPackageName: "bar_pb",
-			protoPackage:    "foo.api.bar",
+			name: "foo/bar",
+			files: []string{
+				"api/protos/foo/bar.proto",
+				"app/server/foo/bar_server.go",
+			},
 		},
 		{
-			input:           "bar/baz/qux",
-			importPath:      "foo",
-			path:            "bar/baz/qux",
-			name:            "qux",
-			serviceName:     "Qux",
-			packagePath:     "bar/baz",
-			packageName:     "baz",
-			pbgoPackagePath: "api/bar/baz",
-			pbgoPackageName: "baz_pb",
-			protoPackage:    "foo.api.bar.baz",
+			name: "foo/bar_baz",
+			files: []string{
+				"api/protos/foo/bar_baz.proto",
+				"app/server/foo/bar_baz_server.go",
+			},
 		},
 		{
-			input:           "bar/baz/qux_quux",
-			importPath:      "foo",
-			path:            "bar/baz/qux_quux",
-			name:            "qux_quux",
-			serviceName:     "QuxQuux",
-			packagePath:     "bar/baz",
-			packageName:     "baz",
-			pbgoPackagePath: "api/bar/baz",
-			pbgoPackageName: "baz_pb",
-			protoPackage:    "foo.api.bar.baz",
-		},
-		{
-			input:           "bar/baz/qux-quux",
-			importPath:      "foo",
-			path:            "bar/baz/qux_quux",
-			name:            "qux_quux",
-			serviceName:     "QuxQuux",
-			packagePath:     "bar/baz",
-			packageName:     "baz",
-			pbgoPackagePath: "api/bar/baz",
-			pbgoPackageName: "baz_pb",
-			protoPackage:    "foo.api.bar.baz",
-		},
-		{
-			input:           "bar-baz/qux-quux",
-			importPath:      "foo",
-			path:            "bar_baz/qux_quux",
-			name:            "qux_quux",
-			serviceName:     "QuxQuux",
-			packagePath:     "bar_baz",
-			packageName:     "bar_baz",
-			pbgoPackagePath: "api/bar_baz",
-			pbgoPackageName: "bar_baz_pb",
-			protoPackage:    "foo.api.bar_baz",
+			name: "foo/bar-baz",
+			files: []string{
+				"api/protos/foo/bar_baz.proto",
+				"app/server/foo/bar_baz_server.go",
+			},
 		},
 	}
 
 	for _, c := range cases {
-		ui := moduletesting.NewMockUI(ctrl)
-		fs := afero.NewMemMapFs()
+		t.Run(c.name, func(t *testing.T) {
+			t.Run("Generate", func(t *testing.T) {
+				err := generator.GenerateService(c.name)
 
-		generator := newServiceGenerator(fs, ui, rootDir).(*serviceGenerator)
+				if err != nil {
+					t.Errorf("returned an error %v", err)
+				}
 
-		got, err := generator.createParams(c.input)
+				for _, file := range c.files {
+					t.Run(file, func(t *testing.T) {
+						data, err := afero.ReadFile(fs, filepath.Join(rootDir, file))
 
-		if err != nil {
-			t.Errorf("Perform() returned an error %v", err)
-		}
+						if err != nil {
+							t.Errorf("returned an error %v", err)
+						}
 
-		want := map[string]interface{}{
-			"importPath":      c.importPath,
-			"path":            c.path,
-			"name":            c.name,
-			"serviceName":     c.serviceName,
-			"packagePath":     c.packagePath,
-			"packageName":     c.packageName,
-			"pbgoPackagePath": c.pbgoPackagePath,
-			"pbgoPackageName": c.pbgoPackageName,
-			"protoPackage":    c.protoPackage,
-		}
+						cupaloy.SnapshotT(t, string(data))
+					})
+				}
+			})
 
-		if diff := cmp.Diff(got, want); diff != "" {
-			t.Errorf("Received params differs: (-got +want)\n%s", diff)
-		}
+			t.Run("Destroy", func(t *testing.T) {
+				err := generator.DestroyService(c.name)
+
+				if err != nil {
+					t.Errorf("returned an error %v", err)
+				}
+
+				for _, file := range c.files {
+					t.Run(file, func(t *testing.T) {
+						ok, err := afero.Exists(fs, filepath.Join(rootDir, file))
+
+						if err != nil {
+							t.Errorf("Exists(fs, %q) returned an error %v", file, err)
+						}
+
+						if ok {
+							t.Errorf("%q should not exist", file)
+						}
+					})
+				}
+			})
+		})
 	}
 }
