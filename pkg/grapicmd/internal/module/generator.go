@@ -15,6 +15,7 @@ type ProjectGenerator interface {
 // ServiceGenerator is an interface to create or destroy gRPC services and implementations.
 type ServiceGenerator interface {
 	GenerateService(name string, methods ...string) error
+	ScaffoldService(name string) error
 	DestroyService(name string) error
 }
 

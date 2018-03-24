@@ -60,6 +60,18 @@ func (_mr *MockGeneratorMockRecorder) GenerateService(arg0 interface{}, arg1 ...
 	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockGenerator)(nil).GenerateService), _s...)
 }
 
+// ScaffoldService mocks base method
+func (_m *MockGenerator) ScaffoldService(name string) error {
+	ret := _m.ctrl.Call(_m, "ScaffoldService", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ScaffoldService indicates an expected call of ScaffoldService
+func (_mr *MockGeneratorMockRecorder) ScaffoldService(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "ScaffoldService", reflect.TypeOf((*MockGenerator)(nil).ScaffoldService), arg0)
+}
+
 // DestroyService mocks base method
 func (_m *MockGenerator) DestroyService(name string) error {
 	ret := _m.ctrl.Call(_m, "DestroyService", name)
@@ -169,6 +181,18 @@ func (_m *MockServiceGenerator) GenerateService(name string, methods ...string) 
 func (_mr *MockServiceGeneratorMockRecorder) GenerateService(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	_s := append([]interface{}{arg0}, arg1...)
 	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockServiceGenerator)(nil).GenerateService), _s...)
+}
+
+// ScaffoldService mocks base method
+func (_m *MockServiceGenerator) ScaffoldService(name string) error {
+	ret := _m.ctrl.Call(_m, "ScaffoldService", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ScaffoldService indicates an expected call of ScaffoldService
+func (_mr *MockServiceGeneratorMockRecorder) ScaffoldService(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "ScaffoldService", reflect.TypeOf((*MockServiceGenerator)(nil).ScaffoldService), arg0)
 }
 
 // DestroyService mocks base method

@@ -33,9 +33,10 @@ func Test_ServiceGenerator(t *testing.T) {
 	generator := newServiceGenerator(fs, ui, rootDir)
 
 	cases := []struct {
-		name  string
-		args  []string
-		files []string
+		name     string
+		args     []string
+		files    []string
+		scaffold bool
 	}{
 		{
 			name: "foo",
@@ -81,6 +82,14 @@ func Test_ServiceGenerator(t *testing.T) {
 				"app/server/foo/bar_baz_server.go",
 			},
 		},
+		{
+			name: "book",
+			files: []string{
+				"api/protos/book.proto",
+				"app/server/book_server.go",
+			},
+			scaffold: true,
+		},
 	}
 
 	for _, c := range cases {
@@ -89,8 +98,17 @@ func Test_ServiceGenerator(t *testing.T) {
 			test += " with " + strings.Join(c.args, ",")
 		}
 		t.Run(test, func(t *testing.T) {
-			t.Run("Generate", func(t *testing.T) {
-				err := generator.GenerateService(c.name, c.args...)
+			test := "Generate"
+			if c.scaffold {
+				test = "Scaffold"
+			}
+			t.Run(test, func(t *testing.T) {
+				var err error
+				if c.scaffold {
+					err = generator.ScaffoldService(c.name)
+				} else {
+					err = generator.GenerateService(c.name, c.args...)
+				}
 
 				if err != nil {
 					t.Errorf("returned an error %v", err)
