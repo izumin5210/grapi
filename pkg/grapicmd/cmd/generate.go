@@ -28,6 +28,7 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 		Short:         "Generate a new service",
 		SilenceErrors: true,
 		SilenceUsage:  true,
+		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !cfg.IsInsideApp() {
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
@@ -46,8 +47,11 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 
 func newGenerateCommandCommand(cfg grapicmd.Config, generator module.CommandGenerator) *cobra.Command {
 	return &cobra.Command{
-		Use:   "command NAME",
-		Short: "Generate a new command",
+		Use:           "command NAME",
+		Short:         "Generate a new command",
+		SilenceErrors: true,
+		SilenceUsage:  true,
+		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !cfg.IsInsideApp() {
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
