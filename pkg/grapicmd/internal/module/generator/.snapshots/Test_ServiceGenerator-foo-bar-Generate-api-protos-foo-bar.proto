@@ -1,0 +1,20 @@
+syntax = "proto3";
+option go_package = "foo_pb";
+package testapp.api.foo;
+
+import "google/api/annotations.proto";
+
+service BarService {	
+  rpc GetBar (GetBarRequest) returns (GetBarResponse) {
+    option (google.api.http) = {
+      get:  "/foo/bar"
+    };
+  }
+}
+
+message GetBarRequest {
+}
+
+message GetBarResponse {
+}
+
