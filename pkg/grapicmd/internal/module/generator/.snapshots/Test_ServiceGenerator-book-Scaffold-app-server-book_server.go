@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/izumin5210/grapi/pkg/grapiserver"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -13,7 +14,7 @@ import (
 )
 
 // New creates a new BookServiceServer instance.
-func New() interface {
+func NewBookServiceServer() interface {
 	api_pb.BookServiceServer
 	grapiserver.Server
 } {

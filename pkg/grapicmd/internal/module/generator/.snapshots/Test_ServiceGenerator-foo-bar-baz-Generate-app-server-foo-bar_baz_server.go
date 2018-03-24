@@ -3,6 +3,7 @@ package foo
 import (
 	"context"
 
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/izumin5210/grapi/pkg/grapiserver"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -12,7 +13,7 @@ import (
 )
 
 // New creates a new BarBazServiceServer instance.
-func New() interface {
+func NewBarBazServiceServer() interface {
 	foo_pb.BarBazServiceServer
 	grapiserver.Server
 } {

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/izumin5210/grapi/pkg/grapiserver"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -12,7 +13,7 @@ import (
 )
 
 // New creates a new FooServiceServer instance.
-func New() interface {
+func NewFooServiceServer() interface {
 	api_pb.FooServiceServer
 	grapiserver.Server
 } {
