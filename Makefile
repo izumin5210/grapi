@@ -18,7 +18,7 @@ MOCK_PKG := pkg/grapicmd/internal/module/testing
 GENERATED_PKGS := $(TEMPLATE_PKG)
 GENERATED_PKGS += $(MOCK_PKG)
 
-SRC_FILES := $(shell git ls-files --cached --others --exclude-standard | grep -E "\.go$$")
+SRC_FILES := $(shell git ls-files --cached --others --exclude-standard | grep -E "\.go$$" | grep -v ".snapshot")
 GOFMT_TARGET := $(SRC_FILES)
 $(foreach pkg,$(GENERATED_PKGS),$(eval GOFMT_TARGET := $(filter-out $(pkg)/%,$(GOFMT_TARGET))))
 GOLINT_TARGET := $(shell go list ./...)
