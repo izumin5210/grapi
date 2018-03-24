@@ -10,7 +10,7 @@ import (
 )
 
 // New creates a new {{.Go.ServerName}} instance.
-func New() interface {
+func New{{.Go.ServerName}}() interface {
 	{{.PbGo.PackageName }}.{{.Go.ServerName}}
 	grapiserver.Server
 } {
