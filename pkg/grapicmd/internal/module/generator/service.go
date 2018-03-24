@@ -2,8 +2,10 @@ package generator
 
 import (
 	"path/filepath"
+	"sort"
 	"strings"
 
+	"github.com/jinzhu/inflection"
 	"github.com/pkg/errors"
 	"github.com/serenize/snaker"
 	"github.com/spf13/afero"
@@ -26,7 +28,7 @@ func newServiceGenerator(fs afero.Fs, ui module.UI, rootDir string) module.Servi
 }
 
 func (g *serviceGenerator) GenerateService(name string, methods ...string) error {
-	data, err := g.createParams(name)
+	data, err := g.createParams(name, methods)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -34,14 +36,113 @@ func (g *serviceGenerator) GenerateService(name string, methods ...string) error
 }
 
 func (g *serviceGenerator) DestroyService(name string) error {
-	data, err := g.createParams(name)
+	data, err := g.createParams(name, []string{})
 	if err != nil {
 		return errors.WithStack(err)
 	}
 	return g.Destroy(g.rootDir, data)
 }
 
-func (g *serviceGenerator) createParams(path string) (map[string]interface{}, error) {
+type nameParams struct {
+	pluralCamel        string
+	pluralCamelLower   string
+	pluralSnake        string
+	singularCamel      string
+	singularCamelLower string
+	singularSnake      string
+}
+
+type serviceParams struct {
+	Path        string
+	ServiceName string
+	Methods     []serviceMethodParams
+	Proto       serviceProtoParams
+	PbGo        servicePbGoParams
+	Go          serviceGoParams
+}
+
+type serviceProtoParams struct {
+	Package  string
+	Imports  []string
+	Messages []serviceMethodMessage
+}
+
+type servicePbGoParams struct {
+	PackageName string
+	PackagePath string
+}
+
+type serviceGoParams struct {
+	Package    string
+	Imports    []string
+	ServerName string
+	StructName string
+}
+
+type serviceMethodsParams struct {
+	Methods      []serviceMethodParams
+	ProtoImports []string
+	GoImports    []string
+	Messages     []serviceMethodMessage
+}
+
+type serviceMethodParams struct {
+	Method         string
+	HTTP           serviceMethodHTTPParams
+	requestCommon  string
+	requestGo      string
+	requestProto   string
+	responseCommon string
+	responseGo     string
+	responseProto  string
+}
+
+func (p *serviceMethodParams) RequestGo(pkg string) string {
+	if p.requestGo == "" {
+		return pkg + "." + p.requestCommon
+	}
+	return p.requestGo
+}
+
+func (p *serviceMethodParams) RequestProto() string {
+	if p.requestProto == "" {
+		return p.requestCommon
+	}
+	return p.requestProto
+}
+
+func (p *serviceMethodParams) ResponseGo(pkg string) string {
+	if p.responseGo == "" {
+		return pkg + "." + p.responseCommon
+	}
+	return p.responseGo
+}
+
+func (p *serviceMethodParams) ResponseProto() string {
+	if p.responseProto == "" {
+		return p.responseCommon
+	}
+	return p.responseProto
+}
+
+type serviceMethodMessage struct {
+	Name   string
+	Fields []serviceMethodMessageField
+}
+
+type serviceMethodMessageField struct {
+	Name     string
+	Type     string
+	Repeated bool
+}
+
+type serviceMethodHTTPParams struct {
+	Method string
+	Path   string
+	Body   string
+}
+
+func (g *serviceGenerator) createParams(path string, methodNames []string) (*serviceParams, error) {
 	// github.com/foo/bar
 	importPath, err := fs.GetImportPath(g.rootDir)
 	if err != nil {
@@ -53,8 +154,18 @@ func (g *serviceGenerator) createParams(path string) (map[string]interface{}, er
 
 	// quux
 	name := filepath.Base(path)
+
+	nameParams := nameParams{
+		pluralCamel:   inflection.Plural(snaker.SnakeToCamel(name)),
+		singularCamel: inflection.Singular(snaker.SnakeToCamel(name)),
+	}
+	nameParams.pluralCamelLower = strings.ToLower(string(nameParams.pluralCamel[0])) + nameParams.pluralCamel[1:]
+	nameParams.pluralSnake = snaker.CamelToSnake(nameParams.pluralCamel)
+	nameParams.singularCamelLower = strings.ToLower(string(nameParams.singularCamel[0])) + nameParams.singularCamel[1:]
+	nameParams.singularSnake = snaker.CamelToSnake(nameParams.singularCamel)
+
 	// Quux
-	serviceName := snaker.SnakeToCamel(name)
+	serviceName := nameParams.singularCamel
 	// quux
 	localServiceName := strings.ToLower(string(serviceName[0])) + serviceName[1:]
 
@@ -85,16 +196,169 @@ func (g *serviceGenerator) createParams(path string) (map[string]interface{}, er
 	// com.github.foo.bar.baz.qux
 	protoPackage := strings.Join(protoPackageChunks, ".")
 
-	return map[string]interface{}{
-		"importPath":       importPath,
-		"path":             path,
-		"name":             name,
-		"serviceName":      serviceName,
-		"localServiceName": localServiceName,
-		"packagePath":      packagePath,
-		"packageName":      packageName,
-		"pbgoPackagePath":  pbgoPackagePath,
-		"pbgoPackageName":  pbgoPackageName,
-		"protoPackage":     protoPackage,
-	}, nil
+	protoImports := []string{
+		"google/api/annotations.proto",
+	}
+	goImports := []string{
+		"google.golang.org/grpc",
+		"google.golang.org/grpc/codes",
+		"google.golang.org/grpc/status",
+	}
+
+	methods := g.createMethodParams(nameParams, methodNames)
+
+	protoImports = append(protoImports, methods.ProtoImports...)
+	sort.Strings(protoImports)
+	goImports = append(goImports, methods.GoImports...)
+	sort.Strings(goImports)
+
+	params := &serviceParams{
+		Path:        path,
+		ServiceName: serviceName,
+		Methods:     methods.Methods,
+		Proto: serviceProtoParams{
+			Package:  protoPackage,
+			Imports:  protoImports,
+			Messages: methods.Messages,
+		},
+		PbGo: servicePbGoParams{
+			PackageName: pbgoPackageName,
+			PackagePath: filepath.Join(importPath, pbgoPackagePath),
+		},
+		Go: serviceGoParams{
+			Package:    packageName,
+			Imports:    goImports,
+			ServerName: serviceName + "Service" + "Server",
+			StructName: localServiceName + "Service" + "Server" + "Impl",
+		},
+	}
+
+	return params, nil
+}
+
+func (g *serviceGenerator) createMethodParams(name nameParams, methods []string) (
+	params serviceMethodsParams,
+) {
+	id := name.singularSnake + "_id"
+	resource := &serviceMethodMessage{
+		Name:   name.singularCamel,
+		Fields: []serviceMethodMessageField{{Name: id, Type: "string"}},
+	}
+
+	basicMethods := [5]*serviceMethodParams{}
+	customMethods := []serviceMethodParams{}
+	basicMessages := [7]*serviceMethodMessage{}
+	customMessages := []serviceMethodMessage{}
+
+	for _, meth := range methods {
+		switch strings.ToLower(meth) {
+		case "list":
+			methodName := "List" + name.pluralCamel
+			reqName := methodName + "Request"
+			respName := methodName + "Response"
+			basicMethods[0] = &serviceMethodParams{
+				Method:         methodName,
+				requestCommon:  reqName,
+				responseCommon: respName,
+				HTTP:           serviceMethodHTTPParams{Method: "get", Path: name.pluralSnake},
+			}
+			basicMessages[0] = resource
+			basicMessages[1] = &serviceMethodMessage{Name: reqName}
+			basicMessages[2] = &serviceMethodMessage{
+				Name:   respName,
+				Fields: []serviceMethodMessageField{{Name: name.pluralSnake, Type: name.singularCamel, Repeated: true}},
+			}
+		case "get":
+			methodName := "Get" + name.singularCamel
+			reqName := methodName + "Request"
+			basicMethods[1] = &serviceMethodParams{
+				Method:         methodName,
+				requestCommon:  reqName,
+				responseCommon: resource.Name,
+				HTTP:           serviceMethodHTTPParams{Method: "get", Path: name.pluralSnake + "/{" + id + "}"},
+			}
+			basicMessages[0] = resource
+			basicMessages[3] = &serviceMethodMessage{
+				Name:   reqName,
+				Fields: []serviceMethodMessageField{{Name: id, Type: "string"}},
+			}
+		case "create":
+			methodName := "Create" + name.singularCamel
+			reqName := methodName + "Request"
+			basicMethods[2] = &serviceMethodParams{
+				Method:         methodName,
+				requestCommon:  reqName,
+				responseCommon: resource.Name,
+				HTTP:           serviceMethodHTTPParams{Method: "post", Path: name.pluralSnake, Body: name.singularSnake},
+			}
+			basicMessages[0] = resource
+			basicMessages[4] = &serviceMethodMessage{
+				Name:   reqName,
+				Fields: []serviceMethodMessageField{{Name: name.singularSnake, Type: name.singularCamel}},
+			}
+		case "update":
+			methodName := "Update" + name.singularCamel
+			reqName := methodName + "Request"
+			basicMethods[3] = &serviceMethodParams{
+				Method:         methodName,
+				requestCommon:  reqName,
+				responseCommon: resource.Name,
+				HTTP:           serviceMethodHTTPParams{Method: "patch", Path: name.pluralSnake + "/{" + name.singularSnake + "." + id + "}", Body: name.singularSnake},
+			}
+			basicMessages[0] = resource
+			basicMessages[5] = &serviceMethodMessage{
+				Name:   reqName,
+				Fields: []serviceMethodMessageField{{Name: name.singularSnake, Type: name.singularCamel}},
+			}
+		case "delete":
+			methodName := "Delete" + name.singularCamel
+			reqName := methodName + "Request"
+			basicMethods[4] = &serviceMethodParams{
+				Method:        methodName,
+				requestCommon: reqName,
+				responseProto: "google.protobuf.Empty",
+				responseGo:    "empty.Empty",
+				HTTP:          serviceMethodHTTPParams{Method: "patch", Path: name.pluralSnake + "/{" + id + "}"},
+			}
+			basicMessages[6] = &serviceMethodMessage{
+				Name:   reqName,
+				Fields: []serviceMethodMessageField{{Name: id, Type: "string"}},
+			}
+			params.ProtoImports = append(params.ProtoImports, "google/protobuf/empty.proto")
+			params.GoImports = append(params.GoImports, "github.com/golang/protobuf/ptypes/empty")
+		default:
+			methodName := snaker.SnakeToCamel(meth)
+			reqName := methodName + "Request"
+			respName := methodName + "Response"
+			customMethods = append(customMethods, serviceMethodParams{
+				Method:         methodName,
+				requestCommon:  reqName,
+				responseCommon: respName,
+				HTTP:           serviceMethodHTTPParams{Method: "get", Path: name.pluralSnake + "/" + snaker.CamelToSnake(meth)},
+			})
+			customMessages = append(
+				customMessages,
+				serviceMethodMessage{Name: reqName},
+				serviceMethodMessage{Name: respName},
+			)
+		}
+	}
+
+	for _, meth := range basicMethods {
+		if meth != nil {
+			params.Methods = append(params.Methods, *meth)
+		}
+	}
+	for _, msg := range basicMessages {
+		if msg != nil {
+			params.Messages = append(params.Messages, *msg)
+		}
+	}
+	for _, meth := range customMethods {
+		params.Methods = append(params.Methods, meth)
+	}
+	for _, msg := range customMessages {
+		params.Messages = append(params.Messages, msg)
+	}
+	return
 }

@@ -1,0 +1,38 @@
+package {{.Go.Package }}
+
+import (
+	"context"
+{{range .Go.Imports}}
+	"{{.}}"
+{{- end}}
+
+	{{.PbGo.PackageName}} "{{ .PbGo.PackagePath }}"
+)
+
+var (
+	// Register{{.ServiceName}}ServiceHandler is a function to register card service handler to gRPC Gateway's mux.
+	Register{{.ServiceName}}ServiceHandler = {{.PbGo.PackageName}}.Register{{.ServiceName}}ServiceHandler
+)
+
+// Register{{.Go.ServerName}}Factory creates a function to register card service server impl to grpc.Server.
+func Register{{.Go.ServerName}}Factory() func(s *grpc.Server) {
+	return func(s *grpc.Server) {
+		{{.PbGo.PackageName}}.Register{{.Go.ServerName}}(s, New())
+	}
+}
+
+// New creates a new {{.Go.ServerName}} instance.
+func New() {{.PbGo.PackageName }}.{{.Go.ServerName}} {
+	return &{{.Go.StructName}}{}
+}
+
+type {{.Go.StructName}} struct {
+}
+{{$go := .Go -}}
+{{$pbGo := .PbGo -}}
+{{- range .Methods}}
+func (s *{{$go.StructName}}) {{.Method}}(ctx context.Context, req *{{.RequestGo $pbGo.PackageName}}) (*{{.ResponseGo $pbGo.PackageName}}, error) {
+	// TODO: Not yet implemented.
+	return nil, status.Error(codes.Unimplemented, "TODO: You should implement it!")
+}
+{{end -}}
