@@ -1,12 +1,14 @@
 package grapiserver
 
 import (
-	"net"
-	"sync"
+	"context"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"google.golang.org/grpc"
 )
 
-// Server provides an interface for starting and stopping the server.
+// Server is an interface for representing gRPC server implementations.
 type Server interface {
-	Serve(l net.Listener, wg *sync.WaitGroup)
-	Shutdown()
+	RegisterWithServer(*grpc.Server)
+	RegisterWithHandler(context.Context, *runtime.ServeMux, *grpc.ClientConn) error
 }

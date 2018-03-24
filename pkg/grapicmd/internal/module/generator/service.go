@@ -209,6 +209,8 @@ func (g *serviceGenerator) createParams(path string, methodNames []string) (*ser
 		"google/api/annotations.proto",
 	}
 	goImports := []string{
+		"github.com/grpc-ecosystem/grpc-gateway/runtime",
+		"github.com/izumin5210/grapi/pkg/grapiserver",
 		"google.golang.org/grpc",
 		"google.golang.org/grpc/codes",
 		"google.golang.org/grpc/status",

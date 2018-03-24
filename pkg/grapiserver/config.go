@@ -1,7 +1,6 @@
 package grapiserver
 
 import (
-	"context"
 	"net"
 	"os"
 	"path/filepath"
@@ -27,12 +26,6 @@ var (
 		MaxConcurrentStreams: 1000,
 	}
 )
-
-// RegisterGatewayHandlerFunc represents gRPC gateway's register handler functions.
-type RegisterGatewayHandlerFunc func(context.Context, *runtime.ServeMux, *grpc.ClientConn) error
-
-// RegisterGrpcServerImplFunc should register gRPC service server implementations to *grpc.Server.
-type RegisterGrpcServerImplFunc func(s *grpc.Server)
 
 // Address represents a network end point address.
 type Address struct {
@@ -63,8 +56,7 @@ func (a *Address) createListener() (net.Listener, error) {
 type Config struct {
 	GrpcInternalAddr                *Address
 	GatewayAddr                     *Address
-	RegisterGrpcServerImplFuncs     []RegisterGrpcServerImplFunc
-	RegisterGatewayHandlerFuncs     []RegisterGatewayHandlerFunc
+	Servers                         []Server
 	GrpcServerUnaryInterceptors     []grpc.UnaryServerInterceptor
 	GrpcServerStreamInterceptors    []grpc.StreamServerInterceptor
 	GatewayServerUnaryInterceptors  []grpc.UnaryClientInterceptor

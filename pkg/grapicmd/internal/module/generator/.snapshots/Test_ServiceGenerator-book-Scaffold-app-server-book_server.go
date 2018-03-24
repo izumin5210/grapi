@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/izumin5210/grapi/pkg/grapiserver"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -11,24 +13,25 @@ import (
 	api_pb "testapp/api"
 )
 
-var (
-	// RegisterBookServiceHandler is a function to register card service handler to gRPC Gateway's mux.
-	RegisterBookServiceHandler = api_pb.RegisterBookServiceHandler
-)
-
-// RegisterBookServiceServerFactory creates a function to register card service server impl to grpc.Server.
-func RegisterBookServiceServerFactory() func(s *grpc.Server) {
-	return func(s *grpc.Server) {
-		api_pb.RegisterBookServiceServer(s, New())
-	}
-}
-
 // New creates a new BookServiceServer instance.
-func New() api_pb.BookServiceServer {
+func NewBookServiceServer() interface {
+	api_pb.BookServiceServer
+	grapiserver.Server
+} {
 	return &bookServiceServerImpl{}
 }
 
 type bookServiceServerImpl struct {
+}
+
+// RegisterWithServer implements grapiserver.Server.RegisterWithServer.
+func (s *bookServiceServerImpl) RegisterWithServer(grpcSvr *grpc.Server) {
+	api_pb.RegisterBookServiceServer(grpcSvr, s)
+}
+
+// RegisterWithHandler implements grapiserver.Server.RegisterWithHandler.
+func (s *bookServiceServerImpl) RegisterWithHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return api_pb.RegisterBookServiceHandler(ctx, mux, conn)
 }
 
 func (s *bookServiceServerImpl) ListBooks(ctx context.Context, req *api_pb.ListBooksRequest) (*api_pb.ListBooksResponse, error) {

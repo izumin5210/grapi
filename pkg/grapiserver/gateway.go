@@ -8,13 +8,14 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/izumin5210/grapi/pkg/grapiserver/internal"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 )
 
 // NewGatewayServer creates GrpcServer instance.
-func NewGatewayServer(c *Config) Server {
+func NewGatewayServer(c *Config) internal.Server {
 	return &GatewayServer{
 		Config: c,
 	}
@@ -77,9 +78,8 @@ func (s *GatewayServer) createServer(conn *grpc.ClientConn) (*http.Server, error
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 
-	grpclog.Infof("register %d server handlers to gRPC Gateway", len(s.RegisterGatewayHandlerFuncs))
-	for _, register := range s.RegisterGatewayHandlerFuncs {
-		err := register(ctx, mux, conn)
+	for _, svr := range s.Servers {
+		err := svr.RegisterWithHandler(ctx, mux, conn)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to register handler")
 		}

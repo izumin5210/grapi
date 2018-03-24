@@ -3,6 +3,8 @@ package server
 import (
 	"context"
 
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/izumin5210/grapi/pkg/grapiserver"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -10,23 +12,24 @@ import (
 	api_pb "testapp/api"
 )
 
-var (
-	// RegisterFooServiceHandler is a function to register card service handler to gRPC Gateway's mux.
-	RegisterFooServiceHandler = api_pb.RegisterFooServiceHandler
-)
-
-// RegisterFooServiceServerFactory creates a function to register card service server impl to grpc.Server.
-func RegisterFooServiceServerFactory() func(s *grpc.Server) {
-	return func(s *grpc.Server) {
-		api_pb.RegisterFooServiceServer(s, New())
-	}
-}
-
 // New creates a new FooServiceServer instance.
-func New() api_pb.FooServiceServer {
+func NewFooServiceServer() interface {
+	api_pb.FooServiceServer
+	grapiserver.Server
+} {
 	return &fooServiceServerImpl{}
 }
 
 type fooServiceServerImpl struct {
+}
+
+// RegisterWithServer implements grapiserver.Server.RegisterWithServer.
+func (s *fooServiceServerImpl) RegisterWithServer(grpcSvr *grpc.Server) {
+	api_pb.RegisterFooServiceServer(grpcSvr, s)
+}
+
+// RegisterWithHandler implements grapiserver.Server.RegisterWithHandler.
+func (s *fooServiceServerImpl) RegisterWithHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return api_pb.RegisterFooServiceHandler(ctx, mux, conn)
 }
 
