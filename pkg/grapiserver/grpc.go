@@ -21,9 +21,8 @@ type GrpcServer struct {
 func NewGrpcServer(c *Config) internal.Server {
 	s := grpc.NewServer(c.serverOptions()...)
 	reflection.Register(s)
-	grpclog.Infof("register %d server impls to gRPC server", len(c.RegisterGrpcServerImplFuncs))
-	for _, register := range c.RegisterGrpcServerImplFuncs {
-		register(s)
+	for _, svr := range c.Servers {
+		svr.RegisterWithServer(s)
 	}
 	return &GrpcServer{
 		server: s,

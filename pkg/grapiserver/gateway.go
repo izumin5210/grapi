@@ -78,9 +78,8 @@ func (s *GatewayServer) createServer(conn *grpc.ClientConn) (*http.Server, error
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 
-	grpclog.Infof("register %d server handlers to gRPC Gateway", len(s.RegisterGatewayHandlerFuncs))
-	for _, register := range s.RegisterGatewayHandlerFuncs {
-		err := register(ctx, mux, conn)
+	for _, svr := range s.Servers {
+		err := svr.RegisterWithHandler(ctx, mux, conn)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to register handler")
 		}

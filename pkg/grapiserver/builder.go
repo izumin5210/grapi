@@ -10,12 +10,11 @@ import (
 type Builder interface {
 	SetGrpcInternalAddr(network, addr string) Builder
 	SetGatewayAddr(network, addr string) Builder
+	AddServers(svrs ...Server) Builder
 	AddGrpcServerUnaryInterceptors(interceptors ...grpc.UnaryServerInterceptor) Builder
 	AddGrpcServerStreamInterceptors(interceptors ...grpc.StreamServerInterceptor) Builder
 	AddGatewayServerUnaryInterceptors(interceptors ...grpc.UnaryClientInterceptor) Builder
 	AddGatewayServerStreamInterceptors(interceptors ...grpc.StreamClientInterceptor) Builder
-	AddRegisterGrpcServerImplFuncs(registerFuncs ...RegisterGrpcServerImplFunc) Builder
-	AddRegisterGatewayHandlerFuncs(registerFuncs ...RegisterGatewayHandlerFunc) Builder
 	AddGrpcServerOptions(opts ...grpc.ServerOption) Builder
 	AddGatewayDialOptions(opts ...grpc.DialOption) Builder
 	AddGatewayMuxOptions(opts ...runtime.ServeMuxOption) Builder
@@ -53,6 +52,11 @@ func (b *builder) SetGatewayAddr(network, addr string) Builder {
 	return b
 }
 
+func (b *builder) AddServers(svrs ...Server) Builder {
+	b.c.Servers = append(b.c.Servers, svrs...)
+	return b
+}
+
 func (b *builder) AddGrpcServerUnaryInterceptors(interceptors ...grpc.UnaryServerInterceptor) Builder {
 	b.c.GrpcServerUnaryInterceptors = append(b.c.GrpcServerUnaryInterceptors, interceptors...)
 	return b
@@ -70,16 +74,6 @@ func (b *builder) AddGatewayServerUnaryInterceptors(interceptors ...grpc.UnaryCl
 
 func (b *builder) AddGatewayServerStreamInterceptors(interceptors ...grpc.StreamClientInterceptor) Builder {
 	b.c.GatewayServerStreamInterceptors = append(b.c.GatewayServerStreamInterceptors, interceptors...)
-	return b
-}
-
-func (b *builder) AddRegisterGrpcServerImplFuncs(registerFuncs ...RegisterGrpcServerImplFunc) Builder {
-	b.c.RegisterGrpcServerImplFuncs = append(b.c.RegisterGrpcServerImplFuncs, registerFuncs...)
-	return b
-}
-
-func (b *builder) AddRegisterGatewayHandlerFuncs(registerFuncs ...RegisterGatewayHandlerFunc) Builder {
-	b.c.RegisterGatewayHandlerFuncs = append(b.c.RegisterGatewayHandlerFuncs, registerFuncs...)
 	return b
 }
 
