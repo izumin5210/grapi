@@ -34,7 +34,7 @@ func Test_Integration(t *testing.T) {
 	fs.MkdirAll(srcDir, 0755)
 	defer fs.RemoveAll(gopath)
 
-	cmd := exec.Command(bin, "--debug", "init", name)
+	cmd := exec.Command(bin, "--debug", "init", "--HEAD", name)
 	cmd.Dir = srcDir
 	cmd.Env = append(os.Environ(), "GOPATH="+gopath)
 	out, err := cmd.CombinedOutput()
@@ -174,17 +174,12 @@ func updateRun(t *testing.T, fs afero.Fs, rootPath string, port int) {
 								},
 							},
 						}
-					case "AddRegisterGrpcServerImplFuncs":
+					case "AddServers":
 						n.Args = append(n.Args, &ast.CallExpr{
 							Fun: &ast.SelectorExpr{
 								X:   ast.NewIdent("server"),
-								Sel: ast.NewIdent("RegisterBookServiceServerFactory"),
+								Sel: ast.NewIdent("NewBookServiceServer"),
 							},
-						})
-					case "AddRegisterGatewayHandlerFuncs":
-						n.Args = append(n.Args, &ast.SelectorExpr{
-							X:   ast.NewIdent("server"),
-							Sel: ast.NewIdent("RegisterBookServiceHandler"),
 						})
 					}
 				}
@@ -226,6 +221,18 @@ func updateServerImpl(t *testing.T, fs afero.Fs, rootPath string) {
 							Path: &ast.BasicLit{
 								Kind:  token.STRING,
 								Value: strconv.Quote("context"),
+							},
+						},
+						&ast.ImportSpec{
+							Path: &ast.BasicLit{
+								Kind:  token.STRING,
+								Value: strconv.Quote("github.com/grpc-ecosystem/grpc-gateway/runtime"),
+							},
+						},
+						&ast.ImportSpec{
+							Path: &ast.BasicLit{
+								Kind:  token.STRING,
+								Value: strconv.Quote("github.com/izumin5210/grapi/pkg/grapiserver"),
 							},
 						},
 						&ast.ImportSpec{
