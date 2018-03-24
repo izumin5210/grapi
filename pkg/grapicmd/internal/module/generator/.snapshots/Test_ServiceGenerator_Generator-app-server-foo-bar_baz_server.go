@@ -24,13 +24,13 @@ func RegisterBarBazServiceServerFactory() func(s *grpc.Server) {
 
 // New creates a new BarBazServiceServer instance.
 func New() foo_pb.BarBazServiceServer {
-	return &bar_bazServiceServerImpl{}
+	return &barBazServiceServerImpl{}
 }
 
-type bar_bazServiceServerImpl struct {
+type barBazServiceServerImpl struct {
 }
 
-func (s *bar_bazServiceServerImpl) GetBarBaz(ctx context.Context, req *foo_pb.GetBarBazRequest) (*foo_pb.GetBarBazResponse, error) {
+func (s *barBazServiceServerImpl) GetBarBaz(ctx context.Context, req *foo_pb.GetBarBazRequest) (*foo_pb.GetBarBazResponse, error) {
 	// TODO: Not yet implemented.
 	return nil, status.Error(codes.Unimplemented, "TODO: You should implement it!")
 }
