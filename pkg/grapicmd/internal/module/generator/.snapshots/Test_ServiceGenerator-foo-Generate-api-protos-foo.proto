@@ -4,17 +4,6 @@ package testapp.api;
 
 import "google/api/annotations.proto";
 
-service FooService {	
-  rpc GetFoo (GetFooRequest) returns (GetFooResponse) {
-    option (google.api.http) = {
-      get:  "/foo"
-    };
-  }
-}
-
-message GetFooRequest {
-}
-
-message GetFooResponse {
+service FooService {
 }
 

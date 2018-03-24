@@ -30,8 +30,3 @@ func New() api_pb.FooServiceServer {
 type fooServiceServerImpl struct {
 }
 
-func (s *fooServiceServerImpl) GetFoo(ctx context.Context, req *api_pb.GetFooRequest) (*api_pb.GetFooResponse, error) {
-	// TODO: Not yet implemented.
-	return nil, status.Error(codes.Unimplemented, "TODO: You should implement it!")
-}
-
