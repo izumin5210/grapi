@@ -35,6 +35,14 @@ func (g *serviceGenerator) GenerateService(name string, methods ...string) error
 	return g.Generate(g.rootDir, data)
 }
 
+func (g *serviceGenerator) ScaffoldService(name string) error {
+	data, err := g.createParams(name, []string{"list", "get", "create", "update", "delete"})
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return g.Generate(g.rootDir, data)
+}
+
 func (g *serviceGenerator) DestroyService(name string) error {
 	data, err := g.createParams(name, []string{})
 	if err != nil {
