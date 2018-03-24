@@ -17,6 +17,7 @@ func newGenerateCommand(cfg grapicmd.Config, ui module.UI, generator module.Gene
 	}
 
 	cmd.AddCommand(newGenerateServiceCommand(cfg, ui, generator, commandFactory))
+	cmd.AddCommand(newGenerateScaffoldServiceCommand(cfg, ui, generator, commandFactory))
 	cmd.AddCommand(newGenerateCommandCommand(cfg, generator))
 
 	return cmd
@@ -24,7 +25,7 @@ func newGenerateCommand(cfg grapicmd.Config, ui module.UI, generator module.Gene
 
 func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator module.ServiceGenerator, commandFactory module.CommandFactory) *cobra.Command {
 	return &cobra.Command{
-		Use:           "service NAME",
+		Use:           "service NAME [METHODS...]",
 		Short:         "Generate a new service",
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -35,6 +36,29 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 			}
 
 			err := errors.WithStack(generator.GenerateService(args[0], args[1:]...))
+			if err != nil {
+				return err
+			}
+
+			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ui, commandFactory, cfg.RootDir())
+			return errors.WithStack(protocUsecase.Perform())
+		},
+	}
+}
+
+func newGenerateScaffoldServiceCommand(cfg grapicmd.Config, ui module.UI, generator module.ServiceGenerator, commandFactory module.CommandFactory) *cobra.Command {
+	return &cobra.Command{
+		Use:           "scaffold-service NAME",
+		Short:         "Generate a new service with standard methods",
+		SilenceErrors: true,
+		SilenceUsage:  true,
+		Args:          cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if !cfg.IsInsideApp() {
+				return errors.New("geneate command should execut inside a grapi applicaiton directory")
+			}
+
+			err := errors.WithStack(generator.ScaffoldService(args[0]))
 			if err != nil {
 				return err
 			}
