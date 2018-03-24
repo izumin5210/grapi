@@ -28,8 +28,6 @@ func Test_ServiceGenerator(t *testing.T) {
 
 	ui := moduletesting.NewMockUI(ctrl)
 	ui.EXPECT().ItemSuccess(gomock.Any()).AnyTimes()
-	ui.EXPECT().ItemSkipped(gomock.Any()).AnyTimes() // TODO: 消す
-	ui.EXPECT().ItemFailure(gomock.Any()).AnyTimes() // TODO: 消す
 	fs := afero.NewMemMapFs()
 
 	generator := newServiceGenerator(fs, ui, rootDir)
