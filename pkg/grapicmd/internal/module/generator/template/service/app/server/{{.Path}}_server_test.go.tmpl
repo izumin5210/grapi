@@ -16,7 +16,7 @@ func Test_{{$go.ServerName}}_{{.Method}}(t *testing.T) {
 	svr := New{{$go.ServerName}}()
 
 	ctx := context.Background()
-	req := &{{.ResponseGo $pbGo.PackageName}}{}
+	req := &{{.RequestGo $pbGo.PackageName}}{}
 
 	resp, err := svr.{{.Method}}(ctx, req)
 
