@@ -39,6 +39,7 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
 			}
 
+			ui.Section("Generate service")
 			genCfg := module.ServiceGenerationConfig{Methods: args[1:], SkipTest: skipTest}
 			err := errors.WithStack(generator.GenerateService(args[0], genCfg))
 			if err != nil {
@@ -67,6 +68,7 @@ func newGenerateScaffoldServiceCommand(cfg grapicmd.Config, ui module.UI, genera
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
 			}
 
+			ui.Section("Generate command")
 			genCfg := module.ServiceGenerationConfig{}
 			err := errors.WithStack(generator.ScaffoldService(args[0], genCfg))
 			if err != nil {
