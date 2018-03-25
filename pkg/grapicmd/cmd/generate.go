@@ -24,7 +24,11 @@ func newGenerateCommand(cfg grapicmd.Config, ui module.UI, generator module.Gene
 }
 
 func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator module.ServiceGenerator, commandFactory module.CommandFactory) *cobra.Command {
-	return &cobra.Command{
+	var (
+		skipTest bool
+	)
+
+	cmd := &cobra.Command{
 		Use:           "service NAME [METHODS...]",
 		Short:         "Generate a new service",
 		SilenceErrors: true,
@@ -35,7 +39,9 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
 			}
 
-			err := errors.WithStack(generator.GenerateService(args[0], args[1:]...))
+			ui.Section("Generate service")
+			genCfg := module.ServiceGenerationConfig{Methods: args[1:], SkipTest: skipTest}
+			err := errors.WithStack(generator.GenerateService(args[0], genCfg))
 			if err != nil {
 				return err
 			}
@@ -44,6 +50,10 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 			return errors.WithStack(protocUsecase.Perform())
 		},
 	}
+
+	cmd.PersistentFlags().BoolVarP(&skipTest, "skip-test", "T", false, "Skip test files")
+
+	return cmd
 }
 
 func newGenerateScaffoldServiceCommand(cfg grapicmd.Config, ui module.UI, generator module.ServiceGenerator, commandFactory module.CommandFactory) *cobra.Command {
@@ -58,7 +68,9 @@ func newGenerateScaffoldServiceCommand(cfg grapicmd.Config, ui module.UI, genera
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
 			}
 
-			err := errors.WithStack(generator.ScaffoldService(args[0]))
+			ui.Section("Generate command")
+			genCfg := module.ServiceGenerationConfig{}
+			err := errors.WithStack(generator.ScaffoldService(args[0], genCfg))
 			if err != nil {
 				return err
 			}

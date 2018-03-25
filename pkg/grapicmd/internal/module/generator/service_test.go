@@ -10,6 +10,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	moduletesting "github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
@@ -28,21 +29,25 @@ func Test_ServiceGenerator(t *testing.T) {
 
 	ui := moduletesting.NewMockUI(ctrl)
 	ui.EXPECT().ItemSuccess(gomock.Any()).AnyTimes()
+	ui.EXPECT().ItemSkipped(gomock.Any()).AnyTimes()
 	fs := afero.NewMemMapFs()
 
 	generator := newServiceGenerator(fs, ui, rootDir)
 
 	cases := []struct {
-		name     string
-		args     []string
-		files    []string
-		scaffold bool
+		name         string
+		args         []string
+		files        []string
+		skippedFiles map[string]struct{}
+		scaffold     bool
+		skipTest     bool
 	}{
 		{
 			name: "foo",
 			files: []string{
 				"api/protos/foo.proto",
 				"app/server/foo_server.go",
+				"app/server/foo_server_test.go",
 			},
 		},
 		{
@@ -50,6 +55,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/foo/bar.proto",
 				"app/server/foo/bar_server.go",
+				"app/server/foo/bar_server_test.go",
 			},
 		},
 		{
@@ -57,6 +63,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/foo/bar_baz.proto",
 				"app/server/foo/bar_baz_server.go",
+				"app/server/foo/bar_baz_server_test.go",
 			},
 		},
 		{
@@ -64,6 +71,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/foo/bar_baz.proto",
 				"app/server/foo/bar_baz_server.go",
+				"app/server/foo/bar_baz_server_test.go",
 			},
 		},
 		{
@@ -72,6 +80,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/foo/bar_baz.proto",
 				"app/server/foo/bar_baz_server.go",
+				"app/server/foo/bar_baz_server_test.go",
 			},
 		},
 		{
@@ -80,6 +89,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/foo/bar_baz.proto",
 				"app/server/foo/bar_baz_server.go",
+				"app/server/foo/bar_baz_server_test.go",
 			},
 		},
 		{
@@ -87,8 +97,20 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/book.proto",
 				"app/server/book_server.go",
+				"app/server/book_server_test.go",
 			},
 			scaffold: true,
+		},
+		{
+			name: "book",
+			files: []string{
+				"api/protos/book.proto",
+				"app/server/book_server.go",
+			},
+			skippedFiles: map[string]struct{}{
+				"app/server/book_server_test.go": {},
+			},
+			skipTest: true,
 		},
 	}
 
@@ -102,27 +124,42 @@ func Test_ServiceGenerator(t *testing.T) {
 			if c.scaffold {
 				test = "Scaffold"
 			}
+			if c.skipTest {
+				test += " without test"
+			}
 			t.Run(test, func(t *testing.T) {
 				var err error
 				if c.scaffold {
-					err = generator.ScaffoldService(c.name)
+					err = generator.ScaffoldService(c.name, module.ServiceGenerationConfig{SkipTest: c.skipTest})
 				} else {
-					err = generator.GenerateService(c.name, c.args...)
+					err = generator.GenerateService(c.name, module.ServiceGenerationConfig{Methods: c.args, SkipTest: c.skipTest})
 				}
 
 				if err != nil {
-					t.Errorf("returned an error %v", err)
+					t.Errorf("returned an error: %v", err)
 				}
 
 				for _, file := range c.files {
 					t.Run(file, func(t *testing.T) {
-						data, err := afero.ReadFile(fs, filepath.Join(rootDir, file))
+						if _, ok := c.skippedFiles[file]; ok {
+							ok, err := afero.Exists(fs, file)
 
-						if err != nil {
-							t.Errorf("returned an error %v", err)
+							if err != nil {
+								t.Errorf("returned an error: %v", err)
+							}
+
+							if ok {
+								t.Error("should not exist")
+							}
+						} else {
+							data, err := afero.ReadFile(fs, filepath.Join(rootDir, file))
+
+							if err != nil {
+								t.Errorf("returned an error: %v", err)
+							}
+
+							cupaloy.SnapshotT(t, string(data))
 						}
-
-						cupaloy.SnapshotT(t, string(data))
 					})
 				}
 			})
@@ -131,7 +168,7 @@ func Test_ServiceGenerator(t *testing.T) {
 				err := generator.DestroyService(c.name)
 
 				if err != nil {
-					t.Errorf("returned an error %v", err)
+					t.Errorf("returned an error: %v", err)
 				}
 
 				for _, file := range c.files {
@@ -139,7 +176,7 @@ func Test_ServiceGenerator(t *testing.T) {
 						ok, err := afero.Exists(fs, filepath.Join(rootDir, file))
 
 						if err != nil {
-							t.Errorf("Exists(fs, %q) returned an error %v", file, err)
+							t.Errorf("Exists(fs, %q) returned an error: %v", file, err)
 						}
 
 						if ok {

@@ -21,7 +21,7 @@ func newCommandGenerator(fs afero.Fs, ui module.UI, rootDir string) module.Comma
 }
 
 func (g *commandGenerator) GenerateCommand(name string) error {
-	return errors.WithStack(g.Generate(g.rootDir, map[string]string{"name": name}))
+	return errors.WithStack(g.Generate(g.rootDir, map[string]string{"name": name}, generationConfig{}))
 }
 
 func (g *commandGenerator) DestroyCommand(name string) error {
