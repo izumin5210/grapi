@@ -85,3 +85,7 @@ required = [
 [[constraint]]
   branch = "master"
   name = "github.com/jinzhu/inflection"
+
+[[constraint]]
+  name = "github.com/soheilhy/cmux"
+  version = "0.1.4"
