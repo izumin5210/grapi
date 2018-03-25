@@ -14,6 +14,7 @@ import (
 // Engine is the framework instance.
 type Engine struct {
 	*Config
+	sdCh chan os.Signal
 }
 
 // Serve starts gRPC and Gateway servers.
@@ -47,12 +48,18 @@ func (e *Engine) Serve() error {
 	return nil
 }
 
+// Shutdown closes servers.
+func (e *Engine) Shutdown() {
+	e.sdCh <- os.Interrupt
+}
+
 func (e *Engine) watchShutdownSignal(wg *sync.WaitGroup, servers ...internal.Server) {
 	defer wg.Done()
-	sdCh := make(chan os.Signal, 1)
-	defer close(sdCh)
-	signal.Notify(sdCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	sig := <-sdCh
+	e.sdCh = make(chan os.Signal, 1)
+	defer close(e.sdCh)
+	defer signal.Reset()
+	signal.Notify(e.sdCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	sig := <-e.sdCh
 	grpclog.Infof("terminating now...: %v", sig)
 	for _, svr := range servers {
 		svr.Shutdown()

@@ -21,7 +21,7 @@ GENERATED_PKGS += $(MOCK_PKG)
 SRC_FILES := $(shell git ls-files --cached --others --exclude-standard | grep -E "\.go$$" | grep -v ".snapshot")
 GOFMT_TARGET := $(SRC_FILES)
 $(foreach pkg,$(GENERATED_PKGS),$(eval GOFMT_TARGET := $(filter-out $(pkg)/%,$(GOFMT_TARGET))))
-GOLINT_TARGET := $(shell go list ./...)
+GOLINT_TARGET := $(shell go list ./... | grep -v "$(pkg)/testing")
 $(foreach pkg,$(GENERATED_PKGS),$(eval GOLINT_TARGET := $(filter-out $(ROOT_PKG)/$(pkg),$(GOLINT_TARGET))))
 
 GO_BUILD_FLAGS := -v
