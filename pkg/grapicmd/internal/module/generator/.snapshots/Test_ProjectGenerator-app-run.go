@@ -7,6 +7,7 @@ import (
 // Run starts the grapiserver.
 func Run() error {
 	return grapiserver.New().
+		UseDefaultLogger().
 		AddServers(
 		// TODO
 		).
