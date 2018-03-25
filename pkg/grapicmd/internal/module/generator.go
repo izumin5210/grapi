@@ -14,9 +14,15 @@ type ProjectGenerator interface {
 
 // ServiceGenerator is an interface to create or destroy gRPC services and implementations.
 type ServiceGenerator interface {
-	GenerateService(name string, methods ...string) error
-	ScaffoldService(name string) error
+	GenerateService(name string, cfg ServiceGenerationConfig) error
+	ScaffoldService(name string, cfg ServiceGenerationConfig) error
 	DestroyService(name string) error
+}
+
+// ServiceGenerationConfig contains configurations for generating a new service.
+type ServiceGenerationConfig struct {
+	Methods  []string
+	SkipTest bool
 }
 
 // CommandGenerator is an interface to create or destroy user-defined command tempates.

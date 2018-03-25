@@ -10,6 +10,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	moduletesting "github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
@@ -112,9 +113,9 @@ func Test_ServiceGenerator(t *testing.T) {
 			t.Run(test, func(t *testing.T) {
 				var err error
 				if c.scaffold {
-					err = generator.ScaffoldService(c.name)
+					err = generator.ScaffoldService(c.name, module.ServiceGenerationConfig{})
 				} else {
-					err = generator.GenerateService(c.name, c.args...)
+					err = generator.GenerateService(c.name, module.ServiceGenerationConfig{Methods: c.args})
 				}
 
 				if err != nil {

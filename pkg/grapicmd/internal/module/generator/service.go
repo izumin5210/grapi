@@ -27,15 +27,15 @@ func newServiceGenerator(fs afero.Fs, ui module.UI, rootDir string) module.Servi
 	}
 }
 
-func (g *serviceGenerator) GenerateService(name string, methods ...string) error {
-	data, err := g.createParams(name, methods)
+func (g *serviceGenerator) GenerateService(name string, cfg module.ServiceGenerationConfig) error {
+	data, err := g.createParams(name, cfg.Methods)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 	return g.Generate(g.rootDir, data)
 }
 
-func (g *serviceGenerator) ScaffoldService(name string) error {
+func (g *serviceGenerator) ScaffoldService(name string, cfg module.ServiceGenerationConfig) error {
 	data, err := g.createParams(name, []string{"list", "get", "create", "update", "delete"})
 	if err != nil {
 		return errors.WithStack(err)
