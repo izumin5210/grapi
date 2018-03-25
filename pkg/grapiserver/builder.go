@@ -31,8 +31,13 @@ type Builder interface {
 	Serve() error
 }
 
-// New creates a server builder object.
+// New is deprecated.
 func New() Builder {
+	return NewBuilder()
+}
+
+// NewBuilder creates a server builder object.
+func NewBuilder() Builder {
 	return &builder{
 		c: createDefaultConfig(),
 	}

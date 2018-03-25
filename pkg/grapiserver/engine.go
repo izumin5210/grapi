@@ -20,6 +20,13 @@ type Engine struct {
 	sdCh chan os.Signal
 }
 
+// NewServer creates a server intstance.
+func NewServer(opts ...Option) *Engine {
+	return &Engine{
+		Config: createConfig(opts),
+	}
+}
+
 // Serve starts gRPC and Gateway servers.
 func (e *Engine) Serve() error {
 	var (
