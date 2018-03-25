@@ -1,9 +1,12 @@
 package grapiserver
 
 import (
+	"os"
+
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/grpclog"
 )
 
 // Builder creates an engine.
@@ -20,6 +23,7 @@ type Builder interface {
 	AddGatewayMuxOptions(opts ...runtime.ServeMuxOption) Builder
 	AddGatewayServerMiddleware(middlewares ...HTTPServerMiddleware) Builder
 	AddPassedHeader(decider PassedHeaderDeciderFunc) Builder
+	UseDefaultLogger() Builder
 	Validate() error
 	Build() (*Engine, error)
 	Serve() error
@@ -99,6 +103,11 @@ func (b *builder) AddGatewayServerMiddleware(middlewares ...HTTPServerMiddleware
 
 func (b *builder) AddPassedHeader(decider PassedHeaderDeciderFunc) Builder {
 	return b.AddGatewayServerMiddleware(createPassingHeaderMiddleware(decider))
+}
+
+func (b *builder) UseDefaultLogger() Builder {
+	grpclog.SetLoggerV2(grpclog.NewLoggerV2(os.Stdout, os.Stderr, os.Stderr))
+	return b
 }
 
 func (b *builder) Validate() error {
