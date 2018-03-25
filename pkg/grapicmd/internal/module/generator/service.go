@@ -81,10 +81,11 @@ type servicePbGoParams struct {
 }
 
 type serviceGoParams struct {
-	Package    string
-	Imports    []string
-	ServerName string
-	StructName string
+	Package     string
+	Imports     []string
+	TestImports []string
+	ServerName  string
+	StructName  string
 }
 
 type serviceMethodsParams struct {
@@ -215,6 +216,7 @@ func (g *serviceGenerator) createParams(path string, methodNames []string) (*ser
 		"google.golang.org/grpc/codes",
 		"google.golang.org/grpc/status",
 	}
+	goTestImports := []string{}
 
 	methods := g.createMethodParams(nameParams, methodNames)
 
@@ -222,6 +224,8 @@ func (g *serviceGenerator) createParams(path string, methodNames []string) (*ser
 	sort.Strings(protoImports)
 	goImports = append(goImports, methods.GoImports...)
 	sort.Strings(goImports)
+	goTestImports = append(goTestImports, methods.GoImports...)
+	sort.Strings(goTestImports)
 
 	params := &serviceParams{
 		Path:        path,
@@ -237,10 +241,11 @@ func (g *serviceGenerator) createParams(path string, methodNames []string) (*ser
 			PackagePath: filepath.Join(importPath, pbgoPackagePath),
 		},
 		Go: serviceGoParams{
-			Package:    packageName,
-			Imports:    goImports,
-			ServerName: serviceName + "Service" + "Server",
-			StructName: localServiceName + "Service" + "Server" + "Impl",
+			Package:     packageName,
+			Imports:     goImports,
+			TestImports: goTestImports,
+			ServerName:  serviceName + "Service" + "Server",
+			StructName:  localServiceName + "Service" + "Server" + "Impl",
 		},
 	}
 
