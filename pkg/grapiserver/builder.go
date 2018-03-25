@@ -11,6 +11,7 @@ import (
 
 // Builder creates an engine.
 type Builder interface {
+	SetAddr(network, addr string) Builder
 	SetGrpcAddr(network, addr string) Builder
 	SetGrpcInternalAddr(network, addr string) Builder
 	SetGatewayAddr(network, addr string) Builder
@@ -39,6 +40,12 @@ func New() Builder {
 
 type builder struct {
 	c *Config
+}
+
+func (b *builder) SetAddr(network, addr string) Builder {
+	return b.
+		SetGrpcAddr(network, addr).
+		SetGatewayAddr(network, addr)
 }
 
 func (b *builder) SetGrpcAddr(network, addr string) Builder {

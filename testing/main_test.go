@@ -83,8 +83,7 @@ func Test_server_samePort(t *testing.T) {
 	addr := ":" + strconv.FormatInt(port, 10)
 	app, err := grapiserver.New().
 		UseDefaultLogger().
-		SetGrpcAddr("tcp", addr).
-		SetGatewayAddr("tcp", addr).
+		SetAddr("tcp", addr).
 		AddServers(
 			server.NewLibraryServiceServer(),
 		).
