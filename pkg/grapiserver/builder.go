@@ -33,7 +33,7 @@ type Builder interface {
 // New creates a server builder object.
 func New() Builder {
 	return &builder{
-		c: DefaultConfig,
+		c: createDefaultConfig(),
 	}
 }
 
