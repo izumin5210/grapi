@@ -41,6 +41,7 @@ func Test_ServiceGenerator(t *testing.T) {
 		skippedFiles map[string]struct{}
 		scaffold     bool
 		skipTest     bool
+		resource     string
 	}{
 		{
 			name: "foo",
@@ -112,6 +113,16 @@ func Test_ServiceGenerator(t *testing.T) {
 			},
 			skipTest: true,
 		},
+		{
+			name: "library",
+			files: []string{
+				"api/protos/library.proto",
+				"app/server/library_server.go",
+				"app/server/library_server_test.go",
+			},
+			resource: "book",
+			scaffold: true,
+		},
 	}
 
 	for _, c := range cases {
@@ -130,9 +141,9 @@ func Test_ServiceGenerator(t *testing.T) {
 			t.Run(test, func(t *testing.T) {
 				var err error
 				if c.scaffold {
-					err = generator.ScaffoldService(c.name, module.ServiceGenerationConfig{SkipTest: c.skipTest})
+					err = generator.ScaffoldService(c.name, module.ServiceGenerationConfig{ResourceName: c.resource, SkipTest: c.skipTest})
 				} else {
-					err = generator.GenerateService(c.name, module.ServiceGenerationConfig{Methods: c.args, SkipTest: c.skipTest})
+					err = generator.GenerateService(c.name, module.ServiceGenerationConfig{ResourceName: c.resource, Methods: c.args, SkipTest: c.skipTest})
 				}
 
 				if err != nil {

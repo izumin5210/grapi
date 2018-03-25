@@ -28,7 +28,7 @@ func newServiceGenerator(fs afero.Fs, ui module.UI, rootDir string) module.Servi
 }
 
 func (g *serviceGenerator) GenerateService(name string, cfg module.ServiceGenerationConfig) error {
-	data, err := g.createParams(name, cfg.Methods)
+	data, err := g.createParams(name, cfg.ResourceName, cfg.Methods)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -36,7 +36,7 @@ func (g *serviceGenerator) GenerateService(name string, cfg module.ServiceGenera
 }
 
 func (g *serviceGenerator) ScaffoldService(name string, cfg module.ServiceGenerationConfig) error {
-	data, err := g.createParams(name, []string{"list", "get", "create", "update", "delete"})
+	data, err := g.createParams(name, cfg.ResourceName, []string{"list", "get", "create", "update", "delete"})
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -44,7 +44,7 @@ func (g *serviceGenerator) ScaffoldService(name string, cfg module.ServiceGenera
 }
 
 func (g *serviceGenerator) DestroyService(name string) error {
-	data, err := g.createParams(name, []string{})
+	data, err := g.createParams(name, "", []string{})
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -58,6 +58,18 @@ type nameParams struct {
 	singularCamel      string
 	singularCamelLower string
 	singularSnake      string
+}
+
+func createNameParams(name string) nameParams {
+	nameParams := nameParams{
+		pluralCamel:   inflection.Plural(snaker.SnakeToCamel(name)),
+		singularCamel: inflection.Singular(snaker.SnakeToCamel(name)),
+	}
+	nameParams.pluralCamelLower = strings.ToLower(string(nameParams.pluralCamel[0])) + nameParams.pluralCamel[1:]
+	nameParams.pluralSnake = snaker.CamelToSnake(nameParams.pluralCamel)
+	nameParams.singularCamelLower = strings.ToLower(string(nameParams.singularCamel[0])) + nameParams.singularCamel[1:]
+	nameParams.singularSnake = snaker.CamelToSnake(nameParams.singularCamel)
+	return nameParams
 }
 
 type serviceParams struct {
@@ -152,7 +164,7 @@ type serviceMethodHTTPParams struct {
 	Body   string
 }
 
-func (g *serviceGenerator) createParams(path string, methodNames []string) (*serviceParams, error) {
+func (g *serviceGenerator) createParams(path string, resName string, methodNames []string) (*serviceParams, error) {
 	// github.com/foo/bar
 	importPath, err := fs.GetImportPath(g.rootDir)
 	if err != nil {
@@ -165,14 +177,7 @@ func (g *serviceGenerator) createParams(path string, methodNames []string) (*ser
 	// quux
 	name := filepath.Base(path)
 
-	nameParams := nameParams{
-		pluralCamel:   inflection.Plural(snaker.SnakeToCamel(name)),
-		singularCamel: inflection.Singular(snaker.SnakeToCamel(name)),
-	}
-	nameParams.pluralCamelLower = strings.ToLower(string(nameParams.pluralCamel[0])) + nameParams.pluralCamel[1:]
-	nameParams.pluralSnake = snaker.CamelToSnake(nameParams.pluralCamel)
-	nameParams.singularCamelLower = strings.ToLower(string(nameParams.singularCamel[0])) + nameParams.singularCamel[1:]
-	nameParams.singularSnake = snaker.CamelToSnake(nameParams.singularCamel)
+	nameParams := createNameParams(name)
 
 	// Quux
 	serviceName := nameParams.singularCamel
@@ -218,7 +223,11 @@ func (g *serviceGenerator) createParams(path string, methodNames []string) (*ser
 	}
 	goTestImports := []string{}
 
-	methods := g.createMethodParams(nameParams, methodNames)
+	resNameParams := nameParams
+	if resName != "" {
+		resNameParams = createNameParams(resName)
+	}
+	methods := g.createMethodParams(resNameParams, methodNames)
 
 	protoImports = append(protoImports, methods.ProtoImports...)
 	sort.Strings(protoImports)

@@ -21,8 +21,9 @@ type ServiceGenerator interface {
 
 // ServiceGenerationConfig contains configurations for generating a new service.
 type ServiceGenerationConfig struct {
-	Methods  []string
-	SkipTest bool
+	ResourceName string
+	Methods      []string
+	SkipTest     bool
 }
 
 // CommandGenerator is an interface to create or destroy user-defined command tempates.

@@ -1,0 +1,64 @@
+syntax = "proto3";
+option go_package = "api_pb";
+package testapp.api;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service LibraryService {
+  rpc ListBooks (ListBooksRequest) returns (ListBooksResponse) {
+    option (google.api.http) = {
+      get: "/books"
+    };
+  }
+  rpc GetBook (GetBookRequest) returns (Book) {
+    option (google.api.http) = {
+      get: "/books/{book_id}"
+    };
+  }
+  rpc CreateBook (CreateBookRequest) returns (Book) {
+    option (google.api.http) = {
+      post: "/books"
+      body: "book"
+    };
+  }
+  rpc UpdateBook (UpdateBookRequest) returns (Book) {
+    option (google.api.http) = {
+      patch: "/books/{book.book_id}"
+      body: "book"
+    };
+  }
+  rpc DeleteBook (DeleteBookRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      patch: "/books/{book_id}"
+    };
+  }
+}
+
+message Book {
+  string book_id = 1;
+}
+
+message ListBooksRequest {
+}
+
+message ListBooksResponse {
+  repeated Book books = 1;
+}
+
+message GetBookRequest {
+  string book_id = 1;
+}
+
+message CreateBookRequest {
+  Book book = 1;
+}
+
+message UpdateBookRequest {
+  Book book = 1;
+}
+
+message DeleteBookRequest {
+  string book_id = 1;
+}
+

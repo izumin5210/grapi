@@ -25,7 +25,8 @@ func newGenerateCommand(cfg grapicmd.Config, ui module.UI, generator module.Gene
 
 func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator module.ServiceGenerator, commandFactory module.CommandFactory) *cobra.Command {
 	var (
-		skipTest bool
+		skipTest     bool
+		resourceName string
 	)
 
 	cmd := &cobra.Command{
@@ -40,7 +41,7 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 			}
 
 			ui.Section("Generate service")
-			genCfg := module.ServiceGenerationConfig{Methods: args[1:], SkipTest: skipTest}
+			genCfg := module.ServiceGenerationConfig{ResourceName: resourceName, Methods: args[1:], SkipTest: skipTest}
 			err := errors.WithStack(generator.GenerateService(args[0], genCfg))
 			if err != nil {
 				return err
@@ -52,12 +53,18 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 	}
 
 	cmd.PersistentFlags().BoolVarP(&skipTest, "skip-test", "T", false, "Skip test files")
+	cmd.PersistentFlags().StringVar(&resourceName, "resource-name", "", "ResourceName to be used")
 
 	return cmd
 }
 
 func newGenerateScaffoldServiceCommand(cfg grapicmd.Config, ui module.UI, generator module.ServiceGenerator, commandFactory module.CommandFactory) *cobra.Command {
-	return &cobra.Command{
+	var (
+		skipTest     bool
+		resourceName string
+	)
+
+	cmd := &cobra.Command{
 		Use:           "scaffold-service NAME",
 		Short:         "Generate a new service with standard methods",
 		SilenceErrors: true,
@@ -68,8 +75,8 @@ func newGenerateScaffoldServiceCommand(cfg grapicmd.Config, ui module.UI, genera
 				return errors.New("geneate command should execut inside a grapi applicaiton directory")
 			}
 
-			ui.Section("Generate command")
-			genCfg := module.ServiceGenerationConfig{}
+			ui.Section("Scaffold service")
+			genCfg := module.ServiceGenerationConfig{ResourceName: resourceName, SkipTest: skipTest}
 			err := errors.WithStack(generator.ScaffoldService(args[0], genCfg))
 			if err != nil {
 				return err
@@ -79,6 +86,11 @@ func newGenerateScaffoldServiceCommand(cfg grapicmd.Config, ui module.UI, genera
 			return errors.WithStack(protocUsecase.Perform())
 		},
 	}
+
+	cmd.PersistentFlags().BoolVarP(&skipTest, "skip-test", "T", false, "Skip test files")
+	cmd.PersistentFlags().StringVar(&resourceName, "resource-name", "", "ResourceName to be used")
+
+	return cmd
 }
 
 func newGenerateCommandCommand(cfg grapicmd.Config, generator module.CommandGenerator) *cobra.Command {
