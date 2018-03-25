@@ -43,6 +43,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/foo.proto",
 				"app/server/foo_server.go",
+				"app/server/foo_server_test.go",
 			},
 		},
 		{
@@ -50,6 +51,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/foo/bar.proto",
 				"app/server/foo/bar_server.go",
+				"app/server/foo/bar_server_test.go",
 			},
 		},
 		{
@@ -57,6 +59,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/foo/bar_baz.proto",
 				"app/server/foo/bar_baz_server.go",
+				"app/server/foo/bar_baz_server_test.go",
 			},
 		},
 		{
@@ -64,6 +67,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/foo/bar_baz.proto",
 				"app/server/foo/bar_baz_server.go",
+				"app/server/foo/bar_baz_server_test.go",
 			},
 		},
 		{
@@ -72,6 +76,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/foo/bar_baz.proto",
 				"app/server/foo/bar_baz_server.go",
+				"app/server/foo/bar_baz_server_test.go",
 			},
 		},
 		{
@@ -80,6 +85,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/foo/bar_baz.proto",
 				"app/server/foo/bar_baz_server.go",
+				"app/server/foo/bar_baz_server_test.go",
 			},
 		},
 		{
@@ -87,6 +93,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			files: []string{
 				"api/protos/book.proto",
 				"app/server/book_server.go",
+				"app/server/book_server_test.go",
 			},
 			scaffold: true,
 		},
