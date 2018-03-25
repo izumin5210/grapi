@@ -32,7 +32,7 @@ func (g *serviceGenerator) GenerateService(name string, cfg module.ServiceGenera
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return g.Generate(g.rootDir, data)
+	return g.Generate(g.rootDir, data, generationConfig{skipTest: cfg.SkipTest})
 }
 
 func (g *serviceGenerator) ScaffoldService(name string, cfg module.ServiceGenerationConfig) error {
@@ -40,7 +40,7 @@ func (g *serviceGenerator) ScaffoldService(name string, cfg module.ServiceGenera
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return g.Generate(g.rootDir, data)
+	return g.Generate(g.rootDir, data, generationConfig{skipTest: cfg.SkipTest})
 }
 
 func (g *serviceGenerator) DestroyService(name string) error {

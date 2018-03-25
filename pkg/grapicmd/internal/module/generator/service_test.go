@@ -29,15 +29,18 @@ func Test_ServiceGenerator(t *testing.T) {
 
 	ui := moduletesting.NewMockUI(ctrl)
 	ui.EXPECT().ItemSuccess(gomock.Any()).AnyTimes()
+	ui.EXPECT().ItemSkipped(gomock.Any()).AnyTimes()
 	fs := afero.NewMemMapFs()
 
 	generator := newServiceGenerator(fs, ui, rootDir)
 
 	cases := []struct {
-		name     string
-		args     []string
-		files    []string
-		scaffold bool
+		name         string
+		args         []string
+		files        []string
+		skippedFiles map[string]struct{}
+		scaffold     bool
+		skipTest     bool
 	}{
 		{
 			name: "foo",
@@ -98,6 +101,17 @@ func Test_ServiceGenerator(t *testing.T) {
 			},
 			scaffold: true,
 		},
+		{
+			name: "book",
+			files: []string{
+				"api/protos/book.proto",
+				"app/server/book_server.go",
+			},
+			skippedFiles: map[string]struct{}{
+				"app/server/book_server_test.go": struct{}{},
+			},
+			skipTest: true,
+		},
 	}
 
 	for _, c := range cases {
@@ -110,27 +124,42 @@ func Test_ServiceGenerator(t *testing.T) {
 			if c.scaffold {
 				test = "Scaffold"
 			}
+			if c.skipTest {
+				test += " without test"
+			}
 			t.Run(test, func(t *testing.T) {
 				var err error
 				if c.scaffold {
-					err = generator.ScaffoldService(c.name, module.ServiceGenerationConfig{})
+					err = generator.ScaffoldService(c.name, module.ServiceGenerationConfig{SkipTest: c.skipTest})
 				} else {
-					err = generator.GenerateService(c.name, module.ServiceGenerationConfig{Methods: c.args})
+					err = generator.GenerateService(c.name, module.ServiceGenerationConfig{Methods: c.args, SkipTest: c.skipTest})
 				}
 
 				if err != nil {
-					t.Errorf("returned an error %v", err)
+					t.Errorf("returned an error: %v", err)
 				}
 
 				for _, file := range c.files {
 					t.Run(file, func(t *testing.T) {
-						data, err := afero.ReadFile(fs, filepath.Join(rootDir, file))
+						if _, ok := c.skippedFiles[file]; ok {
+							ok, err := afero.Exists(fs, file)
 
-						if err != nil {
-							t.Errorf("returned an error %v", err)
+							if err != nil {
+								t.Errorf("returned an error: %v", err)
+							}
+
+							if ok {
+								t.Error("should not exist")
+							}
+						} else {
+							data, err := afero.ReadFile(fs, filepath.Join(rootDir, file))
+
+							if err != nil {
+								t.Errorf("returned an error: %v", err)
+							}
+
+							cupaloy.SnapshotT(t, string(data))
 						}
-
-						cupaloy.SnapshotT(t, string(data))
 					})
 				}
 			})
@@ -139,7 +168,7 @@ func Test_ServiceGenerator(t *testing.T) {
 				err := generator.DestroyService(c.name)
 
 				if err != nil {
-					t.Errorf("returned an error %v", err)
+					t.Errorf("returned an error: %v", err)
 				}
 
 				for _, file := range c.files {
@@ -147,7 +176,7 @@ func Test_ServiceGenerator(t *testing.T) {
 						ok, err := afero.Exists(fs, filepath.Join(rootDir, file))
 
 						if err != nil {
-							t.Errorf("Exists(fs, %q) returned an error %v", file, err)
+							t.Errorf("Exists(fs, %q) returned an error: %v", file, err)
 						}
 
 						if ok {

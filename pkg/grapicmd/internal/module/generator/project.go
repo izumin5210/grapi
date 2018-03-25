@@ -31,5 +31,5 @@ func (g *projectGenerator) GenerateProject(rootDir string, useHead bool) error {
 		"version":    g.version,
 		"headUsed":   useHead,
 	}
-	return g.Generate(rootDir, data)
+	return g.Generate(rootDir, data, generationConfig{})
 }
