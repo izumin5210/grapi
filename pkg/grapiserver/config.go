@@ -13,15 +13,21 @@ import (
 )
 
 var (
+	defaultAddr = ":3000"
+
 	// DefaultConfig is a default configuration.
 	DefaultConfig = &Config{
+		GrpcAddr: &Address{
+			Network: "tcp",
+			Addr:    defaultAddr,
+		},
 		GrpcInternalAddr: &Address{
 			Network: "unix",
 			Addr:    "tmp/server.sock",
 		},
 		GatewayAddr: &Address{
 			Network: "tcp",
-			Addr:    ":3000",
+			Addr:    defaultAddr,
 		},
 		MaxConcurrentStreams: 1000,
 	}
@@ -54,6 +60,7 @@ func (a *Address) createListener() (net.Listener, error) {
 
 // Config contains configurations of gRPC and Gateway server.
 type Config struct {
+	GrpcAddr                        *Address
 	GrpcInternalAddr                *Address
 	GatewayAddr                     *Address
 	Servers                         []Server
