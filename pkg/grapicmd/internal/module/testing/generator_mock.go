@@ -5,6 +5,7 @@ package moduletesting
 
 import (
 	gomock "github.com/golang/mock/gomock"
+	. "github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	reflect "reflect"
 )
 
@@ -44,32 +45,27 @@ func (_mr *MockGeneratorMockRecorder) GenerateProject(arg0, arg1 interface{}) *g
 }
 
 // GenerateService mocks base method
-func (_m *MockGenerator) GenerateService(name string, methods ...string) error {
-	_s := []interface{}{name}
-	for _, _x := range methods {
-		_s = append(_s, _x)
-	}
-	ret := _m.ctrl.Call(_m, "GenerateService", _s...)
+func (_m *MockGenerator) GenerateService(name string, cfg ServiceGenerationConfig) error {
+	ret := _m.ctrl.Call(_m, "GenerateService", name, cfg)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // GenerateService indicates an expected call of GenerateService
-func (_mr *MockGeneratorMockRecorder) GenerateService(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
-	_s := append([]interface{}{arg0}, arg1...)
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockGenerator)(nil).GenerateService), _s...)
+func (_mr *MockGeneratorMockRecorder) GenerateService(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockGenerator)(nil).GenerateService), arg0, arg1)
 }
 
 // ScaffoldService mocks base method
-func (_m *MockGenerator) ScaffoldService(name string) error {
-	ret := _m.ctrl.Call(_m, "ScaffoldService", name)
+func (_m *MockGenerator) ScaffoldService(name string, cfg ServiceGenerationConfig) error {
+	ret := _m.ctrl.Call(_m, "ScaffoldService", name, cfg)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // ScaffoldService indicates an expected call of ScaffoldService
-func (_mr *MockGeneratorMockRecorder) ScaffoldService(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "ScaffoldService", reflect.TypeOf((*MockGenerator)(nil).ScaffoldService), arg0)
+func (_mr *MockGeneratorMockRecorder) ScaffoldService(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "ScaffoldService", reflect.TypeOf((*MockGenerator)(nil).ScaffoldService), arg0, arg1)
 }
 
 // DestroyService mocks base method
@@ -167,32 +163,27 @@ func (_m *MockServiceGenerator) EXPECT() *MockServiceGeneratorMockRecorder {
 }
 
 // GenerateService mocks base method
-func (_m *MockServiceGenerator) GenerateService(name string, methods ...string) error {
-	_s := []interface{}{name}
-	for _, _x := range methods {
-		_s = append(_s, _x)
-	}
-	ret := _m.ctrl.Call(_m, "GenerateService", _s...)
+func (_m *MockServiceGenerator) GenerateService(name string, cfg ServiceGenerationConfig) error {
+	ret := _m.ctrl.Call(_m, "GenerateService", name, cfg)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // GenerateService indicates an expected call of GenerateService
-func (_mr *MockServiceGeneratorMockRecorder) GenerateService(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
-	_s := append([]interface{}{arg0}, arg1...)
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockServiceGenerator)(nil).GenerateService), _s...)
+func (_mr *MockServiceGeneratorMockRecorder) GenerateService(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "GenerateService", reflect.TypeOf((*MockServiceGenerator)(nil).GenerateService), arg0, arg1)
 }
 
 // ScaffoldService mocks base method
-func (_m *MockServiceGenerator) ScaffoldService(name string) error {
-	ret := _m.ctrl.Call(_m, "ScaffoldService", name)
+func (_m *MockServiceGenerator) ScaffoldService(name string, cfg ServiceGenerationConfig) error {
+	ret := _m.ctrl.Call(_m, "ScaffoldService", name, cfg)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // ScaffoldService indicates an expected call of ScaffoldService
-func (_mr *MockServiceGeneratorMockRecorder) ScaffoldService(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "ScaffoldService", reflect.TypeOf((*MockServiceGenerator)(nil).ScaffoldService), arg0)
+func (_mr *MockServiceGeneratorMockRecorder) ScaffoldService(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCallWithMethodType(_mr.mock, "ScaffoldService", reflect.TypeOf((*MockServiceGenerator)(nil).ScaffoldService), arg0, arg1)
 }
 
 // DestroyService mocks base method
