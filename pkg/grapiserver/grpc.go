@@ -34,7 +34,6 @@ func NewGrpcServer(c *Config) internal.Server {
 func (s *GrpcServer) Serve(l net.Listener, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	grpclog.Infof("gRPC server is starting %s://%s", s.GrpcInternalAddr.Network, s.GrpcInternalAddr.Addr)
 	err := s.server.Serve(l)
 	grpclog.Infof("gRPC server stopred: %v", err)
 }

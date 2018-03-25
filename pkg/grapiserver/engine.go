@@ -73,14 +73,17 @@ func (e *Engine) Serve() error {
 
 	if internalLis != nil {
 		wg.Add(1)
+		grpclog.Infof("gRPC server is starting %s://%s", e.GrpcInternalAddr.Network, e.GrpcInternalAddr.Addr)
 		go grpcServer.Serve(internalLis, &wg)
 	}
 	if grpcLis != nil {
 		wg.Add(1)
+		grpclog.Infof("gRPC server is starting %s://%s", e.GrpcAddr.Network, e.GrpcAddr.Addr)
 		go grpcServer.Serve(grpcLis, &wg)
 	}
 	if gatewayLis != nil {
 		wg.Add(1)
+		grpclog.Infof("gRPC Gateway server is starting: %s://%s", e.GatewayAddr.Network, e.GatewayAddr.Addr)
 		go gatewayServer.Serve(gatewayLis, &wg)
 	}
 	if muxServer != nil {
