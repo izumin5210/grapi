@@ -6,10 +6,11 @@ import (
 
 // Run starts the grapiserver.
 func Run() error {
-	return grapiserver.New().
-		UseDefaultLogger().
-		AddServers(
+	s := grapiserver.NewServer(
+		grapiserver.WithDefaultLogger(),
+		grapiserver.WithServers(
 		// TODO
-		).
-		Serve()
+		),
+	)
+	return s.Serve()
 }

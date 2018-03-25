@@ -157,11 +157,11 @@ func updateRun(t *testing.T, fs afero.Fs, rootPath string, port int) {
 				switch fun := n.Fun.(type) {
 				case *ast.SelectorExpr:
 					switch fun.Sel.Name {
-					case "Serve":
-						fun.X = &ast.CallExpr{
+					case "NewServer":
+						n.Args = append(n.Args, &ast.CallExpr{
 							Fun: &ast.SelectorExpr{
-								X:   fun.X,
-								Sel: ast.NewIdent("SetGatewayAddr"),
+								X:   ast.NewIdent("grapiserver"),
+								Sel: ast.NewIdent("WithGatewayAddr"),
 							},
 							Args: []ast.Expr{
 								&ast.BasicLit{
@@ -173,8 +173,8 @@ func updateRun(t *testing.T, fs afero.Fs, rootPath string, port int) {
 									Value: strconv.Quote(fmt.Sprintf(":%d", port)),
 								},
 							},
-						}
-					case "AddServers":
+						})
+					case "WithServers":
 						n.Args = append(n.Args, &ast.CallExpr{
 							Fun: &ast.SelectorExpr{
 								X:   ast.NewIdent("server"),
