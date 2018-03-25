@@ -1,0 +1,64 @@
+syntax = "proto3";
+option go_package = "api_pb";
+package testapp.api;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service LibraryService {
+  rpc ListLibraries (ListLibrariesRequest) returns (ListLibrariesResponse) {
+    option (google.api.http) = {
+      get: "/libraries"
+    };
+  }
+  rpc GetLibrary (GetLibraryRequest) returns (Library) {
+    option (google.api.http) = {
+      get: "/libraries/{library_id}"
+    };
+  }
+  rpc CreateLibrary (CreateLibraryRequest) returns (Library) {
+    option (google.api.http) = {
+      post: "/libraries"
+      body: "library"
+    };
+  }
+  rpc UpdateLibrary (UpdateLibraryRequest) returns (Library) {
+    option (google.api.http) = {
+      patch: "/libraries/{library.library_id}"
+      body: "library"
+    };
+  }
+  rpc DeleteLibrary (DeleteLibraryRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      patch: "/libraries/{library_id}"
+    };
+  }
+}
+
+message Library {
+  string library_id = 1;
+}
+
+message ListLibrariesRequest {
+}
+
+message ListLibrariesResponse {
+  repeated Library libraries = 1;
+}
+
+message GetLibraryRequest {
+  string library_id = 1;
+}
+
+message CreateLibraryRequest {
+  Library library = 1;
+}
+
+message UpdateLibraryRequest {
+  Library library = 1;
+}
+
+message DeleteLibraryRequest {
+  string library_id = 1;
+}
+
