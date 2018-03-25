@@ -82,7 +82,6 @@ func Test_server_samePort(t *testing.T) {
 	var port int64 = 15261
 	addr := ":" + strconv.FormatInt(port, 10)
 	app, err := grapiserver.New().
-		UseDefaultLogger().
 		SetAddr("tcp", addr).
 		AddServers(
 			server.NewLibraryServiceServer(),
