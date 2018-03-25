@@ -21,7 +21,7 @@ import (
 
 func Test_server_onlyGateway(t *testing.T) {
 	var port int64 = 15261
-	s := grapiserver.NewServer(
+	s := grapiserver.New(
 		grapiserver.WithGatewayAddr("tcp", ":"+strconv.FormatInt(port, 10)),
 		grapiserver.WithServers(
 			server.NewLibraryServiceServer(),
@@ -77,7 +77,7 @@ func Test_server_onlyGateway(t *testing.T) {
 func Test_server_samePort(t *testing.T) {
 	var port int64 = 15261
 	addr := ":" + strconv.FormatInt(port, 10)
-	s := grapiserver.NewServer(
+	s := grapiserver.New(
 		grapiserver.WithAddr("tcp", addr),
 		grapiserver.WithServers(
 			server.NewLibraryServiceServer(),
@@ -167,7 +167,7 @@ func Test_server_differentPort(t *testing.T) {
 	grpcAddr := ":" + strconv.FormatInt(grpcPort, 10)
 	httpAddr := ":" + strconv.FormatInt(httpPort, 10)
 
-	s := grapiserver.NewServer(
+	s := grapiserver.New(
 		grapiserver.WithGrpcAddr("tcp", grpcAddr),
 		grapiserver.WithGatewayAddr("tcp", httpAddr),
 		grapiserver.WithServers(
