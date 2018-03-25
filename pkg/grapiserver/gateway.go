@@ -44,7 +44,6 @@ func (s *GatewayServer) Serve(l net.Listener, wg *sync.WaitGroup) {
 		return
 	}
 
-	grpclog.Infof("gRPC Gateway server is starting: %s://%s", s.GatewayAddr.Network, s.GatewayAddr.Addr)
 	err = s.server.Serve(l)
 	grpclog.Infof("stopped taking more httr(s) requests: %v", err)
 }

@@ -12,9 +12,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-var (
-	// DefaultConfig is a default configuration.
-	DefaultConfig = &Config{
+func createDefaultConfig() *Config {
+	return &Config{
 		GrpcInternalAddr: &Address{
 			Network: "unix",
 			Addr:    "tmp/server.sock",
@@ -25,7 +24,7 @@ var (
 		},
 		MaxConcurrentStreams: 1000,
 	}
-)
+}
 
 // Address represents a network end point address.
 type Address struct {
@@ -54,6 +53,7 @@ func (a *Address) createListener() (net.Listener, error) {
 
 // Config contains configurations of gRPC and Gateway server.
 type Config struct {
+	GrpcAddr                        *Address
 	GrpcInternalAddr                *Address
 	GatewayAddr                     *Address
 	Servers                         []Server
