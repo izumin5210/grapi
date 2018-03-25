@@ -27,20 +27,20 @@ func newServiceGenerator(fs afero.Fs, ui module.UI, rootDir string) module.Servi
 	}
 }
 
-func (g *serviceGenerator) GenerateService(name string, methods ...string) error {
-	data, err := g.createParams(name, methods)
+func (g *serviceGenerator) GenerateService(name string, cfg module.ServiceGenerationConfig) error {
+	data, err := g.createParams(name, cfg.Methods)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return g.Generate(g.rootDir, data)
+	return g.Generate(g.rootDir, data, generationConfig{skipTest: cfg.SkipTest})
 }
 
-func (g *serviceGenerator) ScaffoldService(name string) error {
+func (g *serviceGenerator) ScaffoldService(name string, cfg module.ServiceGenerationConfig) error {
 	data, err := g.createParams(name, []string{"list", "get", "create", "update", "delete"})
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return g.Generate(g.rootDir, data)
+	return g.Generate(g.rootDir, data, generationConfig{skipTest: cfg.SkipTest})
 }
 
 func (g *serviceGenerator) DestroyService(name string) error {
@@ -81,10 +81,11 @@ type servicePbGoParams struct {
 }
 
 type serviceGoParams struct {
-	Package    string
-	Imports    []string
-	ServerName string
-	StructName string
+	Package     string
+	Imports     []string
+	TestImports []string
+	ServerName  string
+	StructName  string
 }
 
 type serviceMethodsParams struct {
@@ -215,6 +216,7 @@ func (g *serviceGenerator) createParams(path string, methodNames []string) (*ser
 		"google.golang.org/grpc/codes",
 		"google.golang.org/grpc/status",
 	}
+	goTestImports := []string{}
 
 	methods := g.createMethodParams(nameParams, methodNames)
 
@@ -222,6 +224,8 @@ func (g *serviceGenerator) createParams(path string, methodNames []string) (*ser
 	sort.Strings(protoImports)
 	goImports = append(goImports, methods.GoImports...)
 	sort.Strings(goImports)
+	goTestImports = append(goTestImports, methods.GoImports...)
+	sort.Strings(goTestImports)
 
 	params := &serviceParams{
 		Path:        path,
@@ -237,10 +241,11 @@ func (g *serviceGenerator) createParams(path string, methodNames []string) (*ser
 			PackagePath: filepath.Join(importPath, pbgoPackagePath),
 		},
 		Go: serviceGoParams{
-			Package:    packageName,
-			Imports:    goImports,
-			ServerName: serviceName + "Service" + "Server",
-			StructName: localServiceName + "Service" + "Server" + "Impl",
+			Package:     packageName,
+			Imports:     goImports,
+			TestImports: goTestImports,
+			ServerName:  serviceName + "Service" + "Server",
+			StructName:  localServiceName + "Service" + "Server" + "Impl",
 		},
 	}
 

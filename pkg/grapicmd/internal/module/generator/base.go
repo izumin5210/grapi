@@ -15,7 +15,7 @@ import (
 )
 
 type baseGenerator interface {
-	Generate(dir string, data interface{}) error
+	Generate(dir string, data interface{}, cfg generationConfig) error
 	Destroy(dir string, data interface{}) error
 }
 
@@ -33,8 +33,15 @@ type baseGeneratorImpl struct {
 	ui     module.UI
 }
 
-func (g *baseGeneratorImpl) Generate(dir string, data interface{}) error {
+type generationConfig struct {
+	skipTest bool
+}
+
+func (g *baseGeneratorImpl) Generate(dir string, data interface{}, genCfg generationConfig) error {
 	for _, tmplPath := range g.sortedEntryPaths() {
+		if genCfg.skipTest && strings.HasSuffix(tmplPath, "_test.go.tmpl") {
+			continue
+		}
 		entry := g.tmplFs.Files[tmplPath]
 		path, err := TemplateString(strings.TrimSuffix(tmplPath, ".tmpl")).Compile(data)
 		if err != nil {
@@ -118,13 +125,15 @@ func (g *baseGeneratorImpl) Destroy(dir string, data interface{}) error {
 
 		dirPath := filepath.Dir(path)
 		absDirPath := filepath.Dir(absPath)
-		if r, err := afero.Glob(g.fs, filepath.Join(absDirPath, "*")); err == nil && len(r) == 0 {
-			err = g.fs.Remove(absDirPath)
-			if err != nil {
-				g.ui.ItemFailure("failed to remove " + dirPath[1:])
-				return errors.WithStack(err)
+		if ok, err := afero.DirExists(g.fs, absDirPath); err == nil && ok {
+			if r, err := afero.Glob(g.fs, filepath.Join(absDirPath, "*")); err == nil && len(r) == 0 {
+				err = g.fs.Remove(absDirPath)
+				if err != nil {
+					g.ui.ItemFailure("failed to remove " + dirPath[1:])
+					return errors.Wrapf(err, "failed to remove %q", dirPath[1:])
+				}
+				statusDelete.Fprint(g.ui, dirPath[1:])
 			}
-			statusDelete.Fprint(g.ui, dirPath[1:])
 		}
 	}
 
