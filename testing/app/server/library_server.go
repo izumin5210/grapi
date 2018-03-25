@@ -13,7 +13,7 @@ import (
 	api_pb "github.com/izumin5210/grapi/testing/api"
 )
 
-// New creates a new LibraryServiceServer instance.
+// NewLibraryServiceServer creates a new LibraryServiceServer instance.
 func NewLibraryServiceServer() interface {
 	api_pb.LibraryServiceServer
 	grapiserver.Server
