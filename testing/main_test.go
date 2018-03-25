@@ -41,7 +41,7 @@ func Test_server_onlyGateway(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(2)
+	time.Sleep(5)
 	resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", port))
 
 	if err != nil {
@@ -101,7 +101,7 @@ func Test_server_samePort(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(2)
+	time.Sleep(5)
 
 	t.Run("http", func(t *testing.T) {
 		resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", port))
@@ -196,7 +196,7 @@ func Test_server_differentPort(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(2)
+	time.Sleep(5)
 
 	t.Run("http", func(t *testing.T) {
 		resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", httpPort))
