@@ -13,7 +13,7 @@ import (
 	foo_pb "testapp/api/foo"
 )
 
-// New creates a new BarBazServiceServer instance.
+// NewBarBazServiceServer creates a new BarBazServiceServer instance.
 func NewBarBazServiceServer() interface {
 	foo_pb.BarBazServiceServer
 	grapiserver.Server

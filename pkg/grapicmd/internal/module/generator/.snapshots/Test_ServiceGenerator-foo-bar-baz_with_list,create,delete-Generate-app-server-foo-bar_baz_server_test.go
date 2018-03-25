@@ -13,7 +13,7 @@ func Test_BarBazServiceServer_ListBarBazs(t *testing.T) {
 	svr := NewBarBazServiceServer()
 
 	ctx := context.Background()
-	req := &foo_pb.ListBarBazsResponse{}
+	req := &foo_pb.ListBarBazsRequest{}
 
 	resp, err := svr.ListBarBazs(ctx, req)
 
@@ -30,7 +30,7 @@ func Test_BarBazServiceServer_CreateBarBaz(t *testing.T) {
 	svr := NewBarBazServiceServer()
 
 	ctx := context.Background()
-	req := &foo_pb.BarBaz{}
+	req := &foo_pb.CreateBarBazRequest{}
 
 	resp, err := svr.CreateBarBaz(ctx, req)
 
@@ -47,7 +47,7 @@ func Test_BarBazServiceServer_DeleteBarBaz(t *testing.T) {
 	svr := NewBarBazServiceServer()
 
 	ctx := context.Background()
-	req := &empty.Empty{}
+	req := &foo_pb.DeleteBarBazRequest{}
 
 	resp, err := svr.DeleteBarBaz(ctx, req)
 

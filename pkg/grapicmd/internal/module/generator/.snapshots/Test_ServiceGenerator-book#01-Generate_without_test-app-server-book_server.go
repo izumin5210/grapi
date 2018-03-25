@@ -12,7 +12,7 @@ import (
 	api_pb "testapp/api"
 )
 
-// New creates a new BookServiceServer instance.
+// NewBookServiceServer creates a new BookServiceServer instance.
 func NewBookServiceServer() interface {
 	api_pb.BookServiceServer
 	grapiserver.Server

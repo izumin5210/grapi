@@ -12,7 +12,7 @@ import (
 	api_pb "testapp/api"
 )
 
-// New creates a new FooServiceServer instance.
+// NewFooServiceServer creates a new FooServiceServer instance.
 func NewFooServiceServer() interface {
 	api_pb.FooServiceServer
 	grapiserver.Server
