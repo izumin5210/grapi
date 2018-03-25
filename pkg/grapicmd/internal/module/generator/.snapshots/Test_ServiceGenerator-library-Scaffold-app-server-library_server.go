@@ -34,27 +34,27 @@ func (s *libraryServiceServerImpl) RegisterWithHandler(ctx context.Context, mux 
 	return api_pb.RegisterLibraryServiceHandler(ctx, mux, conn)
 }
 
-func (s *libraryServiceServerImpl) ListLibraries(ctx context.Context, req *api_pb.ListLibrariesRequest) (*api_pb.ListLibrariesResponse, error) {
+func (s *libraryServiceServerImpl) ListBooks(ctx context.Context, req *api_pb.ListBooksRequest) (*api_pb.ListBooksResponse, error) {
 	// TODO: Not yet implemented.
 	return nil, status.Error(codes.Unimplemented, "TODO: You should implement it!")
 }
 
-func (s *libraryServiceServerImpl) GetLibrary(ctx context.Context, req *api_pb.GetLibraryRequest) (*api_pb.Library, error) {
+func (s *libraryServiceServerImpl) GetBook(ctx context.Context, req *api_pb.GetBookRequest) (*api_pb.Book, error) {
 	// TODO: Not yet implemented.
 	return nil, status.Error(codes.Unimplemented, "TODO: You should implement it!")
 }
 
-func (s *libraryServiceServerImpl) CreateLibrary(ctx context.Context, req *api_pb.CreateLibraryRequest) (*api_pb.Library, error) {
+func (s *libraryServiceServerImpl) CreateBook(ctx context.Context, req *api_pb.CreateBookRequest) (*api_pb.Book, error) {
 	// TODO: Not yet implemented.
 	return nil, status.Error(codes.Unimplemented, "TODO: You should implement it!")
 }
 
-func (s *libraryServiceServerImpl) UpdateLibrary(ctx context.Context, req *api_pb.UpdateLibraryRequest) (*api_pb.Library, error) {
+func (s *libraryServiceServerImpl) UpdateBook(ctx context.Context, req *api_pb.UpdateBookRequest) (*api_pb.Book, error) {
 	// TODO: Not yet implemented.
 	return nil, status.Error(codes.Unimplemented, "TODO: You should implement it!")
 }
 
-func (s *libraryServiceServerImpl) DeleteLibrary(ctx context.Context, req *api_pb.DeleteLibraryRequest) (*empty.Empty, error) {
+func (s *libraryServiceServerImpl) DeleteBook(ctx context.Context, req *api_pb.DeleteBookRequest) (*empty.Empty, error) {
 	// TODO: Not yet implemented.
 	return nil, status.Error(codes.Unimplemented, "TODO: You should implement it!")
 }

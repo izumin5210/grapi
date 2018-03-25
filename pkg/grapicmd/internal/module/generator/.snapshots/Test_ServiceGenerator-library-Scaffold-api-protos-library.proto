@@ -6,59 +6,59 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 service LibraryService {
-  rpc ListLibraries (ListLibrariesRequest) returns (ListLibrariesResponse) {
+  rpc ListBooks (ListBooksRequest) returns (ListBooksResponse) {
     option (google.api.http) = {
-      get: "/libraries"
+      get: "/books"
     };
   }
-  rpc GetLibrary (GetLibraryRequest) returns (Library) {
+  rpc GetBook (GetBookRequest) returns (Book) {
     option (google.api.http) = {
-      get: "/libraries/{library_id}"
+      get: "/books/{book_id}"
     };
   }
-  rpc CreateLibrary (CreateLibraryRequest) returns (Library) {
+  rpc CreateBook (CreateBookRequest) returns (Book) {
     option (google.api.http) = {
-      post: "/libraries"
-      body: "library"
+      post: "/books"
+      body: "book"
     };
   }
-  rpc UpdateLibrary (UpdateLibraryRequest) returns (Library) {
+  rpc UpdateBook (UpdateBookRequest) returns (Book) {
     option (google.api.http) = {
-      patch: "/libraries/{library.library_id}"
-      body: "library"
+      patch: "/books/{book.book_id}"
+      body: "book"
     };
   }
-  rpc DeleteLibrary (DeleteLibraryRequest) returns (google.protobuf.Empty) {
+  rpc DeleteBook (DeleteBookRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/libraries/{library_id}"
+      patch: "/books/{book_id}"
     };
   }
 }
 
-message Library {
-  string library_id = 1;
+message Book {
+  string book_id = 1;
 }
 
-message ListLibrariesRequest {
+message ListBooksRequest {
 }
 
-message ListLibrariesResponse {
-  repeated Library libraries = 1;
+message ListBooksResponse {
+  repeated Book books = 1;
 }
 
-message GetLibraryRequest {
-  string library_id = 1;
+message GetBookRequest {
+  string book_id = 1;
 }
 
-message CreateLibraryRequest {
-  Library library = 1;
+message CreateBookRequest {
+  Book book = 1;
 }
 
-message UpdateLibraryRequest {
-  Library library = 1;
+message UpdateBookRequest {
+  Book book = 1;
 }
 
-message DeleteLibraryRequest {
-  string library_id = 1;
+message DeleteBookRequest {
+  string book_id = 1;
 }
 
