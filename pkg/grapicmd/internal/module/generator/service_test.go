@@ -108,7 +108,7 @@ func Test_ServiceGenerator(t *testing.T) {
 				"app/server/book_server.go",
 			},
 			skippedFiles: map[string]struct{}{
-				"app/server/book_server_test.go": struct{}{},
+				"app/server/book_server_test.go": {},
 			},
 			skipTest: true,
 		},
