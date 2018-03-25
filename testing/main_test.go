@@ -21,22 +21,18 @@ import (
 
 func Test_server_onlyGateway(t *testing.T) {
 	var port int64 = 15261
-	app, err := grapiserver.New().
-		SetGatewayAddr("tcp", ":"+strconv.FormatInt(port, 10)).
-		AddServers(
+	s := grapiserver.NewServer(
+		grapiserver.WithGatewayAddr("tcp", ":"+strconv.FormatInt(port, 10)),
+		grapiserver.WithServers(
 			server.NewLibraryServiceServer(),
-		).
-		Build()
-
-	if err != nil {
-		t.Fatalf("failed to build grapserver.Engine: %v", err)
-	}
+		),
+	)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := app.Serve(); err != nil {
+		if err := s.Serve(); err != nil {
 			t.Errorf("Engine.Serve returned an error: %v", err)
 		}
 	}()
@@ -74,29 +70,25 @@ func Test_server_onlyGateway(t *testing.T) {
 		t.Errorf("Received body differs: (-got +want)\n%s", diff)
 	}
 
-	app.Shutdown()
+	s.Shutdown()
 	wg.Wait()
 }
 
 func Test_server_samePort(t *testing.T) {
 	var port int64 = 15261
 	addr := ":" + strconv.FormatInt(port, 10)
-	app, err := grapiserver.New().
-		SetAddr("tcp", addr).
-		AddServers(
+	s := grapiserver.NewServer(
+		grapiserver.WithAddr("tcp", addr),
+		grapiserver.WithServers(
 			server.NewLibraryServiceServer(),
-		).
-		Build()
-
-	if err != nil {
-		t.Fatalf("failed to build grapserver.Engine: %v", err)
-	}
+		),
+	)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := app.Serve(); err != nil {
+		if err := s.Serve(); err != nil {
 			t.Errorf("Engine.Serve returned an error: %v", err)
 		}
 	}()
@@ -162,7 +154,7 @@ func Test_server_samePort(t *testing.T) {
 		}
 	})
 
-	app.Shutdown()
+	s.Shutdown()
 	wg.Wait()
 }
 
@@ -175,23 +167,19 @@ func Test_server_differentPort(t *testing.T) {
 	grpcAddr := ":" + strconv.FormatInt(grpcPort, 10)
 	httpAddr := ":" + strconv.FormatInt(httpPort, 10)
 
-	app, err := grapiserver.New().
-		SetGrpcAddr("tcp", grpcAddr).
-		SetGatewayAddr("tcp", httpAddr).
-		AddServers(
+	s := grapiserver.NewServer(
+		grapiserver.WithGrpcAddr("tcp", grpcAddr),
+		grapiserver.WithGatewayAddr("tcp", httpAddr),
+		grapiserver.WithServers(
 			server.NewLibraryServiceServer(),
-		).
-		Build()
-
-	if err != nil {
-		t.Fatalf("failed to build grapserver.Engine: %v", err)
-	}
+		),
+	)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := app.Serve(); err != nil {
+		if err := s.Serve(); err != nil {
 			t.Errorf("Engine.Serve returned an error: %v", err)
 		}
 	}()
@@ -257,6 +245,6 @@ func Test_server_differentPort(t *testing.T) {
 		}
 	})
 
-	app.Shutdown()
+	s.Shutdown()
 	wg.Wait()
 }
