@@ -157,7 +157,7 @@ func updateRun(t *testing.T, fs afero.Fs, rootPath string, port int) {
 				switch fun := n.Fun.(type) {
 				case *ast.SelectorExpr:
 					switch fun.Sel.Name {
-					case "NewServer":
+					case "New":
 						n.Args = append(n.Args, &ast.CallExpr{
 							Fun: &ast.SelectorExpr{
 								X:   ast.NewIdent("grapiserver"),

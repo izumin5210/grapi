@@ -27,11 +27,6 @@ func New(opts ...Option) *Engine {
 	}
 }
 
-// NewServer is deprecated.
-func NewServer(opts ...Option) *Engine {
-	return New(opts...)
-}
-
 // Serve starts gRPC and Gateway servers.
 func (e *Engine) Serve() error {
 	var (
