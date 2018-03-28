@@ -19,7 +19,7 @@ service BarBazService {
   }
   rpc DeleteBarBaz (DeleteBarBazRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/bar_bazs/{bar_baz_id}"
+      delete: "/bar_bazs/{bar_baz_id}"
     };
   }
   rpc Rename (RenameRequest) returns (RenameResponse) {
