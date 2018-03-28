@@ -20,11 +20,20 @@
 
 ## Getting Started
 ### Installation
+#### For Homebrew users
 
 ```
 $ brew install protobuf
 $ brew install izumin5210/tools/grapi
 ```
+
+#### Downloads built binary
+You should install `protoc` command from [google/protobuf](https://github.com/google/protobuf).
+
+- Linux:
+  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.0/grapi_linux_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
+- masOS:
+  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.0/grapi_darwin_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
 
 ### Creates a new application
 ```
