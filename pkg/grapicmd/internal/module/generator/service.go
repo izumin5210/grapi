@@ -343,7 +343,7 @@ func (g *serviceGenerator) createMethodParams(name nameParams, methods []string)
 				requestCommon: reqName,
 				responseProto: "google.protobuf.Empty",
 				responseGo:    "empty.Empty",
-				HTTP:          serviceMethodHTTPParams{Method: "patch", Path: name.pluralSnake + "/{" + id + "}"},
+				HTTP:          serviceMethodHTTPParams{Method: "delete", Path: name.pluralSnake + "/{" + id + "}"},
 			}
 			basicMessages[6] = &serviceMethodMessage{
 				Name:   reqName,
