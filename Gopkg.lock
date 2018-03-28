@@ -101,13 +101,14 @@
   version = "v1.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/izumin5210/clicontrib"
   packages = [
-    ".",
-    "clog"
+    "pkg/cbuild",
+    "pkg/ccmd",
+    "pkg/clog"
   ]
-  revision = "619b4602dfb1b8acecbad33bab02194bb3ed34a1"
+  revision = "fdfd45e15564e04a472c90a37fb1a5d8035fe050"
+  version = "v0.1.0"
 
 [[projects]]
   branch = "master"
@@ -375,6 +376,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9a5a1dbb489f7ecf5427be9f3f8a4af95f7220973afd04285eaccfddafef1daf"
+  inputs-digest = "2c857d3a14b94944969786dc15eae617a0804401018097555db7b338471d5328"
   solver-name = "gps-cdcl"
   solver-version = 1
