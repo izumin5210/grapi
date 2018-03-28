@@ -3,7 +3,7 @@ package cmd
 import (
 	"path/filepath"
 
-	"github.com/izumin5210/clicontrib"
+	"github.com/izumin5210/clicontrib/pkg/ccmd"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -31,7 +31,7 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 
 	var cfgFile string
 	cobra.OnInitialize(func() { cfg.Init(cfgFile) })
-	clicontrib.HandleLogFlags(cmd)
+	ccmd.HandleLogFlags(cmd)
 
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
 
