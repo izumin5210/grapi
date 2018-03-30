@@ -5,7 +5,7 @@
 [![Go project version](https://badge.fury.io/go/github.com%2Fizumin5210%2Fgrapi.svg)](https://badge.fury.io/go/github.com%2Fizumin5210%2Fgrapi)
 [![license](https://img.shields.io/github/license/izumin5210/grapi.svg)](./LICENSE)
 
-:open_mouth: A surprisingly easy API server in gRPC and Go
+:open_mouth: A surprisingly easy API server and generator in gRPC and Go
 
 ## Features
 - You can develop and deploy API servers blazing fastly :zap:
