@@ -5,7 +5,7 @@
 [![Go project version](https://badge.fury.io/go/github.com%2Fizumin5210%2Fgrapi.svg)](https://badge.fury.io/go/github.com%2Fizumin5210%2Fgrapi)
 [![license](https://img.shields.io/github/license/izumin5210/grapi.svg)](./LICENSE)
 
-:open_mouth: A surprisingly easy API server in gRPC and Go
+:open_mouth: A surprisingly easy API server and generator in gRPC and Go
 
 ## Features
 - You can develop and deploy API servers blazing fastly :zap:
@@ -20,11 +20,20 @@
 
 ## Getting Started
 ### Installation
+#### For Homebrew users
 
 ```
 $ brew install protobuf
 $ brew install izumin5210/tools/grapi
 ```
+
+#### Downloads built binary
+You should install `protoc` command from [google/protobuf](https://github.com/google/protobuf).
+
+- Linux:
+  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.0/grapi_linux_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
+- masOS:
+  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.0/grapi_darwin_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
 
 ### Creates a new application
 ```
