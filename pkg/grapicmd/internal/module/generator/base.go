@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/izumin5210/clicontrib/clog"
+	"github.com/izumin5210/clicontrib/pkg/clog"
 	assets "github.com/jessevdk/go-assets"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"

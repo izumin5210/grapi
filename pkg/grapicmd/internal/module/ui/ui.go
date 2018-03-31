@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/izumin5210/clicontrib/clog"
+	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/tcnksm/go-input"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
