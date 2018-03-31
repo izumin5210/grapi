@@ -30,7 +30,7 @@ service BookService {
   }
   rpc DeleteBook (DeleteBookRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/books/{book_id}"
+      delete: "/books/{book_id}"
     };
   }
 }
