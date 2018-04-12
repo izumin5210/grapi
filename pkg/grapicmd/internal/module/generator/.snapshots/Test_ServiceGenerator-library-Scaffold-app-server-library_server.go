@@ -4,9 +4,7 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/izumin5210/grapi/pkg/grapiserver"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -22,16 +20,6 @@ func NewLibraryServiceServer() interface {
 }
 
 type libraryServiceServerImpl struct {
-}
-
-// RegisterWithServer implements grapiserver.Server.RegisterWithServer.
-func (s *libraryServiceServerImpl) RegisterWithServer(grpcSvr *grpc.Server) {
-	api_pb.RegisterLibraryServiceServer(grpcSvr, s)
-}
-
-// RegisterWithHandler implements grapiserver.Server.RegisterWithHandler.
-func (s *libraryServiceServerImpl) RegisterWithHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return api_pb.RegisterLibraryServiceHandler(ctx, mux, conn)
 }
 
 func (s *libraryServiceServerImpl) ListBooks(ctx context.Context, req *api_pb.ListBooksRequest) (*api_pb.ListBooksResponse, error) {
