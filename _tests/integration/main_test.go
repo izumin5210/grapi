@@ -72,6 +72,7 @@ func Test_Integration(t *testing.T) {
 	cmd.Dir = rootPath
 	cmd.Env = append(os.Environ(), "GOPATH="+gopath)
 	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	err = cmd.Start()
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
