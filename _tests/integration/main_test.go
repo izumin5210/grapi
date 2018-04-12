@@ -227,19 +227,7 @@ func updateServerImpl(t *testing.T, fs afero.Fs, rootPath string) {
 						&ast.ImportSpec{
 							Path: &ast.BasicLit{
 								Kind:  token.STRING,
-								Value: strconv.Quote("github.com/grpc-ecosystem/grpc-gateway/runtime"),
-							},
-						},
-						&ast.ImportSpec{
-							Path: &ast.BasicLit{
-								Kind:  token.STRING,
 								Value: strconv.Quote("github.com/izumin5210/grapi/pkg/grapiserver"),
-							},
-						},
-						&ast.ImportSpec{
-							Path: &ast.BasicLit{
-								Kind:  token.STRING,
-								Value: strconv.Quote("google.golang.org/grpc"),
 							},
 						},
 						&ast.ImportSpec{
