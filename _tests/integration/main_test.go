@@ -78,7 +78,7 @@ func Test_Integration(t *testing.T) {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 	defer func() {
-		if !cmd.ProcessState.Exited() {
+		if cmd.Process != nil && cmd.ProcessState != nil && !cmd.ProcessState.Exited() {
 			cmd.Process.Kill()
 		}
 	}()
