@@ -4,15 +4,6 @@ required = [
   "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger",
 ]
 
-[prune]
-  go-tests = true
-  unused-packages = true
-
-  [[prune.project]]
-    name = "github.com/grpc-ecosystem/grpc-gateway"
-    non-go = false
-    unused-packages = false
-
 [[constraint]]
   name = "github.com/izumin5210/grapi"
   version = ""
