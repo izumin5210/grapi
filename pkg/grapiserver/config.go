@@ -4,6 +4,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	pkg_runtime "runtime"
 	"time"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
@@ -13,7 +14,7 @@ import (
 )
 
 func createDefaultConfig() *Config {
-	return &Config{
+	config := &Config{
 		GrpcInternalAddr: &Address{
 			Network: "unix",
 			Addr:    "tmp/server.sock",
@@ -24,6 +25,13 @@ func createDefaultConfig() *Config {
 		},
 		MaxConcurrentStreams: 1000,
 	}
+	if pkg_runtime.GOOS == "windows" {
+		config.GrpcInternalAddr = &Address{
+			Network: "tcp",
+			Addr:    ":5050",
+		}
+	}
+	return config
 }
 
 // Address represents a network end point address.
