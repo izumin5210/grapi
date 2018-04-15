@@ -132,7 +132,7 @@ func (u *executeProtocUsecase) executeProtoc(protoPath string) error {
 		return errors.WithStack(err)
 	}
 	for _, cmd := range cmds {
-		out, err := u.commandFactory.Create(cmd).AddEnv("PATH", u.binDir+":"+os.Getenv("PATH")).SetDir(u.rootDir).Exec()
+		out, err := u.commandFactory.Create(cmd).AddEnv("PATH", u.binDir+string(filepath.ListSeparator)+os.Getenv("PATH")).SetDir(u.rootDir).Exec()
 		if err != nil {
 			return errors.Wrapf(err, "failed to execute module: %s", string(out))
 		}
