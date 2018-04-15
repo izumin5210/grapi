@@ -26,7 +26,7 @@ func init() {
 // GetImportPath creates the golang package path from the given path.
 func GetImportPath(rootPath string) (importPath string, err error) {
 	for _, gopath := range filepath.SplitList(BuildContext.GOPATH) {
-		prefix := filepath.Join(gopath, "src") + "/"
+		prefix := filepath.Join(gopath, "src") + string(filepath.Separator)
 		// FIXME: should not use strings.HasPrefix
 		if strings.HasPrefix(rootPath, prefix) {
 			importPath = strings.Replace(rootPath, prefix, "", 1)
