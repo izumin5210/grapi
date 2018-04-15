@@ -74,7 +74,8 @@ func LookupRoot(fs afero.Fs, dir string) (string, bool) {
 		return dir, true
 	}
 
-	if dir == "/" {
+	p := dir[len(filepath.VolumeName(dir)):]
+	if p == string(filepath.Separator) {
 		return "", false
 	}
 
