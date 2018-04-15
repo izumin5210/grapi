@@ -2,6 +2,7 @@ package script
 
 import (
 	"path/filepath"
+	"runtime"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -42,12 +43,16 @@ func (f *scriptLoader) Load(dir string) error {
 			srcPaths = append(srcPaths, filepath.Join(dir, name))
 		}
 		name := filepath.Base(dir)
+		ext := ""
+		if runtime.GOOS == "windows" {
+			ext = ".exe"
+		}
 		f.scripts[name] = &script{
 			fs:             f.fs,
 			commandFactory: f.commandFactory,
 			srcPaths:       srcPaths,
 			name:           name,
-			binPath:        filepath.Join(f.binDir, name),
+			binPath:        filepath.Join(f.binDir, name+ext),
 			rootDir:        f.rootDir,
 		}
 		f.names = append(f.names, name)
