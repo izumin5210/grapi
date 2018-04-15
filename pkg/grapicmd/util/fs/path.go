@@ -29,7 +29,7 @@ func GetImportPath(rootPath string) (importPath string, err error) {
 		prefix := filepath.Join(gopath, "src") + string(filepath.Separator)
 		// FIXME: should not use strings.HasPrefix
 		if strings.HasPrefix(rootPath, prefix) {
-			importPath = strings.Replace(rootPath, prefix, "", 1)
+			importPath = filepath.ToSlash(strings.Replace(rootPath, prefix, "", 1))
 			break
 		}
 	}
