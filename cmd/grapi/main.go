@@ -29,6 +29,9 @@ func init() {
 		outWriter = colorable.NewColorableStdout()
 		errWriter = colorable.NewColorableStderr()
 	}
+	if name == "" {
+		name = "grapi"
+	}
 }
 
 func main() {
