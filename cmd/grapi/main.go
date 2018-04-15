@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"runtime"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/cmd"
+	"github.com/mattn/go-colorable"
 )
 
 var (
@@ -16,10 +19,17 @@ var (
 
 	releaseType string
 
-	inReader  = os.Stdin
-	outWriter = os.Stdout
-	errWriter = os.Stderr
+	inReader            = os.Stdin
+	outWriter io.Writer = os.Stdout
+	errWriter io.Writer = os.Stderr
 )
+
+func init() {
+	if runtime.GOOS == "windows" {
+		outWriter = colorable.NewColorableStdout()
+		errWriter = colorable.NewColorableStderr()
+	}
+}
 
 func main() {
 	cwd, err := os.Getwd()
