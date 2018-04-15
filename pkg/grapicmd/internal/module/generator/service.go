@@ -245,7 +245,7 @@ func (g *serviceGenerator) createParams(path string, resName string, methodNames
 		},
 		PbGo: servicePbGoParams{
 			PackageName: pbgoPackageName,
-			PackagePath: filepath.Join(importPath, pbgoPackagePath),
+			PackagePath: filepath.ToSlash(filepath.Join(importPath, pbgoPackagePath)),
 		},
 		Go: serviceGoParams{
 			Package:     packageName,
