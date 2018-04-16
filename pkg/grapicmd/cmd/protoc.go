@@ -17,7 +17,7 @@ func newProtocCommand(cfg grapicmd.Config, ui module.UI, commandFactory module.C
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !cfg.IsInsideApp() {
-				return errors.New("protoc command should be execute inside a grapi applicaiton directory")
+				return errors.New("protoc command should be execute inside a grapi application directory")
 			}
 			u := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ui, commandFactory, cfg.RootDir())
 			return errors.WithStack(u.Perform())
