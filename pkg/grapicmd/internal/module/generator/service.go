@@ -202,7 +202,7 @@ func (g *serviceGenerator) createParams(path string, resName string, methodNames
 	}
 
 	protoPackageChunks := []string{}
-	for _, pkg := range strings.Split(filepath.Join(importPath, "api", filepath.Dir(path)), "/") {
+	for _, pkg := range strings.Split(filepath.ToSlash(filepath.Join(importPath, "api", filepath.Dir(path))), "/") {
 		chunks := strings.Split(strings.Replace(pkg, "-", "_", -1), ".")
 		for i := len(chunks) - 1; i >= 0; i-- {
 			protoPackageChunks = append(protoPackageChunks, chunks[i])
@@ -245,7 +245,7 @@ func (g *serviceGenerator) createParams(path string, resName string, methodNames
 		},
 		PbGo: servicePbGoParams{
 			PackageName: pbgoPackageName,
-			PackagePath: filepath.Join(importPath, pbgoPackagePath),
+			PackagePath: filepath.ToSlash(filepath.Join(importPath, pbgoPackagePath)),
 		},
 		Go: serviceGoParams{
 			Package:     packageName,

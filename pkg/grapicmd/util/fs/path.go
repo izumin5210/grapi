@@ -26,10 +26,10 @@ func init() {
 // GetImportPath creates the golang package path from the given path.
 func GetImportPath(rootPath string) (importPath string, err error) {
 	for _, gopath := range filepath.SplitList(BuildContext.GOPATH) {
-		prefix := filepath.Join(gopath, "src") + "/"
+		prefix := filepath.Join(gopath, "src") + string(filepath.Separator)
 		// FIXME: should not use strings.HasPrefix
 		if strings.HasPrefix(rootPath, prefix) {
-			importPath = strings.Replace(rootPath, prefix, "", 1)
+			importPath = filepath.ToSlash(strings.Replace(rootPath, prefix, "", 1))
 			break
 		}
 	}
@@ -74,7 +74,8 @@ func LookupRoot(fs afero.Fs, dir string) (string, bool) {
 		return dir, true
 	}
 
-	if dir == "/" {
+	p := dir[len(filepath.VolumeName(dir)):]
+	if p == string(filepath.Separator) {
 		return "", false
 	}
 
