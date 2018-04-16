@@ -8,13 +8,13 @@
 :open_mouth: A surprisingly easy API server and generator in gRPC and Go
 
 ## Features
-- You can develop and deploy API servers blazing fastly :zap:
-- Easily code generator
+- You can develop and deploy API servers blazingly fast :zap:
+- Easy code generator
 	- application  (inspired by `rails new` and `create-react-app`)
 	- gRPC services and their implementations (inspired by `rails g (scaffold_)controller`)
 - User-friendly `protoc` wrapper (inspired by [protoeasy](https://github.com/peter-edge/protoeasy-go))
-- Provides gRPC and HTTP JSON API  with single implementation, by using [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
-- Generates codes followed [google's API design guideline](https://cloud.google.com/apis/design/)
+- Provides gRPC and HTTP JSON API  with single implementation by using [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
+- Generates codes based on [google's API design guideline](https://cloud.google.com/apis/design/)
 
 [![asciicast](https://asciinema.org/a/172436.png)](https://asciinema.org/a/172436)
 
@@ -27,7 +27,7 @@ $ brew install protobuf
 $ brew install izumin5210/tools/grapi
 ```
 
-#### Downloads built binary
+#### Download built binary
 You should install `protoc` command from [google/protobuf](https://github.com/google/protobuf).
 
 - Linux:
@@ -35,17 +35,17 @@ You should install `protoc` command from [google/protobuf](https://github.com/go
 - masOS:
   - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.0/grapi_darwin_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
 
-### Creates a new application
+### Create a new application
 ```
 $ grapi init awesome-app
 ```
 
-### Creates a new service
+### Create a new service
 ```
 $ grapi g service books
 ```
 
-Or if you need full [standard methods](https://cloud.google.com/apis/design/standard_methods), you can get them with following command:
+Or, if you need full [standard methods](https://cloud.google.com/apis/design/standard_methods), you can get them with following command:
 
 ```
 $ grapi g scaffold-service books
@@ -69,13 +69,13 @@ And you should register generated services to the `grapiserver.Engine` instance:
  }
 ```
 
-If you updated service definition, you can re-generate `.pb.go` and `.pb.gw.go` with the following command:
+If you updated service definition, you can re-generate `.pb.go` and `.pb.gw.go` with following command:
 
 ```
 $ grapi protoc
 ```
 
-### Starts server
+### Start server
 
 ```
 $ grapi server
@@ -94,3 +94,4 @@ $ grapi import-books  # run the command
 ```
 $ grapi build
 ```
+
