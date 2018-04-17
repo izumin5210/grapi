@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 )
 
-// MuxServer wraps a conneciton multiplexer and a listener.
+// MuxServer wraps a connection multiplexer and a listener.
 type MuxServer struct {
 	mux cmux.CMux
 	lis net.Listener

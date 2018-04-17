@@ -16,7 +16,7 @@ func newBuildCommand(cfg grapicmd.Config, ui module.UI, scriptLoader module.Scri
 		SilenceUsage:  true,
 		RunE: func(c *cobra.Command, args []string) (err error) {
 			if !cfg.IsInsideApp() {
-				return errors.New("protoc command should be execute inside a grapi applicaiton directory")
+				return errors.New("protoc command should be execute inside a grapi application directory")
 			}
 
 			nameSet := make(map[string]bool, len(args))

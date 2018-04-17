@@ -37,7 +37,7 @@ func newGenerateServiceCommand(cfg grapicmd.Config, ui module.UI, generator modu
 		Args:          cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !cfg.IsInsideApp() {
-				return errors.New("geneate command should execut inside a grapi applicaiton directory")
+				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
 			ui.Section("Generate service")
@@ -72,7 +72,7 @@ func newGenerateScaffoldServiceCommand(cfg grapicmd.Config, ui module.UI, genera
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !cfg.IsInsideApp() {
-				return errors.New("geneate command should execut inside a grapi applicaiton directory")
+				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
 			ui.Section("Scaffold service")
@@ -102,7 +102,7 @@ func newGenerateCommandCommand(cfg grapicmd.Config, generator module.CommandGene
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !cfg.IsInsideApp() {
-				return errors.New("geneate command should execut inside a grapi applicaiton directory")
+				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
 			return errors.WithStack(generator.GenerateCommand(args[0]))
