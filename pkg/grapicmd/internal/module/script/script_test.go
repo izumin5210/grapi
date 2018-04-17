@@ -128,7 +128,7 @@ func Test_Script(t *testing.T) {
 	if got, want := exec.dir, "/home/app"; got != want {
 		t.Errorf("Run() executed a command in %v, want %v", got, want)
 	}
-	
+
 	if err != nil {
 		t.Errorf("Run() returned an error %v", err)
 	}
