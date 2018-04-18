@@ -16,7 +16,7 @@
 - Provides gRPC and HTTP JSON API  with single implementation by using [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
 - Generates codes based on [google's API design guideline](https://cloud.google.com/apis/design/)
 
-[![asciicast](https://asciinema.org/a/172436.png)](https://asciinema.org/a/172436)
+[![asciicast](https://asciinema.org/a/176280.png)](https://asciinema.org/a/176280)
 
 ## Getting Started
 ### Installation
@@ -31,9 +31,9 @@ $ brew install izumin5210/tools/grapi
 You should install `protoc` command from [google/protobuf](https://github.com/google/protobuf).
 
 - Linux:
-  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.0/grapi_linux_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
+  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.1/grapi_linux_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
 - masOS:
-  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.0/grapi_darwin_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
+  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.1/grapi_darwin_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
 
 ### Create a new application
 ```
