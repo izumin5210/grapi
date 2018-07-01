@@ -32,8 +32,6 @@ func Test_ServiceGenerator(t *testing.T) {
 	ui.EXPECT().ItemSkipped(gomock.Any()).AnyTimes()
 	fs := afero.NewMemMapFs()
 
-	generator := newServiceGenerator(fs, ui, rootDir)
-
 	cases := []struct {
 		name         string
 		args         []string
@@ -42,6 +40,9 @@ func Test_ServiceGenerator(t *testing.T) {
 		scaffold     bool
 		skipTest     bool
 		resource     string
+		protoDir     string
+		protoOutDir  string
+		serverDir    string
 	}{
 		{
 			name: "foo",
@@ -100,6 +101,36 @@ func Test_ServiceGenerator(t *testing.T) {
 			},
 		},
 		{
+			name: "qux",
+			files: []string{
+				"pkg/foo/protos/qux.proto",
+				"app/server/qux_server.go",
+				"app/server/qux_server_register_funcs.go",
+				"app/server/qux_server_test.go",
+			},
+			protoDir: "pkg/foo/protos",
+		},
+		{
+			name: "quux",
+			files: []string{
+				"api/protos/quux.proto",
+				"app/server/quux_server.go",
+				"app/server/quux_server_register_funcs.go",
+				"app/server/quux_server_test.go",
+			},
+			protoOutDir: "api/out",
+		},
+		{
+			name: "corge",
+			files: []string{
+				"api/protos/corge.proto",
+				"pkg/foo/server/corge_server.go",
+				"pkg/foo/server/corge_server_register_funcs.go",
+				"pkg/foo/server/corge_server_test.go",
+			},
+			serverDir: "pkg/foo/server",
+		},
+		{
 			name: "book",
 			files: []string{
 				"api/protos/book.proto",
@@ -139,6 +170,9 @@ func Test_ServiceGenerator(t *testing.T) {
 		if len(c.args) > 0 {
 			test += " with " + strings.Join(c.args, ",")
 		}
+
+		generator := newServiceGenerator(fs, ui, rootDir, c.protoDir, c.protoOutDir, c.serverDir)
+
 		t.Run(test, func(t *testing.T) {
 			test := "Generate"
 			if c.scaffold {
