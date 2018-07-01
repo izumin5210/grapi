@@ -17,13 +17,26 @@ import (
 
 type serviceGenerator struct {
 	baseGenerator
-	rootDir string
+	rootDir, protoDir, protoOutDir, serverDir string
 }
 
-func newServiceGenerator(fs afero.Fs, ui module.UI, rootDir string) module.ServiceGenerator {
+func newServiceGenerator(fs afero.Fs, ui module.UI, rootDir, protoDir, protoOutDir, serverDir string) module.ServiceGenerator {
+	if protoDir == "" {
+		protoDir = filepath.Join("api", "protos")
+	}
+	if protoOutDir == "" {
+		protoOutDir = filepath.Join("api")
+	}
+	if serverDir == "" {
+		serverDir = filepath.Join("app", "server")
+	}
+
 	return &serviceGenerator{
 		baseGenerator: newBaseGenerator(template.Service, fs, ui),
 		rootDir:       rootDir,
+		protoDir:      protoDir,
+		protoOutDir:   protoOutDir,
+		serverDir:     serverDir,
 	}
 }
 
@@ -73,6 +86,9 @@ func createNameParams(name string) nameParams {
 }
 
 type serviceParams struct {
+	ProtoDir    string
+	ProtoOutDir string
+	ServerDir   string
 	Path        string
 	ServiceName string
 	Methods     []serviceMethodParams
@@ -190,19 +206,19 @@ func (g *serviceGenerator) createParams(path string, resName string, methodNames
 	packageName := filepath.Base(packagePath)
 
 	// api/baz/qux
-	pbgoPackagePath := filepath.Join("api", packagePath)
+	pbgoPackagePath := filepath.Join(g.protoOutDir, packagePath)
 	// qux_pb
 	pbgoPackageName := filepath.Base(pbgoPackagePath) + "_pb"
 
 	if packagePath == "." {
-		packagePath = "server"
+		packagePath = filepath.Base(g.serverDir)
 		packageName = packagePath
-		pbgoPackagePath = "api"
-		pbgoPackageName = pbgoPackagePath + "_pb"
+		pbgoPackagePath = g.protoOutDir
+		pbgoPackageName = filepath.Base(pbgoPackagePath) + "_pb"
 	}
 
 	protoPackageChunks := []string{}
-	for _, pkg := range strings.Split(filepath.ToSlash(filepath.Join(importPath, "api", filepath.Dir(path))), "/") {
+	for _, pkg := range strings.Split(filepath.ToSlash(filepath.Join(importPath, g.protoOutDir, filepath.Dir(path))), "/") {
 		chunks := strings.Split(strings.Replace(pkg, "-", "_", -1), ".")
 		for i := len(chunks) - 1; i >= 0; i-- {
 			protoPackageChunks = append(protoPackageChunks, chunks[i])
@@ -235,6 +251,9 @@ func (g *serviceGenerator) createParams(path string, resName string, methodNames
 	sort.Strings(goTestImports)
 
 	params := &serviceParams{
+		ProtoDir:    g.protoDir,
+		ProtoOutDir: g.protoOutDir,
+		ServerDir:   g.serverDir,
 		Path:        path,
 		ServiceName: serviceName,
 		Methods:     methods.Methods,

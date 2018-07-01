@@ -1,0 +1,9 @@
+syntax = "proto3";
+option go_package = "api_pb";
+package testapp.api;
+
+import "google/api/annotations.proto";
+
+service QuxService {
+}
+

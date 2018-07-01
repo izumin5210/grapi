@@ -1,3 +1,6 @@
+[grapi]
+server_dir = "./app/server"
+
 [protoc]
 protos_dir = "./api/protos"
 out_dir = "./api"

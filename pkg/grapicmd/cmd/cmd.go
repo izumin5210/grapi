@@ -36,7 +36,15 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
 
 	ui := ui.New(cfg.OutWriter(), cfg.InReader())
-	generator := generator.New(cfg.Fs(), ui, cfg.RootDir(), cfg.Version())
+	generator := generator.New(
+		cfg.Fs(),
+		ui,
+		cfg.RootDir(),
+		cfg.ProtocConfig().ProtosDir,
+		cfg.ProtocConfig().OutDir,
+		cfg.ServerDir(),
+		cfg.Version(),
+	)
 	commandFactory := command.NewFactory(cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
 	scriptLoader := script.NewLoader(cfg.Fs(), commandFactory, cfg.RootDir())
 
