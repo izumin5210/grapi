@@ -25,6 +25,7 @@ type Config interface {
 	InReader() io.Reader
 	OutWriter() io.Writer
 	ErrWriter() io.Writer
+	ServerDir() string
 	ProtocConfig() *protoc.Config
 }
 
@@ -120,6 +121,10 @@ func (c *config) OutWriter() io.Writer {
 
 func (c *config) ErrWriter() io.Writer {
 	return c.err
+}
+
+func (c *config) ServerDir() string {
+	return c.v.GetString("grapi.server_dir")
 }
 
 func (c *config) ProtocConfig() *protoc.Config {
