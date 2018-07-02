@@ -124,7 +124,7 @@ func (c *config) ErrWriter() io.Writer {
 }
 
 func (c *config) ServerDir() string {
-	return c.v.GetString("grapi.server_dir")
+	return c.v.GetString("server_dir")
 }
 
 func (c *config) ProtocConfig() *protoc.Config {
