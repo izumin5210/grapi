@@ -59,17 +59,6 @@ func LookupRoot(fs afero.Fs, dir string) (string, bool) {
 		})
 	}
 
-	for _, d := range requiredDirs {
-		d := d
-		eg.Go(func() error {
-			ok, err := afero.DirExists(fs, filepath.Join(dir, d))
-			if err != nil || !ok {
-				return errors.Errorf("%s does not exist", d)
-			}
-			return nil
-		})
-	}
-
 	if eg.Wait() == nil {
 		return dir, true
 	}
