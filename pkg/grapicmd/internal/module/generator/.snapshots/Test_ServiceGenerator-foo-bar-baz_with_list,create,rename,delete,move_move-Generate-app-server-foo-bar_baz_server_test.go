@@ -93,3 +93,4 @@ func Test_BarBazServiceServer_MoveMove(t *testing.T) {
 		t.Error("response should not nil")
 	}
 }
+
