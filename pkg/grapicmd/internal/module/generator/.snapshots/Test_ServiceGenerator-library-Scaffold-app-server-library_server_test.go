@@ -22,7 +22,7 @@ func Test_LibraryServiceServer_ListBooks(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 
@@ -39,7 +39,7 @@ func Test_LibraryServiceServer_GetBook(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 
@@ -56,7 +56,7 @@ func Test_LibraryServiceServer_CreateBook(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 
@@ -73,7 +73,7 @@ func Test_LibraryServiceServer_UpdateBook(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 
@@ -90,7 +90,6 @@ func Test_LibraryServiceServer_DeleteBook(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
-

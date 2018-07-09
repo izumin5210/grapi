@@ -25,7 +25,7 @@ func Test_{{$go.ServerName}}_{{.Method}}(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 {{end -}}
