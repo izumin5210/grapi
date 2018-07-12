@@ -22,7 +22,7 @@ func Test_BarBazServiceServer_ListBarBazs(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 
@@ -39,7 +39,7 @@ func Test_BarBazServiceServer_CreateBarBaz(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 
@@ -56,7 +56,7 @@ func Test_BarBazServiceServer_DeleteBarBaz(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 

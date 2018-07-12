@@ -22,7 +22,7 @@ func Test_BookServiceServer_ListBooks(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 
@@ -39,7 +39,7 @@ func Test_BookServiceServer_GetBook(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 
@@ -56,7 +56,7 @@ func Test_BookServiceServer_CreateBook(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 
@@ -73,7 +73,7 @@ func Test_BookServiceServer_UpdateBook(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 
@@ -90,7 +90,7 @@ func Test_BookServiceServer_DeleteBook(t *testing.T) {
 	}
 
 	if resp == nil {
-		at.Error("response should not nil")
+		t.Error("response should not nil")
 	}
 }
 
