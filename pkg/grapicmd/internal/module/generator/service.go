@@ -206,16 +206,19 @@ func (g *serviceGenerator) createParams(path string, resName string, methodNames
 	packageName := filepath.Base(packagePath)
 
 	// api/baz/qux
-	pbgoPackagePath := filepath.Join(g.protoOutDir, packagePath)
-	// qux_pb
-	pbgoPackageName := filepath.Base(pbgoPackagePath) + "_pb"
+	pbgoPackagePath := filepath.Join(g.protoOutDir, packagePath) + "_pb"
 
 	if packagePath == "." {
+		// server
 		packagePath = filepath.Base(g.serverDir)
+		// server
 		packageName = packagePath
-		pbgoPackagePath = g.protoOutDir
-		pbgoPackageName = filepath.Base(pbgoPackagePath) + "_pb"
+		// api_pb
+		pbgoPackagePath = g.protoOutDir + "_pb"
 	}
+
+	// qux_pb
+	pbgoPackageName := filepath.Base(pbgoPackagePath)
 
 	protoPackageChunks := []string{}
 	for _, pkg := range strings.Split(filepath.ToSlash(filepath.Join(importPath, g.protoOutDir, filepath.Dir(path))), "/") {
