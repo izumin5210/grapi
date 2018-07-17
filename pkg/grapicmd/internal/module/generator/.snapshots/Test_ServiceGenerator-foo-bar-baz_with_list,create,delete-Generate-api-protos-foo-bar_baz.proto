@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "foo_pb";
+option go_package = "testapp/api/foo_pb";
 package testapp.api.foo;
 
 import "google/api/annotations.proto";

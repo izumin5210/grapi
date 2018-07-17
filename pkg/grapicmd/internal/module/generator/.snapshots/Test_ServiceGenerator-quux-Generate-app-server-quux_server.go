@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	out_pb "testapp/api/out"
+	out_pb "testapp/api/out_pb"
 )
 
 // NewQuuxServiceServer creates a new QuuxServiceServer instance.
