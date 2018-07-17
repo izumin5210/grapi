@@ -234,7 +234,7 @@ func updateServerImpl(t *testing.T, fs afero.Fs, rootPath string) {
 							Name: &ast.Ident{Name: "api_pb"},
 							Path: &ast.BasicLit{
 								Kind:  token.STRING,
-								Value: strconv.Quote("sample/api"),
+								Value: strconv.Quote("sample/api_pb"),
 							},
 						},
 					}
