@@ -12,7 +12,7 @@ import_dirs = [
   [[protoc.plugins]]
   path = "./vendor/github.com/golang/protobuf/protoc-gen-go"
   name = "go"
-  args = { plugins = "grpc" }
+  args = { plugins = "grpc", paths = "source_relative" }
 
   [[protoc.plugins]]
   path = "./vendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway"
