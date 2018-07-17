@@ -36,12 +36,16 @@ func (c *Config) ProtoFiles(fs afero.Fs, rootDir string) ([]string, error) {
 // OutDirOf returns a directory path of protoc result output path for given proto file.
 func (c *Config) OutDirOf(rootDir string, protoPath string) (string, error) {
 	protosDir := filepath.Join(rootDir, c.ProtosDir)
+
 	relProtoDir, err := filepath.Rel(protosDir, filepath.Dir(protoPath))
 	if strings.Contains(relProtoDir, "..") {
 		return "", errors.Errorf(".proto files should be included in %s", c.ProtosDir)
 	}
 	if err != nil {
 		return "", errors.Wrapf(err, ".proto files should be included in %s", c.ProtosDir)
+	}
+	if relProtoDir != "." {
+		relProtoDir += "_pb"
 	}
 
 	return filepath.Join(c.OutDir, relProtoDir), nil

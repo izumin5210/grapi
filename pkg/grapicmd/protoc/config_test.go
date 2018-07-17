@@ -38,29 +38,40 @@ func Test_Config_OutDirOf(t *testing.T) {
 	cfg := createDefaultConfig()
 	rootDir := "/home/example/app"
 
-	t.Run("with no errors", func(t *testing.T) {
-		outDir, err := cfg.OutDirOf(rootDir, filepath.Join(rootDir, "api/protos/foo/bar.proto"))
+	cases := []struct {
+		test, in, out string
+		isErr         bool
+	}{
+		{
+			test: "simple",
+			in:   "api/protos/foo/bar.proto",
+			out:  "api/foo_pb",
+		},
+		{
+			test:  "out of proto dir",
+			in:    "api/foo/bar.proto",
+			isErr: true,
+		},
+		{
+			test: "directly under proto dir",
+			in:   "api/protos/baz.proto",
+			out:  "api",
+		},
+	}
 
-		if err != nil {
-			t.Errorf("OutDirOf returns an error %v", err)
-		}
+	for _, c := range cases {
+		t.Run(c.test, func(t *testing.T) {
+			outDir, err := cfg.OutDirOf(rootDir, filepath.Join(rootDir, c.in))
 
-		if got, want := outDir, "api/foo"; got != want {
-			t.Errorf("OutDirOf returned %q, want %q", got, want)
-		}
-	})
+			if got, want := err != nil, c.isErr; got != want {
+				t.Errorf("OutDirOf returned an error: got %t, want %t", got, want)
+			}
 
-	t.Run("with an error", func(t *testing.T) {
-		outDir, err := cfg.OutDirOf(rootDir, filepath.Join(rootDir, "api/foo/bar.proto"))
-
-		if err == nil {
-			t.Errorf("OutDirOf should return an error")
-		}
-
-		if got, want := outDir, ""; got != want {
-			t.Errorf("OutDirOf returned %q, want %q", got, want)
-		}
-	})
+			if got, want := outDir, c.out; got != want {
+				t.Errorf("OutDirOf returned %q, want %q", got, want)
+			}
+		})
+	}
 }
 
 func Test_Config_Commands(t *testing.T) {
@@ -79,7 +90,7 @@ func Test_Config_Commands(t *testing.T) {
 		"-I", "api/protos/foo",
 		"-I", "./vendor/github.com/grpc-ecosystem/grpc-gateway",
 		"-I", "./vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis",
-		"--go_out=plugins=grpc:api/foo",
+		"--go_out=plugins=grpc:api/foo_pb",
 		"api/protos/foo/bar.proto",
 	}
 
