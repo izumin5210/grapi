@@ -70,8 +70,8 @@ func (s *GatewayServer) createConn() (conn *grpc.ClientConn, err error) {
 func (s *GatewayServer) createServer(conn *grpc.ClientConn) (*http.Server, error) {
 	mux := runtime.NewServeMux(
 		append(
-			s.GatewayMuxOptions,
-			runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
+			[]runtime.ServeMuxOption{runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler)},
+			s.GatewayMuxOptions...,
 		)...,
 	)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
