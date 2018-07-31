@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 
-	foo_pb "testapp/api/foo"
+	foo_pb "testapp/api/foo_pb"
 )
 
 func Test_BarBazServiceServer_ListBarBazs(t *testing.T) {

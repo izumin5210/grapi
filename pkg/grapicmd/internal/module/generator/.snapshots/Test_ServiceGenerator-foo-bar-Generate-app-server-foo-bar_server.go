@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	foo_pb "testapp/api/foo"
+	foo_pb "testapp/api/foo_pb"
 )
 
 // NewBarServiceServer creates a new BarServiceServer instance.

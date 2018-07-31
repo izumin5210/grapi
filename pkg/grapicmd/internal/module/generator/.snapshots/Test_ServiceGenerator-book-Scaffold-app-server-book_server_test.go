@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 
-	api_pb "testapp/api"
+	api_pb "testapp/api_pb"
 )
 
 func Test_BookServiceServer_ListBooks(t *testing.T) {
