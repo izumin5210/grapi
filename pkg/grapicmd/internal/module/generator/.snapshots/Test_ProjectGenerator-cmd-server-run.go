@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc/grpclog"
 
-	"testapp/app"
+	"testcompany/testapp/app"
 )
 
 func main() {

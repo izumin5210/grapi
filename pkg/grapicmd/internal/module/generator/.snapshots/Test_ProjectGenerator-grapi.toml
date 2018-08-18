@@ -1,3 +1,5 @@
+package = "testcompany.testapp"
+
 [grapi]
 server_dir = "./app/server"
 

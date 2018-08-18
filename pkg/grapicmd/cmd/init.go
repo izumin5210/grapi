@@ -20,6 +20,7 @@ func newInitCommand(cfg grapicmd.Config, ui module.UI, generator module.ProjectG
 	var (
 		depSkipped bool
 		headUsed   bool
+		pkgName    string
 	)
 
 	cmd := &cobra.Command{
@@ -42,12 +43,13 @@ func newInitCommand(cfg grapicmd.Config, ui module.UI, generator module.ProjectG
 				cfg.Version(),
 			)
 
-			return errors.WithStack(u.Perform(root, depSkipped, headUsed))
+			return errors.WithStack(u.Perform(root, pkgName, depSkipped, headUsed))
 		},
 	}
 
 	cmd.PersistentFlags().BoolVarP(&depSkipped, "skip-dep", "D", false, "Don't run dep ensure")
 	cmd.PersistentFlags().BoolVar(&headUsed, "HEAD", false, "Use HEAD grapi")
+	cmd.PersistentFlags().StringVarP(&pkgName, "package", "p", "", `Package name of the application(default: "<parent_package_or_username>.<app_name>")`)
 
 	return cmd
 }

@@ -5,6 +5,7 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
+	"os/user"
 	"path/filepath"
 	"strings"
 
@@ -14,13 +15,22 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+type getOSUserFunc func() (*user.User, error)
+
+const (
+	// PackageSeparator is a package separator string on protobuf.
+	PackageSeparator = "."
+)
+
+// Make visible for testing
 var (
-	// BuildContext is a build context object.
 	BuildContext build.Context
+	GetOSUser    getOSUserFunc
 )
 
 func init() {
 	BuildContext = build.Default
+	GetOSUser = user.Current
 }
 
 // GetImportPath creates the golang package path from the given path.
@@ -37,6 +47,31 @@ func GetImportPath(rootPath string) (importPath string, err error) {
 		err = errors.New("failed to get the import path")
 	}
 	return
+}
+
+// GetPackageName generates the package name of this application from the given path and envs.
+func GetPackageName(rootPath string) (string, error) {
+	importPath, err := GetImportPath(rootPath)
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+	entries := strings.Split(importPath, string(filepath.Separator))
+	if len(entries) < 2 {
+		u, err := GetOSUser()
+		if err != nil {
+			return "", errors.WithStack(err)
+		}
+		entries = []string{u.Username, entries[0]}
+	}
+	entries = entries[len(entries)-2:]
+	if strings.Contains(entries[0], PackageSeparator) {
+		s := strings.Split(entries[0], PackageSeparator)
+		for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+			s[i], s[j] = s[j], s[i]
+		}
+		entries[0] = strings.Join(s, PackageSeparator)
+	}
+	return strings.Join(entries[len(entries)-2:], PackageSeparator), nil
 }
 
 var (

@@ -9,7 +9,7 @@ type Generator interface {
 
 // ProjectGenerator is an interface to build a new project.
 type ProjectGenerator interface {
-	GenerateProject(rootDir string, useHead bool) error
+	GenerateProject(rootDir, pkgName string, useHead bool) error
 }
 
 // ServiceGenerator is an interface to create or destroy gRPC services and implementations.
