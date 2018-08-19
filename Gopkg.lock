@@ -46,7 +46,7 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:6b2ff59817cea1b336d46976ee5b1ad34f4eb2f21c4fbad602febb812fd04e70"
+  digest = "1:6b3f47fc2d485d7669dc9e7bea056d721b3fa417d83fd295d45de1376738568e"
   name = "github.com/golang/protobuf"
   packages = [
     "jsonpb",
@@ -60,8 +60,8 @@
     "ptypes/timestamp",
   ]
   pruneopts = "UT"
-  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
-  version = "v1.0.0"
+  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
+  version = "v1.1.0"
 
 [[projects]]
   digest = "1:2e3c336fc7fde5c984d2841455a658a6d626450b1754a854b3b32e7a8f49a07a"
