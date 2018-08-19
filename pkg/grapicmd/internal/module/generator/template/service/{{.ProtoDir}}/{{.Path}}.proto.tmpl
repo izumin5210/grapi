@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "{{ .PbGo.PackageName }}";
+option go_package = "{{ .PbGo.PackagePath }};{{ .PbGo.PackageName }}";
 package {{ .Proto.Package }};
 {{range .Proto.Imports}}
 import "{{.}}";
