@@ -101,7 +101,9 @@ func (e *Engine) Serve() error {
 
 // Shutdown closes servers.
 func (e *Engine) Shutdown() {
-	e.cancelFunc()
+	if e.cancelFunc != nil {
+		e.cancelFunc()
+	}
 }
 
 func (e *Engine) watchShutdownSignal(ctx context.Context) error {
