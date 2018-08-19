@@ -43,6 +43,7 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 		cfg.ProtocConfig().ProtosDir,
 		cfg.ProtocConfig().OutDir,
 		cfg.ServerDir(),
+		cfg.Package(),
 		cfg.Version(),
 	)
 	commandFactory := command.NewFactory(cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())

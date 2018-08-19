@@ -18,9 +18,10 @@ import (
 type serviceGenerator struct {
 	baseGenerator
 	rootDir, protoDir, protoOutDir, serverDir string
+	pkgName                                   string
 }
 
-func newServiceGenerator(fs afero.Fs, ui module.UI, rootDir, protoDir, protoOutDir, serverDir string) module.ServiceGenerator {
+func newServiceGenerator(fs afero.Fs, ui module.UI, rootDir, protoDir, protoOutDir, serverDir, pkgName string) module.ServiceGenerator {
 	if protoDir == "" {
 		protoDir = filepath.Join("api", "protos")
 	}
@@ -37,6 +38,7 @@ func newServiceGenerator(fs afero.Fs, ui module.UI, rootDir, protoDir, protoOutD
 		protoDir:      protoDir,
 		protoOutDir:   protoOutDir,
 		serverDir:     serverDir,
+		pkgName:       pkgName,
 	}
 }
 
@@ -217,15 +219,18 @@ func (g *serviceGenerator) createParams(path string, resName string, methodNames
 		pbgoPackageName = filepath.Base(pbgoPackagePath) + "_pb"
 	}
 
-	protoPackageChunks := []string{}
-	for _, pkg := range strings.Split(filepath.ToSlash(filepath.Join(importPath, g.protoOutDir, filepath.Dir(path))), "/") {
-		chunks := strings.Split(strings.Replace(pkg, "-", "_", -1), ".")
-		for i := len(chunks) - 1; i >= 0; i-- {
-			protoPackageChunks = append(protoPackageChunks, chunks[i])
+	protoPackage := g.pkgName
+	if protoPackage == "" {
+		protoPackageChunks := []string{}
+		for _, pkg := range strings.Split(filepath.ToSlash(filepath.Join(importPath, g.protoOutDir, filepath.Dir(path))), "/") {
+			chunks := strings.Split(strings.Replace(pkg, "-", "_", -1), ".")
+			for i := len(chunks) - 1; i >= 0; i-- {
+				protoPackageChunks = append(protoPackageChunks, chunks[i])
+			}
 		}
+		// com.github.foo.bar.baz.qux
+		protoPackage = strings.Join(protoPackageChunks, ".")
 	}
-	// com.github.foo.bar.baz.qux
-	protoPackage := strings.Join(protoPackageChunks, ".")
 
 	protoImports := []string{
 		"google/api/annotations.proto",
