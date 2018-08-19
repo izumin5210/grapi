@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"go/build"
 	"path/filepath"
 	"testing"
 
@@ -17,13 +16,10 @@ func Test_ProjectGenerator(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	tmpBuildContext := fs.BuildContext
-	defer func() { fs.BuildContext = tmpBuildContext }()
-	fs.BuildContext = build.Context{
-		GOPATH: "/home",
-	}
+	defer func(tmp string) { fs.BuildContext.GOPATH = tmp }(fs.BuildContext.GOPATH)
+	fs.BuildContext.GOPATH = "/home"
 
-	rootDir := "/home/src/testapp"
+	rootDir := "/home/src/testcompany/testapp"
 
 	ui := moduletesting.NewMockUI(ctrl)
 	ui.EXPECT().ItemSuccess(gomock.Any()).AnyTimes()
@@ -31,7 +27,7 @@ func Test_ProjectGenerator(t *testing.T) {
 
 	generator := newProjectGenerator(fs, ui, "")
 
-	err := generator.GenerateProject(rootDir, false)
+	err := generator.GenerateProject(rootDir, "", false)
 
 	if err != nil {
 		t.Errorf("returned an error %v", err)

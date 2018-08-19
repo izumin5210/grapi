@@ -43,6 +43,7 @@ func Test_ServiceGenerator(t *testing.T) {
 		protoDir     string
 		protoOutDir  string
 		serverDir    string
+		pkgName      string
 	}{
 		{
 			name: "foo",
@@ -54,6 +55,16 @@ func Test_ServiceGenerator(t *testing.T) {
 			},
 		},
 		{
+			name: "foo",
+			files: []string{
+				"api/protos/foo.proto",
+				"app/server/foo_server.go",
+				"app/server/foo_server_register_funcs.go",
+				"app/server/foo_server_test.go",
+			},
+			pkgName: "testcompany.testapp",
+		},
+		{
 			name: "foo/bar",
 			files: []string{
 				"api/protos/foo/bar.proto",
@@ -61,6 +72,16 @@ func Test_ServiceGenerator(t *testing.T) {
 				"app/server/foo/bar_server_register_funcs.go",
 				"app/server/foo/bar_server_test.go",
 			},
+		},
+		{
+			name: "foo/bar",
+			files: []string{
+				"api/protos/foo/bar.proto",
+				"app/server/foo/bar_server.go",
+				"app/server/foo/bar_server_register_funcs.go",
+				"app/server/foo/bar_server_test.go",
+			},
+			pkgName: "testcompany.testapp",
 		},
 		{
 			name: "foo/bar_baz",
@@ -171,7 +192,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			test += " with " + strings.Join(c.args, ",")
 		}
 
-		generator := newServiceGenerator(fs, ui, rootDir, c.protoDir, c.protoOutDir, c.serverDir)
+		generator := newServiceGenerator(fs, ui, rootDir, c.protoDir, c.protoOutDir, c.serverDir, c.pkgName)
 
 		t.Run(test, func(t *testing.T) {
 			test := "Generate"

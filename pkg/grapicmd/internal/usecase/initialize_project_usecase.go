@@ -8,8 +8,8 @@ import (
 
 // InitializeProjectUsecase is an interface to create a new grapi project.
 type InitializeProjectUsecase interface {
-	Perform(rootDir string, depSkipped, headUsed bool) error
-	GenerateProject(rootDir string, headUsed bool) error
+	Perform(rootDir, pkgName string, depSkipped, headUsed bool) error
+	GenerateProject(rootDir, pkgName string, headUsed bool) error
 	InstallDeps(rootDir string) error
 }
 
@@ -30,11 +30,11 @@ type initializeProjectUsecase struct {
 	version        string
 }
 
-func (u *initializeProjectUsecase) Perform(rootDir string, depSkipped, headUsed bool) error {
+func (u *initializeProjectUsecase) Perform(rootDir, pkgName string, depSkipped, headUsed bool) error {
 	u.ui.Section("Initialize project")
 
 	var err error
-	err = u.GenerateProject(rootDir, headUsed)
+	err = u.GenerateProject(rootDir, pkgName, headUsed)
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize project")
 	}
@@ -50,8 +50,8 @@ func (u *initializeProjectUsecase) Perform(rootDir string, depSkipped, headUsed 
 	return nil
 }
 
-func (u *initializeProjectUsecase) GenerateProject(rootDir string, headUsed bool) error {
-	return errors.WithStack(u.generator.GenerateProject(rootDir, headUsed))
+func (u *initializeProjectUsecase) GenerateProject(rootDir, pkgName string, headUsed bool) error {
+	return errors.WithStack(u.generator.GenerateProject(rootDir, pkgName, headUsed))
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string) error {

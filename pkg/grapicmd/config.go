@@ -26,6 +26,7 @@ type Config interface {
 	OutWriter() io.Writer
 	ErrWriter() io.Writer
 	ServerDir() string
+	Package() string
 	ProtocConfig() *protoc.Config
 }
 
@@ -121,6 +122,10 @@ func (c *config) OutWriter() io.Writer {
 
 func (c *config) ErrWriter() io.Writer {
 	return c.err
+}
+
+func (c *config) Package() string {
+	return c.v.GetString("package")
 }
 
 func (c *config) ServerDir() string {

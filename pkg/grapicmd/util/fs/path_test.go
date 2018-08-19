@@ -1,12 +1,109 @@
 package fs
 
 import (
+	"os/user"
 	"path/filepath"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/spf13/afero"
 )
+
+func Test_GetImportPath(t *testing.T) {
+	defer func(tmp string) { BuildContext.GOPATH = tmp }(BuildContext.GOPATH)
+	BuildContext.GOPATH = "/home/go"
+
+	cases := []struct {
+		test  string
+		in    string
+		out   string
+		isErr bool
+	}{
+		{
+			test: "inside of GOPATH",
+			in:   "/home/go/src/github.com/izumin5210/testapp",
+			out:  "github.com/izumin5210/testapp",
+		},
+		{
+			test: "directly under GOPATH",
+			in:   "/home/go/src/testapp",
+			out:  "testapp",
+		},
+		{
+			test:  "outside of GOPATH",
+			in:    "/home/go/testapp",
+			isErr: true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.test, func(t *testing.T) {
+			out, err := GetImportPath(c.in)
+
+			if got, want := err != nil, c.isErr; got != want {
+				t.Errorf("Returned error is %t, want %t (%v)", got, want, err)
+			}
+
+			if got, want := out, c.out; got != want {
+				t.Errorf("Returned %s, want %s", got, want)
+			}
+		})
+	}
+}
+
+func Test_GetPackageName(t *testing.T) {
+	defer func(tmp getOSUserFunc) { GetOSUser = tmp }(GetOSUser)
+	GetOSUser = func() (*user.User, error) { return &user.User{Username: "testuser"}, nil }
+	defer func(tmp string) { BuildContext.GOPATH = tmp }(BuildContext.GOPATH)
+	BuildContext.GOPATH = "/home/go"
+
+	cases := []struct {
+		test  string
+		in    string
+		out   string
+		isErr bool
+	}{
+		{
+			test: "inside of GOPATH",
+			in:   "/home/go/src/github.com/izumin5210/testapp",
+			out:  "izumin5210.testapp",
+		},
+		{
+			test: "directly under GOPATH",
+			in:   "/home/go/src/testapp",
+			out:  "testuser.testapp",
+		},
+		{
+			test: "company name includes separators",
+			in:   "/home/go/src/go.example.com/testapp",
+			out:  "com.example.go.testapp",
+		},
+		{
+			test: "package name includes hyphens",
+			in:   "/home/go/src/go.example.com/test-app",
+			out:  "com.example.go.test_app",
+		},
+		{
+			test:  "outside of GOPATH",
+			in:    "/home/go/testapp",
+			isErr: true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.test, func(t *testing.T) {
+			out, err := GetPackageName(c.in)
+
+			if got, want := err != nil, c.isErr; got != want {
+				t.Errorf("Returned error is %t, want %t (%v)", got, want, err)
+			}
+
+			if got, want := out, c.out; got != want {
+				t.Errorf("Returned %s, want %s", got, want)
+			}
+		})
+	}
+}
 
 func Test_LookupRoot(t *testing.T) {
 	fs := afero.NewMemMapFs()
