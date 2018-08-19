@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
@@ -16,7 +16,7 @@ var (
 	tmplPaths []string
 )
 
-func newInitCommand(cfg grapicmd.Config, ui module.UI, generator module.ProjectGenerator, commandFactory module.CommandFactory) *cobra.Command {
+func newInitCommand(ac di.AppComponent) *cobra.Command {
 	var (
 		depSkipped bool
 		headUsed   bool
@@ -30,17 +30,17 @@ func newInitCommand(cfg grapicmd.Config, ui module.UI, generator module.ProjectG
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			root, err := parseInitArgs(cfg, args)
+			root, err := parseInitArgs(ac.Config(), args)
 			if err != nil {
 				return errors.WithStack(err)
 			}
 			clog.Debug("parseInitArgs", "root", root)
 
 			u := usecase.NewInitializeProjectUsecase(
-				ui,
-				generator,
-				commandFactory,
-				cfg.Version(),
+				ac.UI(),
+				ac.Generator(),
+				ac.CommandFactory(),
+				ac.Config().Version(),
 			)
 
 			return errors.WithStack(u.Perform(root, pkgName, depSkipped, headUsed))
