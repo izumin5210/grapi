@@ -2,9 +2,9 @@ package grapiserver
 
 import (
 	"net"
-	"sync"
 
 	"github.com/izumin5210/grapi/pkg/grapiserver/internal"
+	"github.com/pkg/errors"
 	"github.com/soheilhy/cmux"
 	"google.golang.org/grpc/grpclog"
 )
@@ -24,11 +24,14 @@ func NewMuxServer(mux cmux.CMux, lis net.Listener) internal.Server {
 }
 
 // Serve implements Server.Serve
-func (s *MuxServer) Serve(lis net.Listener, wg *sync.WaitGroup) {
-	defer wg.Done()
-	grpclog.Info("mux is starting")
+func (s *MuxServer) Serve(net.Listener) error {
+	grpclog.Info("mux is starting %s", s.lis.Addr())
+
 	err := s.mux.Serve()
+
 	grpclog.Infof("mux is closed: %v", err)
+
+	return errors.Wrap(err, "failed to serve cmux server")
 }
 
 // Shutdown implements Server.Shutdown

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -17,6 +18,10 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapiserver"
 	"github.com/izumin5210/grapi/testing/api"
 	"github.com/izumin5210/grapi/testing/app/server"
+)
+
+var (
+	waitForServer = func() { time.Sleep(10) }
 )
 
 func Test_server_onlyGateway(t *testing.T) {
@@ -37,7 +42,11 @@ func Test_server_onlyGateway(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(5)
+	defer wg.Wait()
+	defer s.Shutdown()
+
+	waitForServer()
+
 	resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", port))
 
 	if err != nil {
@@ -69,9 +78,6 @@ func Test_server_onlyGateway(t *testing.T) {
 	if diff := cmp.Diff(got, want); diff != "" {
 		t.Errorf("Received body differs: (-got +want)\n%s", diff)
 	}
-
-	s.Shutdown()
-	wg.Wait()
 }
 
 func Test_server_samePort(t *testing.T) {
@@ -88,12 +94,16 @@ func Test_server_samePort(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := s.Serve(); err != nil {
+		// https://github.com/soheilhy/cmux/blob/v0.1.4/example_test.go#L131
+		if err := s.Serve(); err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
 			t.Errorf("Engine.Serve returned an error: %v", err)
 		}
 	}()
 
-	time.Sleep(5)
+	defer wg.Wait()
+	defer s.Shutdown()
+
+	waitForServer()
 
 	t.Run("http", func(t *testing.T) {
 		resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", port))
@@ -153,9 +163,6 @@ func Test_server_samePort(t *testing.T) {
 			t.Errorf("Received body differs: (-got +want)\n%s", diff)
 		}
 	})
-
-	s.Shutdown()
-	wg.Wait()
 }
 
 func Test_server_differentPort(t *testing.T) {
@@ -184,7 +191,10 @@ func Test_server_differentPort(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(5)
+	defer wg.Wait()
+	defer s.Shutdown()
+
+	waitForServer()
 
 	t.Run("http", func(t *testing.T) {
 		resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", httpPort))
@@ -244,7 +254,4 @@ func Test_server_differentPort(t *testing.T) {
 			t.Errorf("Received body differs: (-got +want)\n%s", diff)
 		}
 	})
-
-	s.Shutdown()
-	wg.Wait()
 }
