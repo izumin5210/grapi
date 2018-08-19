@@ -112,6 +112,8 @@ func Test_LookupRoot(t *testing.T) {
 	fs.MkdirAll("/home/root/api/proto", 0755)
 	fs.MkdirAll("/home/root/cmd/server", 0755)
 	fs.MkdirAll("/home/app", 0755)
+	fs.MkdirAll("/home/root2/app/server", 0755)
+	fs.MkdirAll("/home/root2/api/proto", 0755)
 	afero.WriteFile(fs, "/home/root/grapi.toml", []byte(""), 0644)
 	afero.WriteFile(fs, "/home/app/grapi.toml", []byte(""), 0644)
 
@@ -123,9 +125,10 @@ func Test_LookupRoot(t *testing.T) {
 		{cwd: "/", root: "", ok: false},
 		{cwd: "/home", root: "", ok: false},
 		{cwd: "/home/root", root: "/home/root", ok: true},
+		{cwd: "/home/root2", root: "", ok: false},
 		{cwd: "/home/root/app", root: "/home/root", ok: true},
 		{cwd: "/home/root/api/proto", root: "/home/root", ok: true},
-		{cwd: "/home/app", root: "", ok: false},
+		{cwd: "/home/app", root: "/home/app", ok: true},
 		{cwd: "/home/api", root: "", ok: false},
 	}
 
