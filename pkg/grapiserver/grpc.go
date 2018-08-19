@@ -1,14 +1,15 @@
 package grapiserver
 
 import (
+	"context"
 	"net"
-	"sync"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/izumin5210/grapi/pkg/grapiserver/internal"
+	"github.com/pkg/errors"
 )
 
 // GrpcServer wraps grpc.Server setup process.
@@ -31,11 +32,14 @@ func NewGrpcServer(c *Config) internal.Server {
 }
 
 // Serve implements Server.Shutdown
-func (s *GrpcServer) Serve(l net.Listener, wg *sync.WaitGroup) {
-	defer wg.Done()
+func (s *GrpcServer) Serve(ctx context.Context, l net.Listener) error {
+	grpclog.Infof("gRPC server is starting %s", l)
 
-	err := s.server.Serve(l)
-	grpclog.Infof("gRPC server stopred: %v", err)
+	err := internal.StartServer(ctx, func() error { return s.server.Serve(l) }, s.Shutdown)
+
+	grpclog.Infof("gRPC server stopped: %v", err)
+
+	return errors.Wrap(err, "failed to serve gRPC server")
 }
 
 // Shutdown implements Server.Shutdown

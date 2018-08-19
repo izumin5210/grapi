@@ -1,23 +1,23 @@
 package grapiserver
 
 import (
+	"context"
 	"net"
 	"os"
 	"os/signal"
 	"reflect"
-	"sync"
 	"syscall"
 
 	"github.com/izumin5210/grapi/pkg/grapiserver/internal"
 	"github.com/pkg/errors"
 	"github.com/soheilhy/cmux"
-	"google.golang.org/grpc/grpclog"
+	"golang.org/x/sync/errgroup"
 )
 
 // Engine is the framework instance.
 type Engine struct {
 	*Config
-	sdCh chan os.Signal
+	cancelFunc func()
 }
 
 // New creates a server intstance.
@@ -76,52 +76,44 @@ func (e *Engine) Serve() error {
 	}
 
 	// Start servers
-	var wg sync.WaitGroup
+	eg, ctx := errgroup.WithContext(context.Background())
+	ctx, e.cancelFunc = context.WithCancel(ctx)
 
 	if internalLis != nil {
-		wg.Add(1)
-		grpclog.Infof("gRPC server is starting %s://%s", e.GrpcInternalAddr.Network, e.GrpcInternalAddr.Addr)
-		go grpcServer.Serve(internalLis, &wg)
+		eg.Go(func() error { return grpcServer.Serve(ctx, internalLis) })
 	}
 	if grpcLis != nil {
-		wg.Add(1)
-		grpclog.Infof("gRPC server is starting %s://%s", e.GrpcAddr.Network, e.GrpcAddr.Addr)
-		go grpcServer.Serve(grpcLis, &wg)
+		eg.Go(func() error { return grpcServer.Serve(ctx, grpcLis) })
 	}
 	if gatewayLis != nil {
-		wg.Add(1)
-		grpclog.Infof("gRPC Gateway server is starting: %s://%s", e.GatewayAddr.Network, e.GatewayAddr.Addr)
-		go gatewayServer.Serve(gatewayLis, &wg)
+		eg.Go(func() error { return gatewayServer.Serve(ctx, gatewayLis) })
 	}
 	if muxServer != nil {
-		wg.Add(1)
-		go muxServer.Serve(nil, &wg)
+		eg.Go(func() error { return muxServer.Serve(ctx, nil) })
 	}
 
-	wg.Add(1)
-	go e.watchShutdownSignal(&wg, gatewayServer, grpcServer, muxServer)
+	eg.Go(func() error { return e.watchShutdownSignal(ctx) })
 
-	wg.Wait()
+	err = eg.Wait()
 
-	return nil
+	return errors.WithStack(err)
 }
 
 // Shutdown closes servers.
 func (e *Engine) Shutdown() {
-	e.sdCh <- os.Interrupt
+	e.cancelFunc()
 }
 
-func (e *Engine) watchShutdownSignal(wg *sync.WaitGroup, servers ...internal.Server) {
-	defer wg.Done()
-	e.sdCh = make(chan os.Signal, 1)
-	defer close(e.sdCh)
-	defer signal.Reset()
-	signal.Notify(e.sdCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	sig := <-e.sdCh
-	grpclog.Infof("terminating now...: %v", sig)
-	for _, svr := range servers {
-		if svr != nil {
-			svr.Shutdown()
-		}
+func (e *Engine) watchShutdownSignal(ctx context.Context) error {
+	sdCh := make(chan os.Signal, 1)
+	defer close(sdCh)
+	defer signal.Stop(sdCh)
+	signal.Notify(sdCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	select {
+	case <-sdCh:
+		e.Shutdown()
+	case <-ctx.Done():
+		// no-op
 	}
+	return nil
 }

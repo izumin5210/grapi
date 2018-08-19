@@ -4,7 +4,6 @@ import (
 	"context"
 	"net"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -28,24 +27,29 @@ type GatewayServer struct {
 }
 
 // Serve implements Server.Shutdown
-func (s *GatewayServer) Serve(l net.Listener, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func (s *GatewayServer) Serve(ctx context.Context, l net.Listener) error {
 	conn, err := s.createConn()
 	if err != nil {
-		grpclog.Errorf("failed to create connection with gRPC server: %v", err)
-		return
+		return errors.Wrap(err, "failed to create connection with grpc-gateway server")
 	}
 	defer conn.Close()
 
 	s.server, err = s.createServer(conn)
 	if err != nil {
-		grpclog.Errorf("failed to create gRPC Gateway server: %v", err)
-		return
+		return errors.Wrap(err, "failed to create gRPC Gateway server: %v")
 	}
 
-	err = s.server.Serve(l)
-	grpclog.Infof("stopped taking more httr(s) requests: %v", err)
+	grpclog.Infof("gRPC server is starting %s", l)
+
+	err = internal.StartServer(ctx, func() error { return s.server.Serve(l) }, s.Shutdown)
+
+	grpclog.Infof("stopped taking more http(s) requests: %v", err)
+
+	if err != http.ErrServerClosed {
+		return errors.Wrap(err, "failed to serve grpc-gateway server")
+	}
+
+	return nil
 }
 
 // Shutdown implements Server.Shutdown
@@ -55,7 +59,7 @@ func (s *GatewayServer) Shutdown() {
 	err := s.server.Shutdown(ctx)
 	grpclog.Info("All http(s) requets finished")
 	if err != nil {
-		grpclog.Errorf("failed to shutdown gRPC Gateway server: %v", err)
+		grpclog.Errorf("failed to shutdown grpc-gateway server: %v", err)
 	}
 }
 

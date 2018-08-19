@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -88,7 +89,8 @@ func Test_server_samePort(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := s.Serve(); err != nil {
+		// https://github.com/soheilhy/cmux/blob/v0.1.4/example_test.go#L131
+		if err := s.Serve(); err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
 			t.Errorf("Engine.Serve returned an error: %v", err)
 		}
 	}()
