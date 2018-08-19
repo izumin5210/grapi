@@ -20,6 +20,10 @@ import (
 	"github.com/izumin5210/grapi/testing/app/server"
 )
 
+var (
+	waitForServer = func() { time.Sleep(10) }
+)
+
 func Test_server_onlyGateway(t *testing.T) {
 	var port int64 = 15261
 	s := grapiserver.New(
@@ -38,7 +42,8 @@ func Test_server_onlyGateway(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(5)
+	waitForServer()
+
 	resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", port))
 
 	if err != nil {
@@ -95,7 +100,7 @@ func Test_server_samePort(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(5)
+	waitForServer()
 
 	t.Run("http", func(t *testing.T) {
 		resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", port))
@@ -186,7 +191,7 @@ func Test_server_differentPort(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(5)
+	waitForServer()
 
 	t.Run("http", func(t *testing.T) {
 		resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", httpPort))
