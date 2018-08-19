@@ -42,6 +42,9 @@ func Test_server_onlyGateway(t *testing.T) {
 		}
 	}()
 
+	defer wg.Wait()
+	defer s.Shutdown()
+
 	waitForServer()
 
 	resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", port))
@@ -75,9 +78,6 @@ func Test_server_onlyGateway(t *testing.T) {
 	if diff := cmp.Diff(got, want); diff != "" {
 		t.Errorf("Received body differs: (-got +want)\n%s", diff)
 	}
-
-	s.Shutdown()
-	wg.Wait()
 }
 
 func Test_server_samePort(t *testing.T) {
@@ -99,6 +99,9 @@ func Test_server_samePort(t *testing.T) {
 			t.Errorf("Engine.Serve returned an error: %v", err)
 		}
 	}()
+
+	defer wg.Wait()
+	defer s.Shutdown()
 
 	waitForServer()
 
@@ -160,9 +163,6 @@ func Test_server_samePort(t *testing.T) {
 			t.Errorf("Received body differs: (-got +want)\n%s", diff)
 		}
 	})
-
-	s.Shutdown()
-	wg.Wait()
 }
 
 func Test_server_differentPort(t *testing.T) {
@@ -190,6 +190,9 @@ func Test_server_differentPort(t *testing.T) {
 			t.Errorf("Engine.Serve returned an error: %v", err)
 		}
 	}()
+
+	defer wg.Wait()
+	defer s.Shutdown()
 
 	waitForServer()
 
@@ -251,7 +254,4 @@ func Test_server_differentPort(t *testing.T) {
 			t.Errorf("Received body differs: (-got +want)\n%s", diff)
 		}
 	})
-
-	s.Shutdown()
-	wg.Wait()
 }
