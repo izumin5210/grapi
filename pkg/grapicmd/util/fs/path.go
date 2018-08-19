@@ -71,7 +71,9 @@ func GetPackageName(rootPath string) (string, error) {
 		}
 		entries[0] = strings.Join(s, PackageSeparator)
 	}
-	return strings.Join(entries[len(entries)-2:], PackageSeparator), nil
+	pkgName := strings.Join(entries[len(entries)-2:], PackageSeparator)
+	pkgName = strings.Replace(pkgName, "-", "_", -1)
+	return pkgName, nil
 }
 
 var (

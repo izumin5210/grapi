@@ -222,8 +222,8 @@ func (g *serviceGenerator) createParams(path string, resName string, methodNames
 	protoPackage := g.pkgName
 	if protoPackage == "" {
 		protoPackageChunks := []string{}
-		for _, pkg := range strings.Split(filepath.ToSlash(filepath.Join(importPath, g.protoOutDir, filepath.Dir(path))), "/") {
-			chunks := strings.Split(strings.Replace(pkg, "-", "_", -1), ".")
+		for _, pkg := range strings.Split(filepath.ToSlash(filepath.Join(importPath, g.protoOutDir)), "/") {
+			chunks := strings.Split(pkg, ".")
 			for i := len(chunks) - 1; i >= 0; i-- {
 				protoPackageChunks = append(protoPackageChunks, chunks[i])
 			}
@@ -231,6 +231,10 @@ func (g *serviceGenerator) createParams(path string, resName string, methodNames
 		// com.github.foo.bar.baz.qux
 		protoPackage = strings.Join(protoPackageChunks, ".")
 	}
+	if dir := filepath.Dir(path); dir != "." {
+		protoPackage = protoPackage + "." + strings.Replace(dir, string(filepath.Separator), ".", -1)
+	}
+	protoPackage = strings.Replace(protoPackage, "-", "_", -1)
 
 	protoImports := []string{
 		"google/api/annotations.proto",

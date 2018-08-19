@@ -74,6 +74,16 @@ func Test_ServiceGenerator(t *testing.T) {
 			},
 		},
 		{
+			name: "foo/bar",
+			files: []string{
+				"api/protos/foo/bar.proto",
+				"app/server/foo/bar_server.go",
+				"app/server/foo/bar_server_register_funcs.go",
+				"app/server/foo/bar_server_test.go",
+			},
+			pkgName: "testcompany.testapp",
+		},
+		{
 			name: "foo/bar_baz",
 			files: []string{
 				"api/protos/foo/bar_baz.proto",

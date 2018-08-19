@@ -79,6 +79,11 @@ func Test_GetPackageName(t *testing.T) {
 			out:  "com.example.go.testapp",
 		},
 		{
+			test: "package name includes hyphens",
+			in:   "/home/go/src/go.example.com/test-app",
+			out:  "com.example.go.test_app",
+		},
+		{
 			test:  "outside of GOPATH",
 			in:    "/home/go/testapp",
 			isErr: true,
