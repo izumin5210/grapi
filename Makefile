@@ -25,7 +25,8 @@ GOLINT_TARGET := $(shell go list ./... | grep -v "$(pkg)/testing")
 $(foreach pkg,$(GENERATED_PKGS),$(eval GOLINT_TARGET := $(filter-out $(ROOT_PKG)/$(pkg),$(GOLINT_TARGET))))
 
 GO_BUILD_FLAGS := -v
-GO_TEST_FLAGS := -v
+GO_TEST_FLAGS := -v -timeout 30s
+GO_TEST_INTEGRATION_FLAGS := -v
 GO_COVER_FLAGS := -coverpkg $(shell echo $(GOLINT_TARGET) | tr ' ' ',') -coverprofile coverage.txt -covermode atomic
 
 XC_ARCH := 386 amd64
@@ -137,7 +138,7 @@ cover:
 .PHONY: test-integration
 test-integration:
 	$(call section,Integration Testing)
-	cd _tests && go test $(GO_TEST_FLAGS) ./...
+	cd _tests && go test $(GO_TEST_INTEGRATION_FLAGS) ./...
 
 .PHONY: packages
 packages: $(PACKAGES)
