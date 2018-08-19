@@ -33,7 +33,7 @@ func NewGrpcServer(c *Config) internal.Server {
 
 // Serve implements Server.Shutdown
 func (s *GrpcServer) Serve(ctx context.Context, l net.Listener) error {
-	grpclog.Infof("gRPC server is starting %s", l)
+	grpclog.Infof("gRPC server is starting %s", l.Addr())
 
 	err := internal.StartServer(ctx, func() error { return s.server.Serve(l) }, s.Shutdown)
 

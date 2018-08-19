@@ -39,7 +39,7 @@ func (s *GatewayServer) Serve(ctx context.Context, l net.Listener) error {
 		return errors.Wrap(err, "failed to create gRPC Gateway server: %v")
 	}
 
-	grpclog.Infof("gRPC server is starting %s", l)
+	grpclog.Infof("grpc-gateway server is starting %s", l.Addr())
 
 	err = internal.StartServer(ctx, func() error { return s.server.Serve(l) }, s.Shutdown)
 

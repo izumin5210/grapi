@@ -25,8 +25,8 @@ func NewMuxServer(mux cmux.CMux, lis net.Listener) internal.Server {
 }
 
 // Serve implements Server.Serve
-func (s *MuxServer) Serve(ctx context.Context, lis net.Listener) error {
-	grpclog.Info("mux is starting")
+func (s *MuxServer) Serve(ctx context.Context, _ net.Listener) error {
+	grpclog.Info("mux is starting %s", s.lis.Addr())
 
 	err := internal.StartServer(ctx, s.mux.Serve, s.Shutdown)
 
