@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	waitForServer = func() { time.Sleep(10) }
+	waitForServer = func() { time.Sleep(15) }
 )
 
 func Test_server_onlyGateway(t *testing.T) {
