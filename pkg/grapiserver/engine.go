@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/soheilhy/cmux"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc/grpclog"
 )
 
 // Engine is the framework instance.
@@ -112,6 +113,8 @@ func (e *Engine) Serve() error {
 func (e *Engine) Shutdown() {
 	if e.cancelFunc != nil {
 		e.cancelFunc()
+	} else {
+		grpclog.Warning("the server has been started yet")
 	}
 }
 
