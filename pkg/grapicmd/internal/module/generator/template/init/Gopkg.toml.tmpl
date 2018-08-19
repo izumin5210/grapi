@@ -12,3 +12,9 @@ required = [
 {{- if not .headUsed }}
   version = "{{ .version }}"
 {{- end }}
+
+[[override]]
+  name = "github.com/grpc-ecosystem/grpc-gateway"
+  # To use `paths` option in `protoc-gen-grpc-gateway`
+  # See https://github.com/grpc-ecosystem/grpc-gateway/pull/711
+  revision = "42fa2028fd3ba4a546dd525d9db71573f1992ba1"
