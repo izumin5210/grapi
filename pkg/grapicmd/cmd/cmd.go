@@ -8,10 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/command"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/generator"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/script"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/ui"
+	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 )
 
 // NewGrapiCommand creates a new command object.
@@ -35,28 +32,18 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
 
-	ui := ui.New(cfg.OutWriter(), cfg.InReader())
-	generator := generator.New(
-		cfg.Fs(),
-		ui,
-		cfg.RootDir(),
-		cfg.ProtocConfig().ProtosDir,
-		cfg.ProtocConfig().OutDir,
-		cfg.ServerDir(),
-		cfg.Package(),
-		cfg.Version(),
-	)
-	commandFactory := command.NewFactory(cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
-	scriptLoader := script.NewLoader(cfg.Fs(), commandFactory, cfg.RootDir())
+	ac := di.NewAppComponent(cfg)
 
-	cmd.AddCommand(newInitCommand(cfg, ui, generator, commandFactory))
-	cmd.AddCommand(newGenerateCommand(cfg, ui, generator, commandFactory))
-	cmd.AddCommand(newDestroyCommand(cfg, generator))
-	cmd.AddCommand(newProtocCommand(cfg, ui, commandFactory))
-	cmd.AddCommand(newBuildCommand(cfg, ui, scriptLoader))
+	cmd.AddCommand(newInitCommand(ac))
+	cmd.AddCommand(newGenerateCommand(ac))
+	cmd.AddCommand(newDestroyCommand(ac))
+	cmd.AddCommand(newProtocCommand(ac))
+	cmd.AddCommand(newBuildCommand(ac))
 	cmd.AddCommand(newVersionCommand(cfg))
 
 	if cfg.IsInsideApp() {
+		scriptLoader := ac.ScriptLoader()
+
 		err = scriptLoader.Load(filepath.Join(cfg.RootDir(), "cmd"))
 		if err != nil {
 			err = errors.Wrap(err, "failed to load user-defined commands")
@@ -64,7 +51,7 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 
 		udCmds := make([]*cobra.Command, 0)
 		for _, name := range scriptLoader.Names() {
-			udCmds = append(udCmds, newUserDefinedCommand(ui, scriptLoader, name))
+			udCmds = append(udCmds, newUserDefinedCommand(ac.UI(), scriptLoader, name))
 		}
 		if len(udCmds) > 0 {
 			cmd.AddCommand(udCmds...)
