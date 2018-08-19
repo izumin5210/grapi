@@ -27,7 +27,7 @@ type GatewayServer struct {
 }
 
 // Serve implements Server.Shutdown
-func (s *GatewayServer) Serve(ctx context.Context, l net.Listener) error {
+func (s *GatewayServer) Serve(l net.Listener) error {
 	conn, err := s.createConn()
 	if err != nil {
 		return errors.Wrap(err, "failed to create connection with grpc-gateway server")
@@ -41,7 +41,7 @@ func (s *GatewayServer) Serve(ctx context.Context, l net.Listener) error {
 
 	grpclog.Infof("grpc-gateway server is starting %s", l.Addr())
 
-	err = internal.StartServer(ctx, func() error { return s.server.Serve(l) }, s.Shutdown)
+	err = s.server.Serve(l)
 
 	grpclog.Infof("stopped taking more http(s) requests: %v", err)
 

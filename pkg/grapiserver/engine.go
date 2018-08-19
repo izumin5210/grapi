@@ -80,19 +80,28 @@ func (e *Engine) Serve() error {
 	ctx, e.cancelFunc = context.WithCancel(ctx)
 
 	if internalLis != nil {
-		eg.Go(func() error { return grpcServer.Serve(ctx, internalLis) })
+		eg.Go(func() error { return grpcServer.Serve(internalLis) })
 	}
 	if grpcLis != nil {
-		eg.Go(func() error { return grpcServer.Serve(ctx, grpcLis) })
+		eg.Go(func() error { return grpcServer.Serve(grpcLis) })
 	}
 	if gatewayLis != nil {
-		eg.Go(func() error { return gatewayServer.Serve(ctx, gatewayLis) })
+		eg.Go(func() error { return gatewayServer.Serve(gatewayLis) })
 	}
 	if muxServer != nil {
-		eg.Go(func() error { return muxServer.Serve(ctx, nil) })
+		eg.Go(func() error { return muxServer.Serve(nil) })
 	}
 
 	eg.Go(func() error { return e.watchShutdownSignal(ctx) })
+
+	select {
+	case <-ctx.Done():
+		for _, s := range []internal.Server{gatewayServer, grpcServer, muxServer} {
+			if s != nil {
+				s.Shutdown()
+			}
+		}
+	}
 
 	err = eg.Wait()
 

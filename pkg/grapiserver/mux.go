@@ -1,7 +1,6 @@
 package grapiserver
 
 import (
-	"context"
 	"net"
 
 	"github.com/izumin5210/grapi/pkg/grapiserver/internal"
@@ -25,10 +24,10 @@ func NewMuxServer(mux cmux.CMux, lis net.Listener) internal.Server {
 }
 
 // Serve implements Server.Serve
-func (s *MuxServer) Serve(ctx context.Context, _ net.Listener) error {
+func (s *MuxServer) Serve(net.Listener) error {
 	grpclog.Info("mux is starting %s", s.lis.Addr())
 
-	err := internal.StartServer(ctx, s.mux.Serve, s.Shutdown)
+	err := s.mux.Serve()
 
 	grpclog.Infof("mux is closed: %v", err)
 
