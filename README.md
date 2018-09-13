@@ -32,7 +32,7 @@ You should install `protoc` command from [google/protobuf](https://github.com/go
 
 - Linux:
   - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.2/grapi_linux_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
-- masOS:
+- macOS:
   - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.2/grapi_darwin_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
 
 ### Create a new application
