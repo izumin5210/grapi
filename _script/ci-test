@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -eu
+set -o pipefail
+
+cd "$(dirname $0)/.."
+
+coverage=${COVERAGE_ENABLED:-0}
+
+go get -u github.com/golang/lint/golint
+
+make lint
+
+if [ "$coverage" = "1" ]; then
+  make cover
+else
+  make test
+fi
