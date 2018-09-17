@@ -19,6 +19,12 @@ env:
   - CI_JOB=test
   - CI_JOB=test-integration
 
+matrix:
+  exclude:
+  # FIXME: Installing protoc-gen-* is broken on test-integration
+  - go: '1.11'
+    env: CI_JOB=test-integration
+
 branches:
   except:
   - canary
