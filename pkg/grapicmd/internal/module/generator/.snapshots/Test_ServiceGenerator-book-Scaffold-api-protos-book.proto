@@ -1,6 +1,9 @@
 syntax = "proto3";
-option go_package = "api_pb";
+
 package testapp.api;
+
+option go_package = "testapp/api;api_pb";
+
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";

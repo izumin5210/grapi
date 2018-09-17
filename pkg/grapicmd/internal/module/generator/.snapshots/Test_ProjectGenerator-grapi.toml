@@ -7,6 +7,7 @@ server_dir = "./app/server"
 protos_dir = "./api/protos"
 out_dir = "./api"
 import_dirs = [
+  "./api/protos",
   "./vendor/github.com/grpc-ecosystem/grpc-gateway",
   "./vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis",
 ]
@@ -19,7 +20,7 @@ import_dirs = [
   [[protoc.plugins]]
   path = "./vendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway"
   name = "grpc-gateway"
-  args = { logtostderr = true }
+  args = { logtostderr = true, paths = "source_relative" }
 
   [[protoc.plugins]]
   path = "./vendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger"
