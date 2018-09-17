@@ -5,17 +5,10 @@ required = [
 ]
 
 [[constraint]]
+  branch = "master"
   name = "github.com/izumin5210/grapi"
-  version = ""
 
 [[override]]
   name = "github.com/grpc-ecosystem/grpc-gateway"
-  # To use `paths` option in `protoc-gen-grpc-gateway`
-  # See https://github.com/grpc-ecosystem/grpc-gateway/pull/711
-  revision = "42fa2028fd3ba4a546dd525d9db71573f1992ba1"
-
-[[override]]
-  name = "google.golang.org/grpc"
-  # To ignore grpc-gateway@42fa2028's constraints
-  version = "^1.11.3"
+  version = "^1.5.0"
 

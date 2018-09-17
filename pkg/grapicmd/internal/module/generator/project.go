@@ -21,7 +21,7 @@ func newProjectGenerator(fs afero.Fs, ui module.UI, version string) module.Proje
 	}
 }
 
-func (g *projectGenerator) GenerateProject(rootDir, pkgName string, useHead bool) error {
+func (g *projectGenerator) GenerateProject(rootDir, pkgName string, cfg module.ProjectGenerationConfig) error {
 	importPath, err := fs.GetImportPath(rootDir)
 	if err != nil {
 		return errors.WithStack(err)
@@ -38,7 +38,7 @@ func (g *projectGenerator) GenerateProject(rootDir, pkgName string, useHead bool
 		"packageName": pkgName,
 		"importPath":  importPath,
 		"version":     g.version,
-		"headUsed":    useHead,
+		"headUsed":    cfg.UseHEAD,
 	}
 	return g.Generate(rootDir, data, generationConfig{})
 }

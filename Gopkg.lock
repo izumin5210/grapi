@@ -85,7 +85,7 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:6a06217fc753e65aea71446b777393009ef6797dadc0086c4f75bd16590be04d"
+  digest = "1:ee73ed01fc93b8aa38a7f25543afed400df661992eeb7d3b250100b8b8f989b9"
   name = "github.com/grpc-ecosystem/grpc-gateway"
   packages = [
     "runtime",
@@ -93,8 +93,8 @@
     "utilities",
   ]
   pruneopts = "UT"
-  revision = "92583770e3f01b09a0d3e9bdf64321d8bebd48f2"
-  version = "v1.4.1"
+  revision = "8558711daa6c2853489043207b563dceacbc19cf"
+  version = "v1.5.0"
 
 [[projects]]
   branch = "master"
@@ -133,6 +133,18 @@
   pruneopts = "UT"
   revision = "fdfd45e15564e04a472c90a37fb1a5d8035fe050"
   version = "v0.1.0"
+
+[[projects]]
+  digest = "1:90d34344be1899b2c4f614a5bb59ed829346f3f00d8a2009c254b1d060578240"
+  name = "github.com/izumin5210/gex"
+  packages = [
+    "cmd/gex",
+    "pkg/command",
+    "pkg/tool",
+  ]
+  pruneopts = "UT"
+  revision = "c4c75fc151408fb0f769b01a333c904774eb65d7"
+  version = "v0.2.0"
 
 [[projects]]
   branch = "master"
@@ -482,6 +494,7 @@
     "github.com/grpc-ecosystem/grpc-gateway/utilities",
     "github.com/izumin5210/clicontrib/pkg/ccmd",
     "github.com/izumin5210/clicontrib/pkg/clog",
+    "github.com/izumin5210/gex/cmd/gex",
     "github.com/jessevdk/go-assets",
     "github.com/jessevdk/go-assets-builder",
     "github.com/jinzhu/inflection",
