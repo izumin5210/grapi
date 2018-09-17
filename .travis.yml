@@ -1,10 +1,13 @@
 language: go
 
-go: "1.10"
+go:
+- '1.9'
+- '1.10'
+- '1.11'
 
 env:
   global:
-  - DEP_VERSION="0.4.1"
+  - DEP_VERSION="0.5.0"
   - FILE_TO_DEPLOY="dist/*"
   - PROTOBUF_VERSION="3.5.1"
   - CANARY_TAG="canary"
@@ -12,58 +15,68 @@ env:
   # GITHUB_TOKEN
   - secure: "MhmvXAAzOA5HY7koCfagX1wJi2mBVQsVF5cCMaNx73l+7uDgNzGYfTn4OGKmckduiGB/mp5bTJ1DeMbPq+TDX1n/RE6kndu/Q/1vw4pbxm9BsmO9b3DizIFoWlnG+EABdAZa9igbCAfv+Jj57a0WjKGaiLazylj1mb7AYj6Vao+1zvm2ufoZvpKJcnKPqcWTsx/enJD3wx0LbqTpN5a/EdynJF9kj9Z97cGk9lS/hQHqmYVUYLYG5ZIvPjkuc6ho6pYaerupZ8aQgwraupRrNAzh70C3QgxnrCK+6RRmBMchhBsHOZq1MGhbN48ttlSMKow2NyVp8mK8+wLUnQgxEvYjVNJBXf5iKMmCTBiTO8IqgAKkkMgLaB3H0UpkeOoUQNTACPxR42+FJcwObmxYRSekTGFPwAAwnZV/1BuPrpxpT7JHa9ELlShz2OVEDz9aK/WC28/oEmtYKN8s9koKr1sx4OT5c0F/XG+er2idgCWwvfK5A0Om7Fudur+bbp1a38QWb00cAu8dPTIONe01vGXQ04d+NyohS2bcvK3iehVpa+WZ4CHkjRRuv6vQGvFMNCtwwQjXopBM99+yAykLm7yqOewbzbxFI7nCHNBc1zHvI13j7yniEoI/vdWk43e2H3Az0OOtdVASNmmp5Avwo/UWzjVACvlyNK1CST4pqYQ="
 
+  matrix:
+  - CI_JOB=test
+  - CI_JOB=test-integration
+
 branches:
   except:
   - canary
 
 cache:
   directories:
+  - $GOPATH/pkg/mod
   - $GOPATH/pkg/dep
   - $HOME/include
   - $HOME/bin
 
 before_install:
-- export PATH=$PWD/bin:$HOME/bin:$PATH
+- if [[ "$TRAVIS_GO_VERSION" == 1.11* ]]; then
+    export COVERAGE_ENABLED=1;
+    export GO111MODULE=on;
+  else
+    export DEP_ENABLED=1;
+  fi
 - ./_script/ci-install
-- go get -u github.com/golang/lint/golint
 
 install:
-- make setup
+- |
+  if [ "$DEP_ENABLED" = 1 ]; then
+    dep ensure -v -vendor-only;
+  fi
 
 script:
-- make lint
-- make cover
-- make
-- make test-integration
+- ./_script/ci-$CI_JOB
 
-after_success:
-- bash <(curl -s https://codecov.io/bash)
-
-before_deploy:
-- make packages
-# for canary build, ref: https://github.com/oliexdev/openScale/pull/121
-- git remote add gh https://${TRAVIS_REPO_SLUG%/*}:${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
-- git tag -f $CANARY_TAG
-- git push -f gh $CANARY_TAG
-- git remote remove gh
-
-deploy:
-- provider: releases
-  skip_cleanup: true
-  api_key: $GITHUB_TOKEN
-  file_glob: true
-  file: $FILE_TO_DEPLOY
-  on:
-    tags: true
-- provider: releases
-  skip_cleanup: true
-  api_key: $GITHUB_TOKEN
-  file_glob: true
-  file: $FILE_TO_DEPLOY
-  prerelease: true
-  overwrite: true
-  name: canary
-  body: canary build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built by Travis CI on $(date +'%F %T %Z').
-  target_commitish: $TRAVIS_COMMIT
-  on:
-    branch: master
+jobs:
+  include:
+  - stage: deploy
+    go: 1.11
+    script: []
+    before_deploy:
+    - make packages
+    # for canary build, ref: https://github.com/oliexdev/openScale/pull/121
+    - git remote add gh https://${TRAVIS_REPO_SLUG%/*}:${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
+    - git tag -f $CANARY_TAG
+    - git push -f gh $CANARY_TAG
+    - git remote remove gh
+    deploy:
+    - provider: releases
+      skip_cleanup: true
+      api_key: $GITHUB_TOKEN
+      file_glob: true
+      file: $FILE_TO_DEPLOY
+      on:
+        tags: true
+    - provider: releases
+      skip_cleanup: true
+      api_key: $GITHUB_TOKEN
+      file_glob: true
+      file: $FILE_TO_DEPLOY
+      prerelease: true
+      overwrite: true
+      name: canary
+      body: canary build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built by Travis CI on $(date +'%F %T %Z').
+      target_commitish: $TRAVIS_COMMIT
+      on:
+        branch: master

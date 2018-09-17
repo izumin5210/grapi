@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -e
 set -o pipefail
 
 BIN_DIR=$HOME/bin
@@ -37,7 +37,9 @@ install_dep() {
 
 main() {
   install_protoc
-  install_dep
+  if [ "$DEP_ENABLED" = 1 ]; then
+    install_dep
+  fi
 }
 
 main
