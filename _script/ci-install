@@ -33,6 +33,7 @@ install_dep() {
   fi
 
   dep version
+  dep ensure -v -vendor-only
 }
 
 main() {

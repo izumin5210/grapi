@@ -43,13 +43,9 @@ before_install:
   else
     export DEP_ENABLED=1;
   fi
-- ./_script/ci-install
 
 install:
-- |
-  if [ "$DEP_ENABLED" = 1 ]; then
-    dep ensure -v -vendor-only;
-  fi
+- ./_script/ci-install
 
 script:
 - ./_script/ci-$CI_JOB
@@ -58,7 +54,7 @@ jobs:
   include:
   - stage: deploy
     go: 1.11
-    script: []
+    script: skip
     before_deploy:
     - make packages
     # for canary build, ref: https://github.com/oliexdev/openScale/pull/121
