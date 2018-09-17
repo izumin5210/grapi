@@ -51,7 +51,7 @@ func (u *initializeProjectUsecase) Perform(rootDir, pkgName string, depSkipped, 
 }
 
 func (u *initializeProjectUsecase) GenerateProject(rootDir, pkgName string, headUsed bool) error {
-	return errors.WithStack(u.generator.GenerateProject(rootDir, pkgName, headUsed))
+	return errors.WithStack(u.generator.GenerateProject(rootDir, pkgName, module.ProjectGenerationConfig{UseHEAD: true}))
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string) error {

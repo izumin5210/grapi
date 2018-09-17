@@ -8,6 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	moduletesting "github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
@@ -27,7 +28,7 @@ func Test_ProjectGenerator(t *testing.T) {
 
 	generator := newProjectGenerator(fs, ui, "")
 
-	err := generator.GenerateProject(rootDir, "", false)
+	err := generator.GenerateProject(rootDir, "", module.ProjectGenerationConfig{})
 
 	if err != nil {
 		t.Errorf("returned an error %v", err)
