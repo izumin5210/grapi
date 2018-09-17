@@ -5,8 +5,8 @@ required = [
 ]
 
 [[constraint]]
+  branch = "master"
   name = "github.com/izumin5210/grapi"
-  version = ""
 
 [[override]]
   name = "github.com/grpc-ecosystem/grpc-gateway"
