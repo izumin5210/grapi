@@ -15,7 +15,7 @@ func newUserDefinedCommand(ui module.UI, scriptLoader module.ScriptLoader, name 
 		RunE: func(c *cobra.Command, args []string) (err error) {
 			script, ok := scriptLoader.Get(name)
 			if !ok {
-				err = errors.Wrapf(err, "faild to find subcommand %d", name)
+				err = errors.Wrapf(err, "faild to find subcommand %s", name)
 			}
 
 			pos := len(args)

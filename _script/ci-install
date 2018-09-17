@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -e
 set -o pipefail
 
 BIN_DIR=$HOME/bin
@@ -33,6 +33,7 @@ install_dep() {
   fi
 
   dep version
+  dep ensure -v -vendor-only
 }
 
 main() {
