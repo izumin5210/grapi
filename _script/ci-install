@@ -37,9 +37,7 @@ install_dep() {
 
 main() {
   install_protoc
-  if [ "$DEP_ENABLED" = 1 ]; then
-    install_dep
-  fi
+  install_dep
 }
 
 main
