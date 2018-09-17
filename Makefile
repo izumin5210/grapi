@@ -32,30 +32,14 @@ GO_COVER_FLAGS := -coverpkg $(shell echo $(GOLINT_TARGET) | tr ' ' ',') -coverpr
 XC_ARCH := 386 amd64
 XC_OS := darwin linux windows
 
+PATH := ${PWD}/bin:${PATH}
+export PATH
+
 #  Utils
 #----------------------------------------------------------------
 define section
   @printf "\e[34m--> $1\e[0m\n"
 endef
-
-#  dep
-#----------------------------------------------------------------
-DEP_BIN_DIR := ./vendor/.bin/
-DEP_SRCS := \
-	github.com/golang/mock/mockgen \
-	github.com/jessevdk/go-assets-builder \
-	github.com/mitchellh/gox
-
-DEP_BINS := $(addprefix $(DEP_BIN_DIR),$(notdir $(DEP_SRCS)))
-
-define dep-bin-tmpl
-$(eval OUT := $(addprefix $(DEP_BIN_DIR),$(notdir $(1))))
-$(OUT): dep
-	$(call section,Installing $(OUT))
-	@cd vendor/$(1) && GOBIN="$(shell pwd)/$(DEP_BIN_DIR)" go install .
-endef
-
-$(foreach src,$(DEP_SRCS),$(eval $(call dep-bin-tmpl,$(src))))
 
 
 #  App
@@ -82,8 +66,8 @@ $(NAME): $(OUT)
 $(eval PACKAGES += $(NAME)-package)
 
 .PHONY: $(NAME)-package
-$(NAME)-package: $(NAME)
-	@PATH=$(shell pwd)/$(DEP_BIN_DIR):$$$$PATH gox \
+$(NAME)-package: $(NAME) $(BIN_DIR)/gox
+	gox \
 		$(LDFLAGS) \
 		-os="$(XC_OS)" \
 		-arch="$(XC_ARCH)" \
@@ -99,25 +83,19 @@ all: $(GENERATED_BINS)
 
 #  Commands
 #----------------------------------------------------------------
-.PHONY: setup
-setup: dep $(DEP_BINS)
+$(BIN_DIR)/gex:
+	go build -o $(BIN_DIR)/gex github.com/izumin5210/gex/cmd/gex
+
+$(BIN_DIR)/mockgen $(BIN_DIR)/go-assets-builder $(BIN_DIR)/gox: $(BIN_DIR)/gex
+	gex --build
 
 .PHONY: clean
 clean:
 	rm -rf $(BIN_DIR)/*
 
-.PHONY: clobber
-clobber: clean
-	rm -rf vendor
-
-.PHONY: dep
-dep: Gopkg.toml Gopkg.lock
-	$(call section,Installing dependencies)
-	@dep ensure -v -vendor-only
-
 .PHONY: gen
-gen:
-	@PATH=$(shell pwd)/$(DEP_BIN_DIR):$$PATH go generate ./...
+gen: $(BIN_DIR)/mockgen $(BIN_DIR)/go-assets-builder
+	go generate ./...
 
 .PHONY: lint
 lint:
