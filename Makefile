@@ -126,7 +126,7 @@ cover:
 	@go test $(GO_TEST_FLAGS) $(GO_COVER_FLAGS) ./...
 
 .PHONY: test-integration
-test-integration:
+test-integration: $(GENERATED_BINS)
 	$(call section,Integration Testing)
 	cd _tests && go test $(GO_TEST_INTEGRATION_FLAGS) ./...
 
