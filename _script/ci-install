@@ -22,23 +22,8 @@ install_protoc() {
   protoc  --version
 }
 
-install_dep() {
-  section "Installing dep"
-
-  if [ ! -d "${BIN_DIR}/dep" ]; then
-    curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o ${BIN_DIR}/dep
-    chmod +x ${BIN_DIR}/dep
-  else
-    echo "skipped"
-  fi
-
-  dep version
-  dep ensure -v -vendor-only
-}
-
 main() {
   install_protoc
-  install_dep
 }
 
 main
