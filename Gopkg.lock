@@ -77,6 +77,22 @@
   version = "v0.2.0"
 
 [[projects]]
+  digest = "1:f4f203acd8b11b8747bdcd91696a01dbc95ccb9e2ca2db6abf81c3a4f5e950ce"
+  name = "github.com/google/go-github"
+  packages = ["github"]
+  pruneopts = "UT"
+  revision = "f55b50f38167644bb7e4be03d9a2bde71d435239"
+  version = "v18.2.0"
+
+[[projects]]
+  digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
+  name = "github.com/google/go-querystring"
+  packages = ["query"]
+  pruneopts = "UT"
+  revision = "44c6ddd0a2342c386950e880b658017258da92fc"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:1168584a5881d371e96cb0e66ef6db71d7cef0856cc7f311490bc856627f8328"
   name = "github.com/grpc-ecosystem/go-grpc-middleware"
   packages = ["."]
@@ -113,6 +129,33 @@
   ]
   pruneopts = "UT"
   revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
+
+[[projects]]
+  branch = "master"
+  digest = "1:20427ddaa8e0ba0904a08f909495bbbd5d7d0a8a8b201cfd3df076fb4381ff55"
+  name = "github.com/haya14busa/errorformat"
+  packages = [
+    ".",
+    "fmts",
+  ]
+  pruneopts = "UT"
+  revision = "689b7d67b7a82a9cae3d8bfcfa0f6f4b5790b88a"
+
+[[projects]]
+  digest = "1:46bea7432a2d8918f6b45be6b34138804d91c046d99a0b568c37f999d8acfad0"
+  name = "github.com/haya14busa/reviewdog"
+  packages = [
+    ".",
+    "cienv",
+    "cmd/reviewdog",
+    "diff",
+    "doghouse",
+    "doghouse/client",
+    "project",
+  ]
+  pruneopts = "UT"
+  revision = "ffb00ef78fd3e05f042505e8aaaa290919ce4d5a"
+  version = "0.9.11"
 
 [[projects]]
   digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
@@ -179,6 +222,28 @@
   revision = "04140366298a54a039076d798123ffa108fff46c"
 
 [[projects]]
+  digest = "1:395909746961a45abfc8b4a566a53cb6335e580768eae7d29d4a196b2bed2d07"
+  name = "github.com/kisielk/errcheck"
+  packages = [
+    ".",
+    "internal/errcheck",
+  ]
+  pruneopts = "UT"
+  revision = "55d8f507faff4d6eddd0c41a3e713e2567fca4e5"
+  version = "v1.1.0"
+
+[[projects]]
+  digest = "1:15ec2166e33ef6c60b344a04d050eec79193517e7f5082b6233b2d09ef0d10b8"
+  name = "github.com/kisielk/gotool"
+  packages = [
+    ".",
+    "internal/load",
+  ]
+  pruneopts = "UT"
+  revision = "80517062f582ea3340cd4baf70e86d539ae7d84d"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:5149009cc36718234a9ad2896b04b04716808b8d72143b5687c0a15b53132b27"
   name = "github.com/magiconair/properties"
   packages = ["."]
@@ -201,6 +266,14 @@
   pruneopts = "UT"
   revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
   version = "v0.0.3"
+
+[[projects]]
+  digest = "1:7efe48dea4db6b35dcc15e15394b627247e5b3fb814242de986b746ba8e0abf0"
+  name = "github.com/mattn/go-shellwords"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "02e3cf038dcea8290e44424da473dd12be796a8a"
+  version = "v1.0.3"
 
 [[projects]]
   digest = "1:a82223630c35be0e7b7e543bf8db95b8de3f1319671b30c6104ea521a00f36fd"
@@ -318,12 +391,31 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:ba6b1a61040f11451864ea00fbc29fc3f9a29211c630ce94f6141a1d4346f8d7"
+  name = "github.com/srvc/wraperr"
+  packages = [
+    ".",
+    "cmd/wraperr",
+  ]
+  pruneopts = "UT"
+  revision = "d96e660b51e4f1520597bdd720fa3649d08cf2d0"
+  version = "v0.1.1"
+
+[[projects]]
   branch = "master"
   digest = "1:29fa5c9ff973700f1bc2090037b905a06d90547b0223c7d1a5e7bea190b18ca8"
   name = "github.com/tcnksm/go-input"
   packages = ["."]
   pruneopts = "UT"
   revision = "bbe13e92fa7dda71a4e012e3f427df11866c7651"
+
+[[projects]]
+  digest = "1:1e57328b5e7f644282160b0cc1d25dfaf0f0382195ade7c885f6fb917278a663"
+  name = "github.com/xanzy/go-gitlab"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0e1a0aad2f7404e9ad14018b02315af5c2f12ffb"
+  version = "v0.11.1"
 
 [[projects]]
   digest = "1:9d5cf6f23377cc24f00ba9a7b0c83fe070171c094e42eece262c6252a392ec33"
@@ -366,10 +458,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a1146585d49b88c3d2b49c9e513383a381f94c7238f5f6ae889bc029a0821f92"
+  digest = "1:7bed3b51d5574e7ecca8a1de4081e8dc2bd24d1321f61f2daee054fde27885b1"
+  name = "golang.org/x/lint"
+  packages = [
+    ".",
+    "golint",
+  ]
+  pruneopts = "UT"
+  revision = "06c8688daad7faa9da5a0c2f163a3d14aac986ca"
+
+[[projects]]
+  branch = "master"
+  digest = "1:226603166ceff0469614a7216061df29ef9e6c29ad614b600a9857910b156fd0"
   name = "golang.org/x/net"
   packages = [
     "context",
+    "context/ctxhttp",
     "http2",
     "http2/hpack",
     "idna",
@@ -379,6 +483,17 @@
   ]
   pruneopts = "UT"
   revision = "cbe0f9307d0156177f9dd5dc85da1a31abc5f2fb"
+
+[[projects]]
+  branch = "master"
+  digest = "1:363b547c971a2b07474c598b6e9ebcb238d556d8a27f37b3895ad20cd50e7281"
+  name = "golang.org/x/oauth2"
+  packages = [
+    ".",
+    "internal",
+  ]
+  pruneopts = "UT"
+  revision = "d2e6202438beef2727060aa7cabdd924d92ebfd9"
 
 [[projects]]
   branch = "master"
@@ -421,6 +536,44 @@
   pruneopts = "UT"
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
   version = "v0.3.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:c1a931e3040acea0a970f1bb40fb7e6b993f1810f1a5f8ae9a74ba436a830f95"
+  name = "golang.org/x/tools"
+  packages = [
+    "go/ast/astutil",
+    "go/buildutil",
+    "go/callgraph",
+    "go/callgraph/cha",
+    "go/callgraph/rta",
+    "go/gcexportdata",
+    "go/internal/cgo",
+    "go/internal/gcimporter",
+    "go/loader",
+    "go/packages",
+    "go/ssa",
+    "go/ssa/ssautil",
+    "go/types/typeutil",
+  ]
+  pruneopts = "UT"
+  revision = "b71db7f417f13fa74a2565bc57b2387fdbf2c611"
+
+[[projects]]
+  digest = "1:6247f76e55a1e1a5c19a81e2d4b4dff6730461eeb5bbb0a16dd4a8ec8637ee93"
+  name = "google.golang.org/appengine"
+  packages = [
+    "internal",
+    "internal/base",
+    "internal/datastore",
+    "internal/log",
+    "internal/remote_api",
+    "internal/urlfetch",
+    "urlfetch",
+  ]
+  pruneopts = "UT"
+  revision = "ae0ab99deb4dc413a2b4bd6c8bdd0eb67f1e4d06"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -478,6 +631,49 @@
   revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
   version = "v2.1.1"
 
+[[projects]]
+  digest = "1:6eaf68fa53735d0b557c7a4d5411d3ad97d98d0afdb0969252d6506e67600285"
+  name = "honnef.co/go/tools"
+  packages = [
+    "callgraph",
+    "callgraph/static",
+    "cmd/megacheck",
+    "deprecated",
+    "functions",
+    "internal/sharedcheck",
+    "lint",
+    "lint/lintutil",
+    "simple",
+    "ssa",
+    "ssa/ssautil",
+    "staticcheck",
+    "staticcheck/vrp",
+    "unused",
+    "version",
+  ]
+  pruneopts = "UT"
+  revision = "d73ab98e7c39fdcf9ba65062e43d34310f198353"
+  version = "2017.2.2"
+
+[[projects]]
+  branch = "master"
+  digest = "1:521f15c98723cb42db85f5b83980ffa5f707ddaff12976a0d366e6a6cdd1f791"
+  name = "mvdan.cc/lint"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "adc824a0674b99099789b6188a058d485eaf61c0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:fa95b3a7272db2dcc5aa718b8a1d78779037d556b06c486af3028cf3ed5cc7cf"
+  name = "mvdan.cc/unparam"
+  packages = [
+    ".",
+    "check",
+  ]
+  pruneopts = "UT"
+  revision = "8f80bf61b2ce1e2ce4a090028d172bf72b8eec3d"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -492,12 +688,14 @@
     "github.com/grpc-ecosystem/go-grpc-middleware",
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
     "github.com/grpc-ecosystem/grpc-gateway/utilities",
+    "github.com/haya14busa/reviewdog/cmd/reviewdog",
     "github.com/izumin5210/clicontrib/pkg/ccmd",
     "github.com/izumin5210/clicontrib/pkg/clog",
     "github.com/izumin5210/gex/cmd/gex",
     "github.com/jessevdk/go-assets",
     "github.com/jessevdk/go-assets-builder",
     "github.com/jinzhu/inflection",
+    "github.com/kisielk/errcheck",
     "github.com/mattn/go-colorable",
     "github.com/mitchellh/gox",
     "github.com/pkg/errors",
@@ -506,7 +704,9 @@
     "github.com/spf13/afero",
     "github.com/spf13/cobra",
     "github.com/spf13/viper",
+    "github.com/srvc/wraperr/cmd/wraperr",
     "github.com/tcnksm/go-input",
+    "golang.org/x/lint/golint",
     "golang.org/x/net/context",
     "golang.org/x/sync/errgroup",
     "google.golang.org/genproto/googleapis/api/annotations",
@@ -515,6 +715,8 @@
     "google.golang.org/grpc/grpclog",
     "google.golang.org/grpc/reflection",
     "google.golang.org/grpc/status",
+    "honnef.co/go/tools/cmd/megacheck",
+    "mvdan.cc/unparam",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
