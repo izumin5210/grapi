@@ -51,7 +51,7 @@ jobs:
   - name: test with Modules
     go: '1.11'
     env: GO111MODULE=on
-    script: make test
+    script: make cover
     after_success: bash <(curl -s https://codecov.io/bash)
     if: type != 'pull_request'
 
