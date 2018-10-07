@@ -1,29 +1,18 @@
 language: go
 
-go:
-- '1.9'
-- '1.10'
-- '1.11'
+go: '1.11'
 
 env:
   global:
-  - DEP_VERSION="0.5.0"
+  - DEP_RELEASE_TAG=v0.5.0
   - FILE_TO_DEPLOY="dist/*"
   - PROTOBUF_VERSION="3.5.1"
   - CANARY_TAG="canary"
 
   # GITHUB_TOKEN
   - secure: "MhmvXAAzOA5HY7koCfagX1wJi2mBVQsVF5cCMaNx73l+7uDgNzGYfTn4OGKmckduiGB/mp5bTJ1DeMbPq+TDX1n/RE6kndu/Q/1vw4pbxm9BsmO9b3DizIFoWlnG+EABdAZa9igbCAfv+Jj57a0WjKGaiLazylj1mb7AYj6Vao+1zvm2ufoZvpKJcnKPqcWTsx/enJD3wx0LbqTpN5a/EdynJF9kj9Z97cGk9lS/hQHqmYVUYLYG5ZIvPjkuc6ho6pYaerupZ8aQgwraupRrNAzh70C3QgxnrCK+6RRmBMchhBsHOZq1MGhbN48ttlSMKow2NyVp8mK8+wLUnQgxEvYjVNJBXf5iKMmCTBiTO8IqgAKkkMgLaB3H0UpkeOoUQNTACPxR42+FJcwObmxYRSekTGFPwAAwnZV/1BuPrpxpT7JHa9ELlShz2OVEDz9aK/WC28/oEmtYKN8s9koKr1sx4OT5c0F/XG+er2idgCWwvfK5A0Om7Fudur+bbp1a38QWb00cAu8dPTIONe01vGXQ04d+NyohS2bcvK3iehVpa+WZ4CHkjRRuv6vQGvFMNCtwwQjXopBM99+yAykLm7yqOewbzbxFI7nCHNBc1zHvI13j7yniEoI/vdWk43e2H3Az0OOtdVASNmmp5Avwo/UWzjVACvlyNK1CST4pqYQ="
-
-  matrix:
-  - CI_JOB=test
-  - CI_JOB=test-integration
-
-matrix:
-  exclude:
-  # FIXME: Installing protoc-gen-* is broken on test-integration
-  - go: '1.11'
-    env: CI_JOB=test-integration
+  # REVIEWDOG_GITHUB_API_TOKEN
+  - secure: "HIpuAXhIivyVkMKnWucjuFWJcDnGsvBPm4lQmpCnDOWFFWgblhBzojqN9q0DK91Sc7MEeZPDD3yhZAUOYK2mcRthLZYhbblCjZsE742i8dVB9Y8+PiMb/CHRdERCQUNvQKo+fiXJ4QWE42zx9ehTkKRQHGZkHx8cQVgtSnTyMD2lxxBJWRHUQ8OS+v0yKZCmERisClccbcm37vBQQe3/n6RhuhzxIBlA5G5MEt2ig3noocMcRjApl4Qz3eV/IqVrNs8iQeSm87N3eVxuqMS07SxpOBDhyq6tlU0Ab3VD6peY8aiQxqKLCNU5w0yL5ap9jLiHAV4TDYblS7wUAJLabp+Qdj4/5C2di+jfyn1ZITcKJu8H4kAr8hZqQXpAIQ9K6e/SUztyTfVlsPl9BBO56mx4FB2ZN2voAiJSE4ZUzXyp+zIPk2eiWfclPKiPyvPgFDF0RPV0n/EQXybGoJaLgEnZ4Tx7n2WTWCnZROZkw8EuldIY60D0qJiYYTDfhk2W3XBZUJ4isqrTYKdAP/SGcBLPRmWA2/Aaq7XaP6oHa9+jPIkmhyIALtarWESRbwzWtstXXBjPaUSStZx/J/lvJW2gpmbt8e74GKEEOv9FiX2NOglwN5vPwl7ZErPMdlEeMjOx+HOIts4BPfYwtGFD7Ws0WI4oiSf4PXmuvvzjf4s="
 
 branches:
   except:
@@ -36,24 +25,39 @@ cache:
   - $HOME/include
   - $HOME/bin
 
-before_install:
-- if [[ "$TRAVIS_GO_VERSION" == 1.11* ]]; then
-    export COVERAGE_ENABLED=1;
-    export GO111MODULE=on;
-  else
-    export DEP_ENABLED=1;
-  fi
-
 install:
-- ./_script/ci-install
-
-script:
-- ./_script/ci-$CI_JOB
+- make setup
 
 jobs:
   include:
+  - name: lint
+    before_install: skip
+    script: make lint
+    if: type = 'pull_request'
+
+  - &test
+    env: TEST_TASK=test
+    script: make $TEST_TASK
+    if: type != 'pull_request'
+
+  - &test-integration
+    <<: *test
+    env: TEST_TASK=test-integration
+    before_install: ./_script/ci-install
+
+  - <<: *test
+    env:
+    - GO111MODULE=on
+    - TEST_TASK=cover
+    after_success: bash <(curl -s https://codecov.io/bash)
+
+  - <<: *test
+    go: '1.10'
+
+  - <<: *test-integration
+    go: '1.10'
+
   - stage: deploy
-    go: 1.11
     script: skip
     before_deploy:
     - make packages
@@ -82,3 +86,4 @@ jobs:
       target_commitish: $TRAVIS_COMMIT
       on:
         branch: master
+    if: type != 'pull_request'

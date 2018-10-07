@@ -83,11 +83,20 @@ all: $(GENERATED_BINS)
 
 #  Commands
 #----------------------------------------------------------------
-$(BIN_DIR)/gex:
-	go build -o $(BIN_DIR)/gex github.com/izumin5210/gex/cmd/gex
-
 $(BIN_DIR)/mockgen $(BIN_DIR)/go-assets-builder $(BIN_DIR)/gox: $(BIN_DIR)/gex
 	gex --build
+
+.PHONY: setup
+setup:
+	@go get github.com/izumin5210/gex/cmd/gex
+ifeq ($(shell go env GOMOD),)
+ifdef CI
+	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+endif
+	dep ensure -v -vendor-only
+else
+	go get -v ./...
+endif
 
 .PHONY: clean
 clean:
@@ -100,8 +109,11 @@ gen: $(BIN_DIR)/mockgen $(BIN_DIR)/go-assets-builder
 .PHONY: lint
 lint:
 	$(call section,Linting)
-	@gofmt -e -d -s $(GOFMT_TARGET) | awk '{ e = 1; print $0 } END { if (e) exit(1) }'
-	@echo $(GOLINT_TARGET) | xargs -n1 golint -set_exit_status
+ifdef CI
+	gex reviewdog -reporter=github-pr-review
+else
+	gex reviewdog -diff="git diff master"
+endif
 
 .PHONY: test
 test:
@@ -114,7 +126,7 @@ cover:
 	@go test $(GO_TEST_FLAGS) $(GO_COVER_FLAGS) ./...
 
 .PHONY: test-integration
-test-integration:
+test-integration: $(GENERATED_BINS)
 	$(call section,Integration Testing)
 	cd _tests && go test $(GO_TEST_INTEGRATION_FLAGS) ./...
 
