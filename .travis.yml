@@ -1,8 +1,6 @@
 language: go
 
-go:
-- '1.10'
-- '1.11'
+go: '1.11'
 
 env:
   global:
@@ -16,10 +14,6 @@ env:
   # REVIEWDOG_GITHUB_API_TOKEN
   - secure: "HIpuAXhIivyVkMKnWucjuFWJcDnGsvBPm4lQmpCnDOWFFWgblhBzojqN9q0DK91Sc7MEeZPDD3yhZAUOYK2mcRthLZYhbblCjZsE742i8dVB9Y8+PiMb/CHRdERCQUNvQKo+fiXJ4QWE42zx9ehTkKRQHGZkHx8cQVgtSnTyMD2lxxBJWRHUQ8OS+v0yKZCmERisClccbcm37vBQQe3/n6RhuhzxIBlA5G5MEt2ig3noocMcRjApl4Qz3eV/IqVrNs8iQeSm87N3eVxuqMS07SxpOBDhyq6tlU0Ab3VD6peY8aiQxqKLCNU5w0yL5ap9jLiHAV4TDYblS7wUAJLabp+Qdj4/5C2di+jfyn1ZITcKJu8H4kAr8hZqQXpAIQ9K6e/SUztyTfVlsPl9BBO56mx4FB2ZN2voAiJSE4ZUzXyp+zIPk2eiWfclPKiPyvPgFDF0RPV0n/EQXybGoJaLgEnZ4Tx7n2WTWCnZROZkw8EuldIY60D0qJiYYTDfhk2W3XBZUJ4isqrTYKdAP/SGcBLPRmWA2/Aaq7XaP6oHa9+jPIkmhyIALtarWESRbwzWtstXXBjPaUSStZx/J/lvJW2gpmbt8e74GKEEOv9FiX2NOglwN5vPwl7ZErPMdlEeMjOx+HOIts4BPfYwtGFD7Ws0WI4oiSf4PXmuvvzjf4s="
 
-  matrix:
-  - TEST_TASK=test
-  - TEST_TASK=test-integration
-
 branches:
   except:
   - canary
@@ -31,14 +25,8 @@ cache:
   - $HOME/include
   - $HOME/bin
 
-before_install:
-- ./_script/ci-install
-
 install:
 - make setup
-
-script:
-- make $TEST_TASK
 
 jobs:
   include:
@@ -47,17 +35,29 @@ jobs:
     script: make lint
     if: type = 'pull_request'
 
-  # FIXME: Installing protoc-gen-* is broken on test-integration
-  - name: test with Modules
-    go: '1.11'
-    env: GO111MODULE=on
-    script: make cover
-    after_success: bash <(curl -s https://codecov.io/bash)
+  - &test
+    env: TEST_TASK=test
+    script: make $TEST_TASK
     if: type != 'pull_request'
 
+  - &test-integration
+    <<: *test
+    env: TEST_TASK=test-integration
+    before_install: ./_script/ci-install
+
+  - <<: *test
+    env:
+    - GO111MODULE=on
+    - TEST_TASK=cover
+    after_success: bash <(curl -s https://codecov.io/bash)
+
+  - <<: *test
+    go: '1.10'
+
+  - <<: *test-integration
+    go: '1.10'
+
   - stage: deploy
-    go: '1.11'
-    before_install: skip
     script: skip
     before_deploy:
     - make packages
