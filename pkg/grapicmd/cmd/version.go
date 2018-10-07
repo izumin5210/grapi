@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"bytes"
+	"fmt"
+
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
@@ -14,7 +17,12 @@ func newVersionCommand(cfg grapicmd.Config) *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Run: func(cmd *cobra.Command, _ []string) {
-			cmd.Printf("%s %s %s (%s %s)\n", cfg.AppName(), cfg.Version(), cfg.ReleaseType(), cfg.BuildDate(), cfg.Revision())
+			buf := bytes.NewBufferString(cfg.AppName() + " " + cfg.Version())
+			if cfg.Prebuilt() {
+				buf.WriteString(" (" + cfg.BuildDate() + " " + cfg.Revision() + ")")
+			}
+			buf.WriteString("\n")
+			fmt.Fprintf(cfg.OutWriter(), buf.String())
 		},
 	}
 }

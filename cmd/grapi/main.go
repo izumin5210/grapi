@@ -12,13 +12,6 @@ import (
 )
 
 var (
-	name      string
-	version   string
-	revision  string
-	buildDate string
-
-	releaseType string
-
 	inReader            = os.Stdin
 	outWriter io.Writer = os.Stdout
 	errWriter io.Writer = os.Stderr
@@ -28,9 +21,6 @@ func init() {
 	if runtime.GOOS == "windows" {
 		outWriter = colorable.NewColorableStdout()
 		errWriter = colorable.NewColorableStderr()
-	}
-	if name == "" {
-		name = "grapi"
 	}
 }
 
@@ -46,7 +36,7 @@ func main() {
 		version,
 		revision,
 		buildDate,
-		releaseType,
+		prebuilt,
 		inReader,
 		outWriter,
 		errWriter,
