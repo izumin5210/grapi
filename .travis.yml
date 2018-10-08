@@ -61,11 +61,6 @@ jobs:
     script: skip
     before_deploy:
     - make packages
-    # for canary build, ref: https://github.com/oliexdev/openScale/pull/121
-    - git remote add gh https://${TRAVIS_REPO_SLUG%/*}:${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
-    - git tag -f $CANARY_TAG
-    - git push -f gh $CANARY_TAG
-    - git remote remove gh
     deploy:
     - provider: releases
       skip_cleanup: true
@@ -74,16 +69,4 @@ jobs:
       file: $FILE_TO_DEPLOY
       on:
         tags: true
-    - provider: releases
-      skip_cleanup: true
-      api_key: $GITHUB_TOKEN
-      file_glob: true
-      file: $FILE_TO_DEPLOY
-      prerelease: true
-      overwrite: true
-      name: canary
-      body: canary build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built by Travis CI on $(date +'%F %T %Z').
-      target_commitish: $TRAVIS_COMMIT
-      on:
-        branch: master
     if: type != 'pull_request'
