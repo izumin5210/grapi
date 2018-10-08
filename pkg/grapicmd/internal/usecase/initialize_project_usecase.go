@@ -1,6 +1,9 @@
 package usecase
 
 import (
+	"context"
+
+	"github.com/izumin5210/gex"
 	"github.com/pkg/errors"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
@@ -27,6 +30,7 @@ type initializeProjectUsecase struct {
 	ui             module.UI
 	generator      module.ProjectGenerator
 	commandFactory module.CommandFactory
+	gexCfg         *gex.Config
 	version        string
 }
 
@@ -40,11 +44,9 @@ func (u *initializeProjectUsecase) Perform(rootDir, pkgName string, depSkipped, 
 	}
 
 	u.ui.Subsection("Install dependencies")
-	if !depSkipped {
-		err = u.InstallDeps(rootDir)
-		if err != nil {
-			return errors.Wrap(err, "failed to execute `dep ensure`")
-		}
+	err = u.InstallDeps(rootDir)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute `dep ensure`")
 	}
 
 	return nil
@@ -55,7 +57,16 @@ func (u *initializeProjectUsecase) GenerateProject(rootDir, pkgName string, head
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string) error {
-	cmd := u.commandFactory.Create([]string{"dep", "ensure", "-v"})
-	_, err := cmd.ConnectIO().SetDir(rootDir).Exec()
+	repo, err := u.gexCfg.Create()
+	if err == nil {
+		err = repo.Add(
+			context.TODO(),
+			"github.com/izumin5210/grapi/cmd/grapi",
+			// TODO: make configurable
+			"github.com/golang/protobuf/protoc-gen-go",
+			"github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway",
+			"github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger",
+		)
+	}
 	return errors.WithStack(err)
 }
