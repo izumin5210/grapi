@@ -32,12 +32,13 @@ type executeProtocUsecase struct {
 }
 
 // NewExecuteProtocUsecase returns an new ExecuteProtocUsecase implementation instance.
-func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui module.UI, commandFactory module.CommandFactory, rootDir string) ExecuteProtocUsecase {
+func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui module.UI, commandFactory module.CommandFactory, gexCfg *gex.Config, rootDir string) ExecuteProtocUsecase {
 	return &executeProtocUsecase{
 		cfg:            cfg,
 		fs:             fs,
 		ui:             ui,
 		commandFactory: commandFactory,
+		gexCfg:         gexCfg,
 		rootDir:        rootDir,
 	}
 }

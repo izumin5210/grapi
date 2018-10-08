@@ -17,11 +17,12 @@ type InitializeProjectUsecase interface {
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui module.UI, generator module.ProjectGenerator, commandFactory module.CommandFactory, version string) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui module.UI, generator module.ProjectGenerator, commandFactory module.CommandFactory, gexCfg *gex.Config, version string) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
 		ui:             ui,
 		generator:      generator,
 		commandFactory: commandFactory,
+		gexCfg:         gexCfg,
 		version:        version,
 	}
 }

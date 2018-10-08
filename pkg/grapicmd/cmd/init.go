@@ -40,6 +40,7 @@ func newInitCommand(ac di.AppComponent) *cobra.Command {
 				ac.UI(),
 				ac.Generator(),
 				ac.CommandFactory(),
+				ac.GexConfig(),
 				ac.Config().Version(),
 			)
 
