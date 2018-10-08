@@ -11,6 +11,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/grpc-gateway v1.5.0
 	github.com/hashicorp/hcl v0.0.0-20171017181929-23c074d0eceb // indirect
+	github.com/haya14busa/reviewdog v0.0.0-20180723114510-ffb00ef78fd3
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/izumin5210/clicontrib v0.1.0
 	github.com/izumin5210/gex v0.3.2-0.20181008122950-96d48a71bf34
@@ -18,7 +19,7 @@ require (
 	github.com/jessevdk/go-assets-builder v0.0.0-20130903091706-b8483521738f
 	github.com/jessevdk/go-flags v1.4.0 // indirect
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a
-	github.com/kisielk/errcheck v1.1.0 // indirect
+	github.com/kisielk/errcheck v1.1.0
 	github.com/magiconair/properties v1.7.6 // indirect
 	github.com/mattn/go-colorable v0.0.9
 	github.com/mattn/go-isatty v0.0.3 // indirect
@@ -35,16 +36,18 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/jwalterweatherman v0.0.0-20180109140146-7c0cea34c8ec // indirect
 	github.com/spf13/viper v1.0.0
+	github.com/srvc/wraperr v0.1.1
 	github.com/stretchr/testify v1.2.2 // indirect
 	github.com/tcnksm/go-input v0.0.0-20170423203207-bbe13e92fa7d
 	go.uber.org/atomic v1.3.1 // indirect
 	go.uber.org/multierr v1.1.0 // indirect
 	go.uber.org/zap v1.7.1 // indirect
 	golang.org/x/crypto v0.0.0-20180228161326-91a49db82a88 // indirect
+	golang.org/x/lint v0.0.0-20180702182130-06c8688daad7
 	golang.org/x/net v0.0.0-20180926154720-4dfa2610cdf3
 	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f
 	google.golang.org/genproto v0.0.0-20180206005123-2b5a72b8730b
 	google.golang.org/grpc v1.14.0
-	honnef.co/go/tools v0.0.0-20180920025451-e3ad64cb4ed3 // indirect
-	mvdan.cc/unparam v0.0.0-20180912072546-8f80bf61b2ce // indirect
+	honnef.co/go/tools v0.0.0-20180920025451-e3ad64cb4ed3
+	mvdan.cc/unparam v0.0.0-20180912072546-8f80bf61b2ce
 )
