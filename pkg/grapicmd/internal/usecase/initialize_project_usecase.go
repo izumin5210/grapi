@@ -11,7 +11,7 @@ import (
 
 // InitializeProjectUsecase is an interface to create a new grapi project.
 type InitializeProjectUsecase interface {
-	Perform(rootDir, pkgName string, depSkipped, headUsed bool) error
+	Perform(rootDir, pkgName string, headUsed bool) error
 	GenerateProject(rootDir, pkgName string, headUsed bool) error
 	InstallDeps(rootDir string) error
 }
@@ -35,7 +35,7 @@ type initializeProjectUsecase struct {
 	version        string
 }
 
-func (u *initializeProjectUsecase) Perform(rootDir, pkgName string, depSkipped, headUsed bool) error {
+func (u *initializeProjectUsecase) Perform(rootDir, pkgName string, headUsed bool) error {
 	u.ui.Section("Initialize project")
 
 	var err error
