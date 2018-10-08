@@ -19,21 +19,6 @@
 [![asciicast](https://asciinema.org/a/176280.png)](https://asciinema.org/a/176280)
 
 ## Getting Started
-### Installation
-#### For Homebrew users
-
-```
-$ brew install protobuf
-$ brew install izumin5210/tools/grapi
-```
-
-#### Download built binary
-You should install `protoc` command from [google/protobuf](https://github.com/google/protobuf).
-
-- Linux:
-  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.2/grapi_linux_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
-- macOS:
-  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.2/grapi_darwin_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
 
 ### Create a new application
 ```
@@ -95,3 +80,26 @@ $ grapi import-books  # run the command
 $ grapi build
 ```
 
+## Installation
+
+1. **grapi**
+    - Linux
+        - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.2/grapi_linux_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
+    - macOS
+        - `brew install izumin5210/tools/grapi`
+    - others
+        - `go get github.com/izumin5210/grapi/cmd/grapi`
+1. **dep** or **Modules**
+    - [dep](https://golang.github.io/dep/)
+        - macOS
+            - `brew install dep`
+        - others
+            - See [Installation · dep](https://golang.github.io/dep/docs/installation.html)
+            - `curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh`
+    - [Modules](https://github.com/golang/go/wiki/Modules) (experimental)
+        - Use Go 1.11 and set `GO111MODULE=on` your env vars
+1. **protoc**
+    - macOS
+        - `brew install protobuf`
+    - others
+        - Download and install from [google/protobuf](https://github.com/google/protobuf)
