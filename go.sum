@@ -36,8 +36,8 @@ github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NH
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/izumin5210/clicontrib v0.1.0 h1:jBfb5ssp5kro0f036OjIvIXr7LeqIUJm3VNWpmw5hrU=
 github.com/izumin5210/clicontrib v0.1.0/go.mod h1:cSf5+Fv5kS4RExoo+RNNaZCsCXx5DIXdVadbVkh5j7E=
-github.com/izumin5210/gex v0.3.2-0.20181009003910-3ce519ea37b6 h1:7CQPoSe/tDhNRT2JLbiId15iWN9zS5gC9ygdvmYUim4=
-github.com/izumin5210/gex v0.3.2-0.20181009003910-3ce519ea37b6/go.mod h1:EToRS44HUnV5Ta0xwi45yv1Joy2D5X/P/0tsJNcFwn8=
+github.com/izumin5210/gex v0.3.2 h1:EuRJOSiOSBcxmnrtI+ERZgKiXQv+t/ie3Boq/F4ap84=
+github.com/izumin5210/gex v0.3.2/go.mod h1:EToRS44HUnV5Ta0xwi45yv1Joy2D5X/P/0tsJNcFwn8=
 github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15 h1:cW/amwGEJK5MSKntPXRjX4dxs/nGxGT8gXKIsKFmHGc=
 github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15/go.mod h1:Fdm/oWRW+CH8PRbLntksCNtmcCBximKPkVQYvmMl80k=
 github.com/jessevdk/go-assets-builder v0.0.0-20130903091706-b8483521738f h1:K2zqtTU3T3ZX/vVeFtJ1OoxEm+gsLhu3zQ34tKgOAyk=

@@ -91,6 +91,5 @@ required = [
   version = "^0.1.4"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/izumin5210/gex"
-  #version = "^0.3.2"
+  version = "^0.3.2"
