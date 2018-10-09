@@ -3,16 +3,14 @@ package command
 import (
 	"io"
 	"os"
-
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
-// NewFactory creates a new module.CommandFactory instance.
+// NewFactory creates a new Factory instance.
 func NewFactory(
 	outWriter io.Writer,
 	errWriter io.Writer,
 	inReader io.Reader,
-) module.CommandFactory {
+) Factory {
 	return &factory{
 		outWriter: outWriter,
 		errWriter: errWriter,
@@ -26,7 +24,7 @@ type factory struct {
 	inReader  io.Reader
 }
 
-func (f *factory) Create(nameAndArgs []string) module.Command {
+func (f *factory) Create(nameAndArgs []string) Command {
 	name := nameAndArgs[0]
 	args := make([]string, 0, len(nameAndArgs)-1)
 	if len(nameAndArgs) > 1 {

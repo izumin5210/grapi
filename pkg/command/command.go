@@ -10,8 +10,6 @@ import (
 
 	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
-
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
 type command struct {
@@ -25,17 +23,17 @@ type command struct {
 	inReader    io.Reader
 }
 
-func (c *command) SetDir(dir string) module.Command {
+func (c *command) SetDir(dir string) Command {
 	c.dir = dir
 	return c
 }
 
-func (c *command) AddEnv(key, value string) module.Command {
+func (c *command) AddEnv(key, value string) Command {
 	c.env = append(c.env, key+"="+value)
 	return c
 }
 
-func (c *command) ConnectIO() module.Command {
+func (c *command) ConnectIO() Command {
 	c.ioConnected = true
 	return c
 }

@@ -1,7 +1,7 @@
-package module
+package command
 
-// CommandFactory is an interface for executing commands.
-type CommandFactory interface {
+// Factory is an interface for executing commands.
+type Factory interface {
 	Create(nameAndArgs []string) Command
 }
 
