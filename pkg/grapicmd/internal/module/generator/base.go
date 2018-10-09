@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -19,7 +19,7 @@ type baseGenerator interface {
 	Destroy(dir string, data interface{}) error
 }
 
-func newBaseGenerator(tmplFs *assets.FileSystem, fs afero.Fs, ui module.UI) baseGenerator {
+func newBaseGenerator(tmplFs *assets.FileSystem, fs afero.Fs, ui clui.UI) baseGenerator {
 	return &baseGeneratorImpl{
 		tmplFs: tmplFs,
 		fs:     fs,
@@ -30,7 +30,7 @@ func newBaseGenerator(tmplFs *assets.FileSystem, fs afero.Fs, ui module.UI) base
 type baseGeneratorImpl struct {
 	tmplFs *assets.FileSystem
 	fs     afero.Fs
-	ui     module.UI
+	ui     clui.UI
 }
 
 type generationConfig struct {

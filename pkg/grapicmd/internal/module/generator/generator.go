@@ -3,11 +3,12 @@ package generator
 import (
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
 // New creates a module.Generator instance.
-func New(fs afero.Fs, ui module.UI, rootDir, protoDir, protoOutDir, serverDir, pkgName, version string) module.Generator {
+func New(fs afero.Fs, ui clui.UI, rootDir, protoDir, protoOutDir, serverDir, pkgName, version string) module.Generator {
 	return &generator{
 		ProjectGenerator: newProjectGenerator(fs, ui, version),
 		ServiceGenerator: newServiceGenerator(fs, ui, rootDir, protoDir, protoOutDir, serverDir, pkgName),

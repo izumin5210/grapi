@@ -1,4 +1,4 @@
-package ui
+package clui
 
 import (
 	"fmt"
@@ -20,11 +20,9 @@ type printConfig struct {
 type printType int
 
 const (
-	printTypeOutput printType = iota
+	printTypeUnknown printType = iota
 	printTypeSection
 	printTypeSubsection
-	printTypeWarn
-	printTypeError
 	printTypeItemSuccess
 	printTypeItemSkipped
 	printTypeItemFailure
@@ -44,16 +42,6 @@ var (
 		printTypeSubsection: {
 			prefix:     "▸",
 			colorAttrs: []color.Attribute{color.FgBlue},
-			allColor:   true,
-		},
-		printTypeWarn: {
-			prefix:     "⚠",
-			colorAttrs: []color.Attribute{color.FgHiYellow},
-			allColor:   true,
-		},
-		printTypeError: {
-			prefix:     "☓",
-			colorAttrs: []color.Attribute{color.FgHiRed},
 			allColor:   true,
 		},
 		printTypeItemSuccess: {

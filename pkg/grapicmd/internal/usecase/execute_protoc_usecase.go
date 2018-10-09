@@ -6,10 +6,12 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/izumin5210/gex"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/protoc"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
@@ -25,14 +27,14 @@ type ExecuteProtocUsecase interface {
 type executeProtocUsecase struct {
 	cfg            *protoc.Config
 	fs             afero.Fs
-	ui             module.UI
+	ui             clui.UI
 	commandFactory module.CommandFactory
 	gexCfg         *gex.Config
 	rootDir        string
 }
 
 // NewExecuteProtocUsecase returns an new ExecuteProtocUsecase implementation instance.
-func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui module.UI, commandFactory module.CommandFactory, gexCfg *gex.Config, rootDir string) ExecuteProtocUsecase {
+func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui clui.UI, commandFactory module.CommandFactory, gexCfg *gex.Config, rootDir string) ExecuteProtocUsecase {
 	return &executeProtocUsecase{
 		cfg:            cfg,
 		fs:             fs,
@@ -81,9 +83,7 @@ func (u *executeProtocUsecase) ExecuteProtoc() error {
 		}
 	}
 	if len(errs) > 0 {
-		for _, err := range errs {
-			u.ui.Error(err.Error())
-		}
+		clog.Error("failed to execute protoc", "errors", errs)
 		return errors.New("failed to execute protoc")
 	}
 	return nil

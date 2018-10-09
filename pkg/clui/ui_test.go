@@ -1,4 +1,4 @@
-package ui
+package clui_test
 
 import (
 	"bytes"
@@ -6,8 +6,44 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/fatih/color"
+	"github.com/izumin5210/grapi/pkg/clui"
 )
+
+func TestUI(t *testing.T) {
+	defer func(b bool) { color.NoColor = b }(color.NoColor)
+	color.NoColor = true
+
+	want := `  ➜  section 1
+  ▸  subsection 1.1
+     ✔  created
+     ╌  skipped
+     ✔  ok
+
+  ▸  subsection 1.2
+     ✗  failure
+
+  ➜  section 2
+     ✗  fail!!!
+`
+
+	out := new(bytes.Buffer)
+	ui := clui.New(out, new(bytes.Buffer))
+
+	ui.Section("section 1")
+	ui.Subsection("subsection 1.1")
+	ui.ItemSuccess("created")
+	ui.ItemSkipped("skipped")
+	ui.ItemSuccess("ok")
+	ui.Subsection("subsection 1.2")
+	ui.ItemFailure("failure")
+	ui.Section("section 2")
+	ui.ItemFailure("fail!!!")
+
+	if got := out.String(); got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+}
 
 type errReader struct {
 }
@@ -16,10 +52,10 @@ func (r *errReader) Read(p []byte) (n int, err error) {
 	return 0, errors.New("failed to read")
 }
 
-func Test_UI_Confirm(t *testing.T) {
+func TestUI_Confirm(t *testing.T) {
 	type TestContext struct {
 		in, out, err *bytes.Buffer
-		ui           module.UI
+		ui           clui.UI
 	}
 
 	createTestContext := func() *TestContext {
@@ -28,7 +64,7 @@ func Test_UI_Confirm(t *testing.T) {
 		return &TestContext{
 			in:  in,
 			out: out,
-			ui:  New(out, in),
+			ui:  clui.New(out, in),
 		}
 	}
 
@@ -91,7 +127,7 @@ func Test_UI_Confirm(t *testing.T) {
 	}
 
 	t.Run("when failed to read", func(t *testing.T) {
-		ui := New(new(bytes.Buffer), &errReader{})
+		ui := clui.New(new(bytes.Buffer), &errReader{})
 
 		ok, err := ui.Confirm("test")
 
