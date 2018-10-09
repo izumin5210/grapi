@@ -58,6 +58,7 @@ func (u *initializeProjectUsecase) GenerateProject(rootDir, pkgName string, head
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string) error {
+	u.gexCfg.WorkingDir = rootDir
 	repo, err := u.gexCfg.Create()
 	if err == nil {
 		err = repo.Add(

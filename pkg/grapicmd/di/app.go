@@ -104,7 +104,7 @@ func (c *appComponentImpl) GexConfig() *gex.Config {
 			ErrWriter:  cfg.ErrWriter(),
 			InReader:   cfg.InReader(),
 			FS:         cfg.Fs(),
-			WorkingDir: cfg.CurrentDir(),
+			WorkingDir: cfg.RootDir(),
 			// TODO: set verbose flag
 			// TODO: set logger
 		}
