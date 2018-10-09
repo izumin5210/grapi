@@ -6,8 +6,44 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fatih/color"
 	"github.com/izumin5210/grapi/pkg/clui"
 )
+
+func TestUI(t *testing.T) {
+	defer func(b bool) { color.NoColor = b }(color.NoColor)
+	color.NoColor = true
+
+	want := `  ➜  section 1
+  ▸  subsection 1.1
+     ✔  created
+     ╌  skipped
+     ✔  ok
+
+  ▸  subsection 1.2
+     ✗  failure
+
+  ➜  section 2
+     ✗  fail!!!
+`
+
+	out := new(bytes.Buffer)
+	ui := clui.New(out, new(bytes.Buffer))
+
+	ui.Section("section 1")
+	ui.Subsection("subsection 1.1")
+	ui.ItemSuccess("created")
+	ui.ItemSkipped("skipped")
+	ui.ItemSuccess("ok")
+	ui.Subsection("subsection 1.2")
+	ui.ItemFailure("failure")
+	ui.Section("section 2")
+	ui.ItemFailure("fail!!!")
+
+	if got := out.String(); got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+}
 
 type errReader struct {
 }
