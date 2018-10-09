@@ -10,8 +10,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
-	moduletesting "github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -27,9 +27,6 @@ func Test_ServiceGenerator(t *testing.T) {
 
 	rootDir := "/home/src/testapp"
 
-	ui := moduletesting.NewMockUI(ctrl)
-	ui.EXPECT().ItemSuccess(gomock.Any()).AnyTimes()
-	ui.EXPECT().ItemSkipped(gomock.Any()).AnyTimes()
 	fs := afero.NewMemMapFs()
 
 	cases := []struct {
@@ -192,7 +189,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			test += " with " + strings.Join(c.args, ",")
 		}
 
-		generator := newServiceGenerator(fs, ui, rootDir, c.protoDir, c.protoOutDir, c.serverDir, c.pkgName)
+		generator := newServiceGenerator(fs, clui.Nop, rootDir, c.protoDir, c.protoOutDir, c.serverDir, c.pkgName)
 
 		t.Run(test, func(t *testing.T) {
 			test := "Generate"

@@ -4,10 +4,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
+	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
-func newUserDefinedCommand(ui module.UI, scriptLoader module.ScriptLoader, name string) *cobra.Command {
+func newUserDefinedCommand(ui clui.UI, scriptLoader module.ScriptLoader, name string) *cobra.Command {
 	return &cobra.Command{
 		Use:           name + " [-- BUILD_OPTIONS] [-- RUN_ARGS]",
 		SilenceErrors: true,

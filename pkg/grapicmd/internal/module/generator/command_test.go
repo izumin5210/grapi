@@ -9,7 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/spf13/afero"
 
-	moduletesting "github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
+	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -25,11 +25,9 @@ func Test_CommandGenerator(t *testing.T) {
 
 	rootDir := "/home/src/testapp"
 
-	ui := moduletesting.NewMockUI(ctrl)
-	ui.EXPECT().ItemSuccess(gomock.Any()).AnyTimes()
 	fs := afero.NewMemMapFs()
 
-	generator := newCommandGenerator(fs, ui, rootDir)
+	generator := newCommandGenerator(fs, clui.Nop, rootDir)
 
 	name := "foo"
 	files := []string{

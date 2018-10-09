@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
 )
 
@@ -67,9 +68,6 @@ func Test_userDefinedCommand(t *testing.T) {
 		},
 	}
 
-	ui := moduletesting.NewMockUI(ctrl)
-	ui.EXPECT().Section(gomock.Any()).AnyTimes()
-	ui.EXPECT().Subsection(gomock.Any()).AnyTimes()
 	name := "testcommand"
 
 	for _, c := range cases {
@@ -77,7 +75,7 @@ func Test_userDefinedCommand(t *testing.T) {
 		script := moduletesting.NewMockScript(ctrl)
 
 		var verbose bool
-		cmd := newUserDefinedCommand(ui, loader, name)
+		cmd := newUserDefinedCommand(clui.Nop, loader, name)
 		cmd.SetArgs(c.args)
 		cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "")
 

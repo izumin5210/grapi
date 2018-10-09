@@ -8,8 +8,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
-	moduletesting "github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -21,9 +21,6 @@ func TestProjectGenerator_GenerateProject(t *testing.T) {
 	fs.BuildContext.GOPATH = "/home"
 
 	rootDir := "/home/src/testcompany/testapp"
-
-	ui := moduletesting.NewMockUI(ctrl)
-	ui.EXPECT().ItemSuccess(gomock.Any()).AnyTimes()
 
 	cases := []struct {
 		test string
@@ -41,7 +38,7 @@ func TestProjectGenerator_GenerateProject(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.test, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			generator := newProjectGenerator(fs, ui, "v1.0.0")
+			generator := newProjectGenerator(fs, clui.Nop, "v1.0.0")
 			err := generator.GenerateProject(rootDir, "", tc.cfg)
 
 			if err != nil {

@@ -5,19 +5,19 @@ import (
 
 	"github.com/izumin5210/gex"
 
+	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/generator"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/script"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/ui"
 )
 
 // AppComponent is a dependency container.
 type AppComponent interface {
 	Config() grapicmd.Config
 
-	UI() module.UI
+	UI() clui.UI
 	CommandFactory() module.CommandFactory
 	ScriptLoader() module.ScriptLoader
 	Generator() module.Generator
@@ -35,7 +35,7 @@ func NewAppComponent(cfg grapicmd.Config) AppComponent {
 type appComponentImpl struct {
 	config grapicmd.Config
 
-	ui     module.UI
+	ui     clui.UI
 	uiOnce sync.Once
 
 	commandFactory     module.CommandFactory
@@ -55,10 +55,10 @@ func (c *appComponentImpl) Config() grapicmd.Config {
 	return c.config
 }
 
-func (c *appComponentImpl) UI() module.UI {
+func (c *appComponentImpl) UI() clui.UI {
 	c.uiOnce.Do(func() {
 		cfg := c.Config()
-		c.ui = ui.New(cfg.OutWriter(), cfg.InReader())
+		c.ui = clui.New(cfg.OutWriter(), cfg.InReader())
 	})
 	return c.ui
 }
