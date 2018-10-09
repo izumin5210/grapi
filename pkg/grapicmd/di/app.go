@@ -3,6 +3,8 @@ package di
 import (
 	"sync"
 
+	"github.com/izumin5210/gex"
+
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/command"
@@ -19,6 +21,8 @@ type AppComponent interface {
 	CommandFactory() module.CommandFactory
 	ScriptLoader() module.ScriptLoader
 	Generator() module.Generator
+
+	GexConfig() *gex.Config
 }
 
 // NewAppComponent creates a new AppComonent instance.
@@ -42,6 +46,9 @@ type appComponentImpl struct {
 
 	generator     module.Generator
 	generatorOnce sync.Once
+
+	gexConfig     *gex.Config
+	gexConfigOnce sync.Once
 }
 
 func (c *appComponentImpl) Config() grapicmd.Config {
@@ -87,4 +94,20 @@ func (c *appComponentImpl) Generator() module.Generator {
 		)
 	})
 	return c.generator
+}
+
+func (c *appComponentImpl) GexConfig() *gex.Config {
+	c.gexConfigOnce.Do(func() {
+		cfg := c.Config()
+		c.gexConfig = &gex.Config{
+			OutWriter:  cfg.OutWriter(),
+			ErrWriter:  cfg.ErrWriter(),
+			InReader:   cfg.InReader(),
+			FS:         cfg.Fs(),
+			WorkingDir: cfg.RootDir(),
+			// TODO: set verbose flag
+			// TODO: set logger
+		}
+	})
+	return c.gexConfig
 }

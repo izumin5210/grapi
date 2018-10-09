@@ -178,16 +178,19 @@
   version = "v0.1.0"
 
 [[projects]]
-  digest = "1:90d34344be1899b2c4f614a5bb59ed829346f3f00d8a2009c254b1d060578240"
+  digest = "1:ec9a8df83b4e8c652da64d9e9b7cb3569123c6600db42afd377df0a11ce7a142"
   name = "github.com/izumin5210/gex"
   packages = [
+    ".",
     "cmd/gex",
-    "pkg/command",
+    "pkg/manager",
+    "pkg/manager/dep",
+    "pkg/manager/mod",
     "pkg/tool",
   ]
   pruneopts = "UT"
-  revision = "c4c75fc151408fb0f769b01a333c904774eb65d7"
-  version = "v0.2.0"
+  revision = "9469ada3eaa38501cf216f35dfedd562a3d2814d"
+  version = "v0.3.2"
 
 [[projects]]
   branch = "master"
@@ -691,6 +694,7 @@
     "github.com/haya14busa/reviewdog/cmd/reviewdog",
     "github.com/izumin5210/clicontrib/pkg/ccmd",
     "github.com/izumin5210/clicontrib/pkg/clog",
+    "github.com/izumin5210/gex",
     "github.com/izumin5210/gex/cmd/gex",
     "github.com/jessevdk/go-assets",
     "github.com/jessevdk/go-assets-builder",

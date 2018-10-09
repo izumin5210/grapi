@@ -16,17 +16,14 @@ func createDefaultConfig() *Config {
 		OutDir:    "./api",
 		Plugins: []*Plugin{
 			{
-				Path: "./vendor/github.com/golang/protobuf/protoc-gen-go",
 				Name: "go",
 				Args: map[string]interface{}{"plugins": "grpc"},
 			},
 			{
-				Path: "./vendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway",
 				Name: "grpc-gateway",
 				Args: map[string]interface{}{"logtostderr": true},
 			},
 			{
-				Path: "./vendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger",
 				Name: "swagger",
 				Args: map[string]interface{}{"logtostderr": true},
 			},

@@ -18,9 +18,8 @@ var (
 
 func newInitCommand(ac di.AppComponent) *cobra.Command {
 	var (
-		depSkipped bool
-		headUsed   bool
-		pkgName    string
+		headUsed bool
+		pkgName  string
 	)
 
 	cmd := &cobra.Command{
@@ -40,14 +39,14 @@ func newInitCommand(ac di.AppComponent) *cobra.Command {
 				ac.UI(),
 				ac.Generator(),
 				ac.CommandFactory(),
+				ac.GexConfig(),
 				ac.Config().Version(),
 			)
 
-			return errors.WithStack(u.Perform(root, pkgName, depSkipped, headUsed))
+			return errors.WithStack(u.Perform(root, pkgName, headUsed))
 		},
 	}
 
-	cmd.PersistentFlags().BoolVarP(&depSkipped, "skip-dep", "D", false, "Don't run dep ensure")
 	cmd.PersistentFlags().BoolVar(&headUsed, "HEAD", false, "Use HEAD grapi")
 	cmd.PersistentFlags().StringVarP(&pkgName, "package", "p", "", `Package name of the application(default: "<parent_package_or_username>.<app_name>")`)
 

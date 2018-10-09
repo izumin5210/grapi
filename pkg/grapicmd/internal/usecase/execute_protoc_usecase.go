@@ -1,9 +1,12 @@
 package usecase
 
 import (
+	"context"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/izumin5210/gex"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
@@ -20,22 +23,23 @@ type ExecuteProtocUsecase interface {
 }
 
 type executeProtocUsecase struct {
-	cfg             *protoc.Config
-	fs              afero.Fs
-	ui              module.UI
-	commandFactory  module.CommandFactory
-	rootDir, binDir string
+	cfg            *protoc.Config
+	fs             afero.Fs
+	ui             module.UI
+	commandFactory module.CommandFactory
+	gexCfg         *gex.Config
+	rootDir        string
 }
 
 // NewExecuteProtocUsecase returns an new ExecuteProtocUsecase implementation instance.
-func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui module.UI, commandFactory module.CommandFactory, rootDir string) ExecuteProtocUsecase {
+func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui module.UI, commandFactory module.CommandFactory, gexCfg *gex.Config, rootDir string) ExecuteProtocUsecase {
 	return &executeProtocUsecase{
 		cfg:            cfg,
 		fs:             fs,
 		ui:             ui,
 		commandFactory: commandFactory,
+		gexCfg:         gexCfg,
 		rootDir:        rootDir,
-		binDir:         filepath.Join(rootDir, "bin"),
 	}
 }
 
@@ -51,28 +55,13 @@ func (u *executeProtocUsecase) Perform() error {
 }
 
 func (u *executeProtocUsecase) InstallPlugins() error {
-	if err := fs.CreateDirIfNotExists(u.fs, u.binDir); err != nil {
-		return errors.WithStack(err)
+	repo, err := u.gexCfg.Create()
+
+	if err == nil {
+		err = repo.BuildAll(context.TODO())
 	}
-	var errs []error
-	for _, plugin := range u.cfg.Plugins {
-		ok, err := u.installPlugin(plugin)
-		if err != nil {
-			errs = append(errs, err)
-			u.ui.ItemFailure(plugin.BinName())
-		} else if !ok {
-			u.ui.ItemSkipped(plugin.BinName())
-		} else {
-			u.ui.ItemSuccess(plugin.BinName())
-		}
-	}
-	if len(errs) > 0 {
-		for _, err := range errs {
-			u.ui.Error(err.Error())
-		}
-		return errors.New("failed to install protoc plugins")
-	}
-	return nil
+
+	return errors.WithStack(err)
 }
 
 func (u *executeProtocUsecase) ExecuteProtoc() error {
@@ -100,25 +89,6 @@ func (u *executeProtocUsecase) ExecuteProtoc() error {
 	return nil
 }
 
-func (u *executeProtocUsecase) installPlugin(plugin *protoc.Plugin) (bool, error) {
-	binPath := filepath.Join(u.binDir, plugin.BinName())
-	if ok, err := afero.Exists(u.fs, binPath); err != nil {
-		return false, errors.Wrapf(err, "failed to get %q binary", plugin.BinName())
-	} else if ok {
-		return false, nil
-	}
-	dir := filepath.Join(u.rootDir, plugin.Path)
-	if ok, _ := afero.DirExists(u.fs, dir); !ok {
-		return false, errors.Errorf("%s is not found", plugin.Path)
-	}
-	cmd := u.commandFactory.Create([]string{"go", "install", "."})
-	out, err := cmd.SetDir(dir).AddEnv("GOBIN", u.binDir).Exec()
-	if err != nil {
-		return false, errors.Wrapf(err, "failed to execute module: %s", string(out))
-	}
-	return true, nil
-}
-
 func (u *executeProtocUsecase) executeProtoc(protoPath string) error {
 	outDir, err := u.cfg.OutDirOf(u.rootDir, protoPath)
 	if err != nil {
@@ -132,7 +102,11 @@ func (u *executeProtocUsecase) executeProtoc(protoPath string) error {
 		return errors.WithStack(err)
 	}
 	for _, cmd := range cmds {
-		out, err := u.commandFactory.Create(cmd).AddEnv("PATH", u.binDir+string(filepath.ListSeparator)+os.Getenv("PATH")).SetDir(u.rootDir).Exec()
+		path := strings.Join([]string{
+			filepath.Join(u.rootDir, u.gexCfg.BinDirName),
+			os.Getenv("PATH"),
+		}, string(filepath.ListSeparator))
+		out, err := u.commandFactory.Create(cmd).AddEnv("PATH", path).SetDir(u.rootDir).Exec()
 		if err != nil {
 			return errors.Wrapf(err, "failed to execute module: %s", string(out))
 		}

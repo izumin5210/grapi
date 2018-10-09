@@ -3,20 +3,18 @@ package protoc
 import (
 	"bytes"
 	"fmt"
-	"path/filepath"
 	"strings"
 )
 
 // Plugin contains args and plugin name for using in protoc command.
 type Plugin struct {
-	Path string
 	Name string
 	Args map[string]interface{}
 }
 
 // BinName returns a executable binary name.
 func (p *Plugin) BinName() string {
-	return filepath.Base(p.Path)
+	return "protoc-gen-" + p.Name
 }
 
 func (p *Plugin) toProtocArg(outputPath string) string {

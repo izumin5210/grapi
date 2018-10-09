@@ -19,7 +19,7 @@ func newProtocCommand(ac di.AppComponent) *cobra.Command {
 			if !cfg.IsInsideApp() {
 				return errors.New("protoc command should be execute inside a grapi application directory")
 			}
-			u := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ac.UI(), ac.CommandFactory(), cfg.RootDir())
+			u := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ac.UI(), ac.CommandFactory(), ac.GexConfig(), cfg.RootDir())
 			return errors.WithStack(u.Perform())
 		},
 	}

@@ -62,7 +62,7 @@ ifdef CI
 endif
 	dep ensure -v -vendor-only
 else
-	go get -v ./...
+	go mod download
 endif
 	@go get github.com/izumin5210/gex/cmd/gex
 	gex --build --verbose
