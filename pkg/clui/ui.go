@@ -1,4 +1,4 @@
-package ui
+package clui
 
 import (
 	"fmt"
@@ -6,12 +6,10 @@ import (
 
 	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/tcnksm/go-input"
-
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
 // New creates a new UI instance.
-func New(out io.Writer, in io.Reader) module.UI {
+func New(out io.Writer, in io.Reader) UI {
 	return &uiImpl{
 		out: out,
 		inputUI: &input.UI{
@@ -25,11 +23,6 @@ type uiImpl struct {
 	out       io.Writer
 	inSection bool
 	inputUI   *input.UI
-}
-
-func (u *uiImpl) Output(msg string) {
-	u.inSection = true
-	fmt.Fprintf(u.out, "    %s\n", msg)
 }
 
 func (u *uiImpl) Section(msg string) {
@@ -46,16 +39,6 @@ func (u *uiImpl) Subsection(msg string) {
 		u.inSection = false
 	}
 	printTypeSubsection.Fprintln(u.out, msg)
-}
-
-func (u *uiImpl) Warn(msg string) {
-	u.inSection = true
-	printTypeWarn.Fprintln(u.out, msg)
-}
-
-func (u *uiImpl) Error(msg string) {
-	u.inSection = true
-	printTypeError.Fprintln(u.out, msg)
 }
 
 func (u *uiImpl) ItemSuccess(msg string) {

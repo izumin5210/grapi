@@ -1,4 +1,4 @@
-package ui
+package clui_test
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/izumin5210/grapi/pkg/clui"
 )
 
 type errReader struct {
@@ -16,10 +16,10 @@ func (r *errReader) Read(p []byte) (n int, err error) {
 	return 0, errors.New("failed to read")
 }
 
-func Test_UI_Confirm(t *testing.T) {
+func TestUI_Confirm(t *testing.T) {
 	type TestContext struct {
 		in, out, err *bytes.Buffer
-		ui           module.UI
+		ui           clui.UI
 	}
 
 	createTestContext := func() *TestContext {
@@ -28,7 +28,7 @@ func Test_UI_Confirm(t *testing.T) {
 		return &TestContext{
 			in:  in,
 			out: out,
-			ui:  New(out, in),
+			ui:  clui.New(out, in),
 		}
 	}
 
@@ -91,7 +91,7 @@ func Test_UI_Confirm(t *testing.T) {
 	}
 
 	t.Run("when failed to read", func(t *testing.T) {
-		ui := New(new(bytes.Buffer), &errReader{})
+		ui := clui.New(new(bytes.Buffer), &errReader{})
 
 		ok, err := ui.Confirm("test")
 
