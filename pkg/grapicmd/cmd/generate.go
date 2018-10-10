@@ -49,7 +49,7 @@ func newGenerateServiceCommand(ac di.AppComponent) *cobra.Command {
 				return err
 			}
 
-			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ac.UI(), ac.CommandFactory(), ac.GexConfig(), cfg.RootDir())
+			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ac.UI(), ac.CommandExecutor(), ac.GexConfig(), cfg.RootDir())
 			return errors.WithStack(protocUsecase.Perform())
 		},
 	}
@@ -86,7 +86,7 @@ func newGenerateScaffoldServiceCommand(ac di.AppComponent) *cobra.Command {
 				return err
 			}
 
-			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ac.UI(), ac.CommandFactory(), ac.GexConfig(), cfg.RootDir())
+			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ac.UI(), ac.CommandExecutor(), ac.GexConfig(), cfg.RootDir())
 			return errors.WithStack(protocUsecase.Perform())
 		},
 	}
