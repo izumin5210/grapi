@@ -1,14 +1,20 @@
 package command
 
-// Factory is an interface for executing commands.
-type Factory interface {
-	Create(nameAndArgs []string) Command
+import "context"
+
+// Executor is an interface for executing external commands.
+type Executor interface {
+	Exec(ctx context.Context, name string, opts ...Option) ([]byte, error)
 }
 
-// Command is an interface of executable and configurable command object.
-type Command interface {
-	SetDir(dir string) Command
-	AddEnv(key, value string) Command
-	ConnectIO() Command
-	Exec() ([]byte, error)
+// Command contains parameters for executing external commands.
+type Command struct {
+	Name        string
+	Args        []string
+	Dir         string
+	Env         []string
+	IOConnected bool
 }
+
+// Option specifies external command execution configurations.
+type Option func(*Command)
