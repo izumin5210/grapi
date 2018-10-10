@@ -58,7 +58,10 @@ func (e *executor) Exec(ctx context.Context, name string, opts ...Option) (out [
 		}
 	}()
 
-	out, err = e.exec(ctx, c, cmd)
+	out, err = e.exec(c, cmd)
+	if err != nil {
+		err = errors.WithStack(err)
+	}
 
 	signal.Reset()
 	close(sigCh)
@@ -67,7 +70,7 @@ func (e *executor) Exec(ctx context.Context, name string, opts ...Option) (out [
 	return
 }
 
-func (e *executor) exec(ctx context.Context, c *Command, cmd *exec.Cmd) (out []byte, err error) {
+func (e *executor) exec(c *Command, cmd *exec.Cmd) (out []byte, err error) {
 	if c.IOConnected {
 		var (
 			buf bytes.Buffer
