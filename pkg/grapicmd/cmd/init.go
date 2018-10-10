@@ -38,7 +38,6 @@ func newInitCommand(ac di.AppComponent) *cobra.Command {
 			u := usecase.NewInitializeProjectUsecase(
 				ac.UI(),
 				ac.Generator(),
-				ac.CommandFactory(),
 				ac.GexConfig(),
 				ac.Config().Version(),
 			)

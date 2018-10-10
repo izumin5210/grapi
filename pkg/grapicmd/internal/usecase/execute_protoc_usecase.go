@@ -2,9 +2,7 @@ package usecase
 
 import (
 	"context"
-	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/izumin5210/gex"
@@ -12,7 +10,7 @@ import (
 	"github.com/spf13/afero"
 
 	"github.com/izumin5210/grapi/pkg/clui"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/izumin5210/grapi/pkg/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/protoc"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
@@ -25,23 +23,23 @@ type ExecuteProtocUsecase interface {
 }
 
 type executeProtocUsecase struct {
-	cfg            *protoc.Config
-	fs             afero.Fs
-	ui             clui.UI
-	commandFactory module.CommandFactory
-	gexCfg         *gex.Config
-	rootDir        string
+	cfg             *protoc.Config
+	fs              afero.Fs
+	ui              clui.UI
+	commandExecutor command.Executor
+	gexCfg          *gex.Config
+	rootDir         string
 }
 
 // NewExecuteProtocUsecase returns an new ExecuteProtocUsecase implementation instance.
-func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui clui.UI, commandFactory module.CommandFactory, gexCfg *gex.Config, rootDir string) ExecuteProtocUsecase {
+func NewExecuteProtocUsecase(cfg *protoc.Config, fs afero.Fs, ui clui.UI, commandExecutor command.Executor, gexCfg *gex.Config, rootDir string) ExecuteProtocUsecase {
 	return &executeProtocUsecase{
-		cfg:            cfg,
-		fs:             fs,
-		ui:             ui,
-		commandFactory: commandFactory,
-		gexCfg:         gexCfg,
-		rootDir:        rootDir,
+		cfg:             cfg,
+		fs:              fs,
+		ui:              ui,
+		commandExecutor: commandExecutor,
+		gexCfg:          gexCfg,
+		rootDir:         rootDir,
 	}
 }
 
@@ -102,11 +100,13 @@ func (u *executeProtocUsecase) executeProtoc(protoPath string) error {
 		return errors.WithStack(err)
 	}
 	for _, cmd := range cmds {
-		path := strings.Join([]string{
-			filepath.Join(u.rootDir, u.gexCfg.BinDirName),
-			os.Getenv("PATH"),
-		}, string(filepath.ListSeparator))
-		out, err := u.commandFactory.Create(cmd).AddEnv("PATH", path).SetDir(u.rootDir).Exec()
+		out, err := u.commandExecutor.Exec(
+			context.TODO(),
+			cmd[0],
+			command.WithArgs(cmd[1:]...),
+			command.WithPATH(filepath.Join(u.rootDir, u.gexCfg.BinDirName)),
+			command.WithDir(u.rootDir),
+		)
 		if err != nil {
 			return errors.Wrapf(err, "failed to execute module: %s", string(out))
 		}

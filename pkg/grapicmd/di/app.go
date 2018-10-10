@@ -6,9 +6,9 @@ import (
 	"github.com/izumin5210/gex"
 
 	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/generator"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/script"
 )
@@ -18,7 +18,7 @@ type AppComponent interface {
 	Config() grapicmd.Config
 
 	UI() clui.UI
-	CommandFactory() module.CommandFactory
+	CommandExecutor() command.Executor
 	ScriptLoader() module.ScriptLoader
 	Generator() module.Generator
 
@@ -38,8 +38,8 @@ type appComponentImpl struct {
 	ui     clui.UI
 	uiOnce sync.Once
 
-	commandFactory     module.CommandFactory
-	commandFactoryOnce sync.Once
+	commandExecutor     command.Executor
+	commandExecutorOnce sync.Once
 
 	scriptLoader     module.ScriptLoader
 	scriptLoaderOnce sync.Once
@@ -63,18 +63,18 @@ func (c *appComponentImpl) UI() clui.UI {
 	return c.ui
 }
 
-func (c *appComponentImpl) CommandFactory() module.CommandFactory {
-	c.commandFactoryOnce.Do(func() {
+func (c *appComponentImpl) CommandExecutor() command.Executor {
+	c.commandExecutorOnce.Do(func() {
 		cfg := c.Config()
-		c.commandFactory = command.NewFactory(cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
+		c.commandExecutor = command.NewExecutor(cfg.OutWriter(), cfg.ErrWriter(), cfg.InReader())
 	})
-	return c.commandFactory
+	return c.commandExecutor
 }
 
 func (c *appComponentImpl) ScriptLoader() module.ScriptLoader {
 	c.scriptLoaderOnce.Do(func() {
 		cfg := c.Config()
-		c.scriptLoader = script.NewLoader(cfg.Fs(), c.CommandFactory(), cfg.RootDir())
+		c.scriptLoader = script.NewLoader(cfg.Fs(), c.CommandExecutor(), cfg.RootDir())
 	})
 	return c.scriptLoader
 }

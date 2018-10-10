@@ -18,22 +18,20 @@ type InitializeProjectUsecase interface {
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui clui.UI, generator module.ProjectGenerator, commandFactory module.CommandFactory, gexCfg *gex.Config, version string) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui clui.UI, generator module.ProjectGenerator, gexCfg *gex.Config, version string) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
-		ui:             ui,
-		generator:      generator,
-		commandFactory: commandFactory,
-		gexCfg:         gexCfg,
-		version:        version,
+		ui:        ui,
+		generator: generator,
+		gexCfg:    gexCfg,
+		version:   version,
 	}
 }
 
 type initializeProjectUsecase struct {
-	ui             clui.UI
-	generator      module.ProjectGenerator
-	commandFactory module.CommandFactory
-	gexCfg         *gex.Config
-	version        string
+	ui        clui.UI
+	generator module.ProjectGenerator
+	gexCfg    *gex.Config
+	version   string
 }
 
 func (u *initializeProjectUsecase) Perform(rootDir, pkgName string, headUsed bool) error {

@@ -1,21 +1,22 @@
 package script
 
 import (
+	"context"
 	"path/filepath"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/izumin5210/grapi/pkg/command"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 type script struct {
-	fs             afero.Fs
-	commandFactory module.CommandFactory
-	rootDir        string
-	name, binPath  string
-	srcPaths       []string
+	fs              afero.Fs
+	commandExecutor command.Executor
+	rootDir         string
+	name, binPath   string
+	srcPaths        []string
 }
 
 func (s *script) Name() string {
@@ -28,8 +29,7 @@ func (s *script) Build(args ...string) error {
 		return errors.WithStack(err)
 	}
 
-	cmd := s.commandFactory.Create(s.buildCmd(args))
-	_, err = cmd.ConnectIO().SetDir(s.rootDir).Exec()
+	_, err = s.commandExecutor.Exec(context.TODO(), "go", s.buildOpts(args)...)
 	if err != nil {
 		return errors.Wrapf(err, "failed to build %v", s.srcPaths)
 	}
@@ -38,15 +38,24 @@ func (s *script) Build(args ...string) error {
 }
 
 func (s *script) Run(args ...string) error {
-	cmd := s.commandFactory.Create(append([]string{s.binPath}, args...))
-	_, err := cmd.ConnectIO().SetDir(s.rootDir).Exec()
+	_, err := s.commandExecutor.Exec(
+		context.TODO(),
+		s.binPath,
+		command.WithArgs(args...),
+		command.WithDir(s.rootDir),
+		command.WithIOConnected(),
+	)
 	return errors.WithStack(err)
 }
 
-func (s *script) buildCmd(args []string) []string {
-	cmd := make([]string, 0, 3+len(args)+len(s.srcPaths))
-	cmd = append(cmd, "go", "build", "-o="+s.binPath)
-	cmd = append(cmd, args...)
-	cmd = append(cmd, s.srcPaths...)
-	return cmd
+func (s *script) buildOpts(args []string) []command.Option {
+	built := make([]string, 0, 3+len(args)+len(s.srcPaths))
+	built = append(built, "build", "-o="+s.binPath)
+	built = append(built, args...)
+	built = append(built, s.srcPaths...)
+	return []command.Option{
+		command.WithArgs(built...),
+		command.WithDir(s.rootDir),
+		command.WithIOConnected(),
+	}
 }

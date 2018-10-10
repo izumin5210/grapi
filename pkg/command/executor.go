@@ -2,6 +2,7 @@ package command
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"os"
 	"os/exec"
@@ -10,40 +11,36 @@ import (
 
 	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
-
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
-type command struct {
-	name        string
-	args        []string
-	dir         string
-	env         []string
-	ioConnected bool
-	outWriter   io.Writer
-	errWriter   io.Writer
-	inReader    io.Reader
+// NewExecutor creates a new Executor instance.
+func NewExecutor(
+	outWriter io.Writer,
+	errWriter io.Writer,
+	inReader io.Reader,
+) Executor {
+	return &executor{
+		outWriter: outWriter,
+		errWriter: errWriter,
+		inReader:  inReader,
+	}
 }
 
-func (c *command) SetDir(dir string) module.Command {
-	c.dir = dir
-	return c
+type executor struct {
+	outWriter io.Writer
+	errWriter io.Writer
+	inReader  io.Reader
 }
 
-func (c *command) AddEnv(key, value string) module.Command {
-	c.env = append(c.env, key+"="+value)
-	return c
-}
-
-func (c *command) ConnectIO() module.Command {
-	c.ioConnected = true
-	return c
-}
-
-func (c *command) Exec() (out []byte, err error) {
+func (e *executor) Exec(ctx context.Context, name string, opts ...Option) (out []byte, err error) {
 	var wg sync.WaitGroup
 
-	cmd := c.build()
+	c := buildCommand(name, opts)
+	clog.Debug("execute", "command", c)
+
+	cmd := exec.CommandContext(ctx, c.Name, c.Args...)
+	cmd.Dir = c.Dir
+	cmd.Env = c.Env
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh)
@@ -61,8 +58,20 @@ func (c *command) Exec() (out []byte, err error) {
 		}
 	}()
 
-	clog.Debug("execute", "command", cmd.Args, "dir", cmd.Dir)
-	if c.ioConnected {
+	out, err = e.exec(c, cmd)
+	if err != nil {
+		err = errors.WithStack(err)
+	}
+
+	signal.Reset()
+	close(sigCh)
+
+	wg.Wait()
+	return
+}
+
+func (e *executor) exec(c *Command, cmd *exec.Cmd) (out []byte, err error) {
+	if c.IOConnected {
 		var (
 			buf bytes.Buffer
 			wg  sync.WaitGroup
@@ -84,16 +93,16 @@ func (c *command) Exec() (out []byte, err error) {
 		wg.Add(2)
 		go func() {
 			defer wg.Done()
-			io.Copy(c.outWriter, io.TeeReader(outReader, &buf))
+			io.Copy(e.outWriter, io.TeeReader(outReader, &buf))
 		}()
 		closers = append(closers, outReader.Close)
 		go func() {
 			defer wg.Done()
-			io.Copy(c.errWriter, io.TeeReader(errReader, &buf))
+			io.Copy(e.errWriter, io.TeeReader(errReader, &buf))
 		}()
 		closers = append(closers, errReader.Close)
 
-		cmd.Stdin = c.inReader
+		cmd.Stdin = e.inReader
 
 		err = cmd.Run()
 		for _, c := range closers {
@@ -106,16 +115,5 @@ func (c *command) Exec() (out []byte, err error) {
 		out, err = cmd.CombinedOutput()
 	}
 
-	signal.Reset()
-	close(sigCh)
-
-	wg.Wait()
 	return
-}
-
-func (c *command) build() *exec.Cmd {
-	cmd := exec.Command(c.name, c.args...)
-	cmd.Dir = c.dir
-	cmd.Env = c.env
-	return cmd
 }
