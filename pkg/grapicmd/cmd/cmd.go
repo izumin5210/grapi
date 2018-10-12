@@ -1,18 +1,22 @@
 package cmd
 
 import (
-	"path/filepath"
-
 	"github.com/izumin5210/clicontrib/pkg/ccmd"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 )
 
-// NewGrapiCommand creates a new command object.
-func NewGrapiCommand(cfg *grapicmd.Config) *cobra.Command {
+func provideGrapiCommand(
+	cfg *grapicmd.Config,
+	initCmd initCmd,
+	generateCmd generateCmd,
+	destroyCmd destroyCmd,
+	protocCmd protocCmd,
+	buildCmd buildCmd,
+	versionCmd versionCmd,
+	userDefinedCmds userDefinedCmds,
+) *cobra.Command {
 	var err error
 
 	cmd := &cobra.Command{
@@ -32,31 +36,15 @@ func NewGrapiCommand(cfg *grapicmd.Config) *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName+".toml", "config file")
 
-	ac := di.NewAppComponent(cfg)
-
-	cmd.AddCommand(newInitCommand(ac))
-	cmd.AddCommand(newGenerateCommand(ac))
-	cmd.AddCommand(newDestroyCommand(ac))
-	cmd.AddCommand(newProtocCommand(ac))
-	cmd.AddCommand(newBuildCommand(ac))
-	cmd.AddCommand(newVersionCommand(cfg))
-
-	if cfg.InsideApp {
-		scriptLoader := ac.ScriptLoader()
-
-		err = scriptLoader.Load(filepath.Join(cfg.RootDir, "cmd"))
-		if err != nil {
-			err = errors.Wrap(err, "failed to load user-defined commands")
-		}
-
-		udCmds := make([]*cobra.Command, 0)
-		for _, name := range scriptLoader.Names() {
-			udCmds = append(udCmds, newUserDefinedCommand(ac.UI(), scriptLoader, name))
-		}
-		if len(udCmds) > 0 {
-			cmd.AddCommand(udCmds...)
-		}
-	}
+	cmd.AddCommand(
+		initCmd,
+		generateCmd,
+		destroyCmd,
+		protocCmd,
+		buildCmd,
+		versionCmd,
+	)
+	cmd.AddCommand(userDefinedCmds...)
 
 	return cmd
 }

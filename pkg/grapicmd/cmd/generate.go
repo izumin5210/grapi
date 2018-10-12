@@ -4,26 +4,36 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/di"
+	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
-func newGenerateCommand(ac di.AppComponent) *cobra.Command {
+type generateCmd *cobra.Command
+type genSvcCmd *cobra.Command
+type genScaffoldSvcCmd *cobra.Command
+type genCmdCmd *cobra.Command
+
+func provideGenerateCommand(
+	genSvcCmd genSvcCmd,
+	genScaffoldSvcCmd genScaffoldSvcCmd,
+	genCmdCmd genCmdCmd,
+) generateCmd {
 	cmd := &cobra.Command{
 		Use:     "generate GENERATOR",
 		Short:   "Generate new code",
 		Aliases: []string{"g", "gen"},
 	}
 
-	cmd.AddCommand(newGenerateServiceCommand(ac))
-	cmd.AddCommand(newGenerateScaffoldServiceCommand(ac))
-	cmd.AddCommand(newGenerateCommandCommand(ac))
+	cmd.AddCommand(genSvcCmd)
+	cmd.AddCommand(genScaffoldSvcCmd)
+	cmd.AddCommand(genCmdCmd)
 
 	return cmd
 }
 
-func newGenerateServiceCommand(ac di.AppComponent) *cobra.Command {
+func provideGenerateServiceCommand(cfg *grapicmd.Config, ui clui.UI, g module.Generator, u usecase.ExecuteProtocUsecase) genSvcCmd {
 	var (
 		skipTest     bool
 		resourceName string
@@ -36,21 +46,18 @@ func newGenerateServiceCommand(ac di.AppComponent) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cfg := ac.Config()
-
 			if !cfg.InsideApp {
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
-			ac.UI().Section("Generate service")
+			ui.Section("Generate service")
 			genCfg := module.ServiceGenerationConfig{ResourceName: resourceName, Methods: args[1:], SkipTest: skipTest}
-			err := errors.WithStack(ac.Generator().GenerateService(args[0], genCfg))
+			err := errors.WithStack(g.GenerateService(args[0], genCfg))
 			if err != nil {
 				return err
 			}
 
-			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig, cfg.Fs, ac.UI(), ac.CommandExecutor(), ac.GexConfig(), cfg.RootDir)
-			return errors.WithStack(protocUsecase.Perform())
+			return errors.WithStack(u.Perform())
 		},
 	}
 
@@ -60,7 +67,7 @@ func newGenerateServiceCommand(ac di.AppComponent) *cobra.Command {
 	return cmd
 }
 
-func newGenerateScaffoldServiceCommand(ac di.AppComponent) *cobra.Command {
+func provideGenerateScaffoldServiceCommand(cfg *grapicmd.Config, ui clui.UI, g module.Generator, u usecase.ExecuteProtocUsecase) genScaffoldSvcCmd {
 	var (
 		skipTest     bool
 		resourceName string
@@ -73,21 +80,18 @@ func newGenerateScaffoldServiceCommand(ac di.AppComponent) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cfg := ac.Config()
-
 			if !cfg.InsideApp {
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
-			ac.UI().Section("Scaffold service")
+			ui.Section("Scaffold service")
 			genCfg := module.ServiceGenerationConfig{ResourceName: resourceName, SkipTest: skipTest}
-			err := errors.WithStack(ac.Generator().ScaffoldService(args[0], genCfg))
+			err := errors.WithStack(g.ScaffoldService(args[0], genCfg))
 			if err != nil {
 				return err
 			}
 
-			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig, cfg.Fs, ac.UI(), ac.CommandExecutor(), ac.GexConfig(), cfg.RootDir)
-			return errors.WithStack(protocUsecase.Perform())
+			return errors.WithStack(u.Perform())
 		},
 	}
 
@@ -97,7 +101,7 @@ func newGenerateScaffoldServiceCommand(ac di.AppComponent) *cobra.Command {
 	return cmd
 }
 
-func newGenerateCommandCommand(ac di.AppComponent) *cobra.Command {
+func provideGenerateCommandCommand(cfg *grapicmd.Config, g module.Generator) genCmdCmd {
 	return &cobra.Command{
 		Use:           "command NAME",
 		Short:         "Generate a new command",
@@ -105,11 +109,11 @@ func newGenerateCommandCommand(ac di.AppComponent) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ac.Config().InsideApp {
+			if !cfg.InsideApp {
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
-			return errors.WithStack(ac.Generator().GenerateCommand(args[0]))
+			return errors.WithStack(g.GenerateCommand(args[0]))
 		},
 	}
 }

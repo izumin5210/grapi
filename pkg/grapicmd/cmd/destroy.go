@@ -1,25 +1,30 @@
 package cmd
 
 import (
-	"github.com/izumin5210/grapi/pkg/grapicmd/di"
+	grapicmd "github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
-func newDestroyCommand(ac di.AppComponent) *cobra.Command {
+type destroyCmd *cobra.Command
+type destroySvcCmd *cobra.Command
+type destroyCmdCmd *cobra.Command
+
+func provideDestroyCommand(destroySvcCmd destroySvcCmd, destroyCmdCmd destroyCmdCmd) destroyCmd {
 	cmd := &cobra.Command{
 		Use:     "destroy GENERATOR",
 		Short:   "Destroy codes",
 		Aliases: []string{"d"},
 	}
 
-	cmd.AddCommand(newDestroyServiceCommand(ac))
-	cmd.AddCommand(newDestroyCommandCommand(ac))
+	cmd.AddCommand(destroySvcCmd)
+	cmd.AddCommand(destroyCmdCmd)
 
 	return cmd
 }
 
-func newDestroyServiceCommand(ac di.AppComponent) *cobra.Command {
+func provideDestroyServiceCommand(cfg *grapicmd.Config, g module.Generator) destroySvcCmd {
 	return &cobra.Command{
 		Use:           "service NAME",
 		Short:         "Destroy a service",
@@ -27,16 +32,16 @@ func newDestroyServiceCommand(ac di.AppComponent) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ac.Config().InsideApp {
+			if !cfg.InsideApp {
 				return errors.New("destroy command should execute inside a grapi application directory")
 			}
 
-			return errors.WithStack(errors.WithStack(ac.Generator().DestroyService(args[0])))
+			return errors.WithStack(g.DestroyService(args[0]))
 		},
 	}
 }
 
-func newDestroyCommandCommand(ac di.AppComponent) *cobra.Command {
+func provideDestroyCommandCommand(cfg *grapicmd.Config, g module.Generator) destroyCmdCmd {
 	return &cobra.Command{
 		Use:           "command NAME",
 		Short:         "Destroy a command",
@@ -44,11 +49,11 @@ func newDestroyCommandCommand(ac di.AppComponent) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ac.Config().InsideApp {
+			if !cfg.InsideApp {
 				return errors.New("destroy command should execute inside a grapi application directory")
 			}
 
-			return errors.WithStack(ac.Generator().DestroyCommand(args[0]))
+			return errors.WithStack(g.DestroyCommand(args[0]))
 		},
 	}
 }

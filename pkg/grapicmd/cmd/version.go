@@ -9,7 +9,9 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 )
 
-func newVersionCommand(cfg *grapicmd.Config) *cobra.Command {
+type versionCmd *cobra.Command
+
+func provideVersionCommand(cfg *grapicmd.Config) versionCmd {
 	return &cobra.Command{
 		Use:           "version",
 		Short:         "Print version information",
