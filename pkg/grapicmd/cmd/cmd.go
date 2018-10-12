@@ -12,11 +12,11 @@ import (
 )
 
 // NewGrapiCommand creates a new command object.
-func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
+func NewGrapiCommand(cfg *grapicmd.Config) *cobra.Command {
 	var err error
 
 	cmd := &cobra.Command{
-		Use:           cfg.AppName(),
+		Use:           cfg.AppName,
 		Short:         "JSON API framework implemented with gRPC and Gateway",
 		Long:          "",
 		SilenceErrors: true,
@@ -30,7 +30,7 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	cobra.OnInitialize(func() { cfg.Init(cfgFile) })
 	ccmd.HandleLogFlags(cmd)
 
-	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName()+".toml", "config file")
+	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName+".toml", "config file")
 
 	ac := di.NewAppComponent(cfg)
 
@@ -41,10 +41,10 @@ func NewGrapiCommand(cfg grapicmd.Config) *cobra.Command {
 	cmd.AddCommand(newBuildCommand(ac))
 	cmd.AddCommand(newVersionCommand(cfg))
 
-	if cfg.IsInsideApp() {
+	if cfg.InsideApp {
 		scriptLoader := ac.ScriptLoader()
 
-		err = scriptLoader.Load(filepath.Join(cfg.RootDir(), "cmd"))
+		err = scriptLoader.Load(filepath.Join(cfg.RootDir, "cmd"))
 		if err != nil {
 			err = errors.Wrap(err, "failed to load user-defined commands")
 		}

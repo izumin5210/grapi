@@ -38,7 +38,7 @@ func newGenerateServiceCommand(ac di.AppComponent) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := ac.Config()
 
-			if !cfg.IsInsideApp() {
+			if !cfg.InsideApp {
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
@@ -49,7 +49,7 @@ func newGenerateServiceCommand(ac di.AppComponent) *cobra.Command {
 				return err
 			}
 
-			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ac.UI(), ac.CommandExecutor(), ac.GexConfig(), cfg.RootDir())
+			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig, cfg.Fs, ac.UI(), ac.CommandExecutor(), ac.GexConfig(), cfg.RootDir)
 			return errors.WithStack(protocUsecase.Perform())
 		},
 	}
@@ -75,7 +75,7 @@ func newGenerateScaffoldServiceCommand(ac di.AppComponent) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := ac.Config()
 
-			if !cfg.IsInsideApp() {
+			if !cfg.InsideApp {
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
@@ -86,7 +86,7 @@ func newGenerateScaffoldServiceCommand(ac di.AppComponent) *cobra.Command {
 				return err
 			}
 
-			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig(), cfg.Fs(), ac.UI(), ac.CommandExecutor(), ac.GexConfig(), cfg.RootDir())
+			protocUsecase := usecase.NewExecuteProtocUsecase(cfg.ProtocConfig, cfg.Fs, ac.UI(), ac.CommandExecutor(), ac.GexConfig(), cfg.RootDir)
 			return errors.WithStack(protocUsecase.Perform())
 		},
 	}
@@ -105,7 +105,7 @@ func newGenerateCommandCommand(ac di.AppComponent) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ac.Config().IsInsideApp() {
+			if !ac.Config().InsideApp {
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 

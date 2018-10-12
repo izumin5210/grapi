@@ -9,7 +9,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 )
 
-func newVersionCommand(cfg grapicmd.Config) *cobra.Command {
+func newVersionCommand(cfg *grapicmd.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:           "version",
 		Short:         "Print version information",
@@ -17,12 +17,12 @@ func newVersionCommand(cfg grapicmd.Config) *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Run: func(cmd *cobra.Command, _ []string) {
-			buf := bytes.NewBufferString(cfg.AppName() + " " + cfg.Version())
-			if cfg.Prebuilt() {
-				buf.WriteString(" (" + cfg.BuildDate() + " " + cfg.Revision() + ")")
+			buf := bytes.NewBufferString(cfg.AppName + " " + cfg.Version)
+			if cfg.Prebuilt {
+				buf.WriteString(" (" + cfg.BuildDate + " " + cfg.Revision + ")")
 			}
 			buf.WriteString("\n")
-			fmt.Fprintf(cfg.OutWriter(), buf.String())
+			fmt.Fprintf(cfg.OutWriter, buf.String())
 		},
 	}
 }

@@ -16,7 +16,7 @@ func newBuildCommand(ac di.AppComponent) *cobra.Command {
 		RunE: func(c *cobra.Command, args []string) (err error) {
 			cfg := ac.Config()
 
-			if !cfg.IsInsideApp() {
+			if !cfg.InsideApp {
 				return errors.New("protoc command should be execute inside a grapi application directory")
 			}
 

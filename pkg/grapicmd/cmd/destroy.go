@@ -27,7 +27,7 @@ func newDestroyServiceCommand(ac di.AppComponent) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ac.Config().IsInsideApp() {
+			if !ac.Config().InsideApp {
 				return errors.New("destroy command should execute inside a grapi application directory")
 			}
 
@@ -44,7 +44,7 @@ func newDestroyCommandCommand(ac di.AppComponent) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ac.Config().IsInsideApp() {
+			if !ac.Config().InsideApp {
 				return errors.New("destroy command should execute inside a grapi application directory")
 			}
 

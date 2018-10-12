@@ -39,7 +39,7 @@ func newInitCommand(ac di.AppComponent) *cobra.Command {
 				ac.UI(),
 				ac.Generator(),
 				ac.GexConfig(),
-				ac.Config().Version(),
+				ac.Config().Version,
 			)
 
 			return errors.WithStack(u.Perform(root, pkgName, headUsed))
@@ -52,21 +52,21 @@ func newInitCommand(ac di.AppComponent) *cobra.Command {
 	return cmd
 }
 
-func parseInitArgs(cfg grapicmd.Config, args []string) (root string, err error) {
+func parseInitArgs(cfg *grapicmd.Config, args []string) (root string, err error) {
 	if argCnt := len(args); argCnt != 1 {
 		err = errors.Errorf("invalid argument count: want 1, got %d", argCnt)
 		return
 	}
 
 	arg := args[0]
-	root = cfg.CurrentDir()
+	root = cfg.CurrentDir
 
 	if arg == "." {
 		return
 	}
 	root = arg
 	if !filepath.IsAbs(arg) {
-		root = filepath.Join(cfg.CurrentDir(), arg)
+		root = filepath.Join(cfg.CurrentDir, arg)
 	}
 	return
 }
