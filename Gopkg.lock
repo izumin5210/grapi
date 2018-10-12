@@ -64,6 +64,18 @@
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:df952a62d984399a73ad0790d068685c97df728775f37085fc4e4a722702e90f"
+  name = "github.com/google/go-cloud"
+  packages = [
+    "wire",
+    "wire/cmd/wire",
+    "wire/internal/wire",
+  ]
+  pruneopts = "UT"
+  revision = "d51dabf6bc34d700251536a5e943a85a0339bc58"
+  version = "0.3.0"
+
+[[projects]]
   digest = "1:2e3c336fc7fde5c984d2841455a658a6d626450b1754a854b3b32e7a8f49a07a"
   name = "github.com/google/go-cmp"
   packages = [
@@ -687,6 +699,8 @@
     "github.com/golang/mock/mockgen",
     "github.com/golang/protobuf/proto",
     "github.com/golang/protobuf/ptypes/empty",
+    "github.com/google/go-cloud/wire",
+    "github.com/google/go-cloud/wire/cmd/wire",
     "github.com/google/go-cmp/cmp",
     "github.com/grpc-ecosystem/go-grpc-middleware",
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
