@@ -41,27 +41,33 @@ func NewConfig(
 	in io.Reader,
 	out, err io.Writer,
 ) *Config {
-	v := viper.New()
 	afs := afero.NewOsFs()
+	v := viper.New()
+	v.SetFs(afs)
 	rootDir, insideApp := fs.LookupRoot(afs, currentDir)
 	return &Config{
-		Fs:         afs,
-		CurrentDir: currentDir,
-		RootDir:    rootDir,
-		InsideApp:  insideApp,
-		AppName:    appName,
-		Version:    version,
-		Revision:   revision,
-		BuildDate:  buildDate,
-		Prebuilt:   prebuilt,
-		InReader:   in,
-		OutWriter:  out,
-		ErrWriter:  err,
-		viper:      v,
+		Fs:           afs,
+		CurrentDir:   currentDir,
+		RootDir:      rootDir,
+		InsideApp:    insideApp,
+		AppName:      appName,
+		Version:      version,
+		Revision:     revision,
+		BuildDate:    buildDate,
+		Prebuilt:     prebuilt,
+		InReader:     in,
+		OutWriter:    out,
+		ErrWriter:    err,
+		ProtocConfig: &protoc.Config{},
+		viper:        v,
 	}
 }
 
 func (c *Config) Init(cfgFile string) error {
+	if !c.InsideApp {
+		return nil
+	}
+
 	c.viper.SetConfigFile(cfgFile)
 	err := c.viper.ReadInConfig()
 	if err != nil {
@@ -69,8 +75,7 @@ func (c *Config) Init(cfgFile string) error {
 	}
 	c.Package = c.viper.GetString("package")
 	c.ServerDir = c.viper.GetString("grapi.server_dir")
-	cfg := &protoc.Config{}
-	err = c.viper.UnmarshalKey("protoc", cfg)
+	err = c.viper.UnmarshalKey("protoc", c.ProtocConfig)
 	if err != nil {
 		return errors.WithStack(err)
 	}

@@ -10,7 +10,7 @@ import (
 
 // NewGrapiCommand creates a new command object.
 func NewGrapiCommand(cfg *grapicmd.Config) *cobra.Command {
-	var err error
+	var cfgFile string
 
 	cmd := &cobra.Command{
 		Use:           cfg.AppName,
@@ -18,13 +18,11 @@ func NewGrapiCommand(cfg *grapicmd.Config) *cobra.Command {
 		Long:          "",
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return err
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			return errors.WithStack(cfg.Init(cfgFile))
 		},
 	}
 
-	var cfgFile string
-	cobra.OnInitialize(func() { err = errors.WithStack(cfg.Init(cfgFile)) })
 	ccmd.HandleLogFlags(cmd)
 
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName+".toml", "config file")
