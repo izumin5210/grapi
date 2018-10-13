@@ -1,6 +1,8 @@
 package di
 
 import (
+	"sync"
+
 	"github.com/google/go-cloud/wire"
 	"github.com/izumin5210/gex"
 
@@ -13,8 +15,21 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
+var (
+	ui   clui.UI
+	uiMu sync.Mutex
+
+	gexCfg   *gex.Config
+	gexCfgMu sync.Mutex
+)
+
 func ProvideUI(cfg *grapicmd.Config) clui.UI {
-	return clui.New(cfg.OutWriter, cfg.InReader)
+	uiMu.Lock()
+	defer uiMu.Unlock()
+	if ui == nil {
+		ui = clui.New(cfg.OutWriter, cfg.InReader)
+	}
+	return ui
 }
 
 func ProvideCommandExecutor(cfg *grapicmd.Config, ui clui.UI) command.Executor {
@@ -39,15 +54,20 @@ func ProvideScriptLoader(cfg *grapicmd.Config, executor command.Executor) module
 }
 
 func ProvideGexConfig(cfg *grapicmd.Config) *gex.Config {
-	return &gex.Config{
-		OutWriter:  cfg.OutWriter,
-		ErrWriter:  cfg.ErrWriter,
-		InReader:   cfg.InReader,
-		FS:         cfg.Fs,
-		WorkingDir: cfg.RootDir,
-		// TODO: set verbose flag
-		// TODO: set logger
+	gexCfgMu.Lock()
+	defer gexCfgMu.Unlock()
+	if gexCfg == nil {
+		gexCfg = &gex.Config{
+			OutWriter:  cfg.OutWriter,
+			ErrWriter:  cfg.ErrWriter,
+			InReader:   cfg.InReader,
+			FS:         cfg.Fs,
+			WorkingDir: cfg.RootDir,
+			// TODO: set verbose flag
+			// TODO: set logger
+		}
 	}
+	return gexCfg
 }
 
 func ProvideInitializeProjectUsecase(cfg *grapicmd.Config, gexCfg *gex.Config, ui clui.UI, generator module.Generator) usecase.InitializeProjectUsecase {
