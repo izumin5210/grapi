@@ -45,6 +45,7 @@ func TestWrapper_Exec(t *testing.T) {
 	dieIf(t, fs.MkdirAll(binDir, 0755))
 	dieIf(t, fs.MkdirAll(protosDir, 0755))
 	dieIf(t, afero.WriteFile(fs, filepath.Join(rootDir, "api", "should_be_ignored.proto"), []byte{}, 0644))
+	dieIf(t, afero.WriteFile(fs, filepath.Join(rootDir, "api", "should_be_ignored_proto"), []byte{}, 0644))
 	dieIf(t, afero.WriteFile(fs, filepath.Join(protosDir, "book.proto"), []byte{}, 0644))
 	dieIf(t, afero.WriteFile(fs, filepath.Join(protosDir, "types", "users.proto"), []byte{}, 0644))
 
