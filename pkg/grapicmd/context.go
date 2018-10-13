@@ -34,8 +34,10 @@ type Ctx struct {
 
 // Config stores general setting params and provides accessors for them.
 type Config struct {
-	ServerDir string
-	Package   string
+	Package string
+	Grapi   struct {
+		ServerDir string
+	}
 }
 
 func (c *Ctx) Init(cfgFile string) error {

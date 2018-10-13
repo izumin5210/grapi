@@ -43,7 +43,7 @@ func ProvideGenerator(ctx *grapicmd.Ctx, ui clui.UI) module.Generator {
 		ctx.RootDir,
 		ctx.ProtocConfig.ProtosDir,
 		ctx.ProtocConfig.OutDir,
-		ctx.Config.ServerDir,
+		ctx.Config.Grapi.ServerDir,
 		ctx.Config.Package,
 		ctx.Version,
 	)
