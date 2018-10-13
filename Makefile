@@ -56,14 +56,10 @@ $(foreach src,$(wildcard ./cmd/*),$(eval $(call cmd-tmpl,$(src))))
 #----------------------------------------------------------------
 .PHONY: setup
 setup:
-ifeq ($(shell go env GOMOD),)
 ifdef CI
 	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 endif
 	dep ensure -v -vendor-only
-else
-	go mod download
-endif
 	@go get github.com/izumin5210/gex/cmd/gex
 	gex --build --verbose
 

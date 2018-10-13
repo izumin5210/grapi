@@ -20,7 +20,6 @@ branches:
 
 cache:
   directories:
-  - $GOPATH/pkg/mod
   - $GOPATH/pkg/dep
   - $HOME/include
   - $HOME/bin
@@ -46,9 +45,7 @@ jobs:
     before_install: ./_script/ci-install
 
   - <<: *test
-    env:
-    - GO111MODULE=on
-    - TEST_TASK=cover
+    env: TEST_TASK=cover
     after_success: bash <(curl -s https://codecov.io/bash)
 
   - <<: *test
