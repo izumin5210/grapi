@@ -15,6 +15,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
+// Wrapper can execute protoc commands for current project's proto files.
 type Wrapper interface {
 	Exec(context.Context) error
 }
@@ -29,6 +30,7 @@ type wrapperImpl struct {
 	binDir   string
 }
 
+// NewWrapper creates a new Wrapper instance.
 func NewWrapper(cfg *Config, fs afero.Fs, execer exec.Interface, ui clui.UI, toolRepo tool.Repository, rootDir, binDir string) Wrapper {
 	return &wrapperImpl{
 		cfg:      cfg,
