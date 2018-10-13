@@ -23,46 +23,46 @@ var (
 	gexCfgMu sync.Mutex
 )
 
-func ProvideUI(cfg *grapicmd.Config) clui.UI {
+func ProvideUI(ctx *grapicmd.Ctx) clui.UI {
 	uiMu.Lock()
 	defer uiMu.Unlock()
 	if ui == nil {
-		ui = clui.New(cfg.OutWriter, cfg.InReader)
+		ui = clui.New(ctx.OutWriter, ctx.InReader)
 	}
 	return ui
 }
 
-func ProvideCommandExecutor(cfg *grapicmd.Config, ui clui.UI) command.Executor {
-	return command.NewExecutor(cfg.OutWriter, cfg.ErrWriter, cfg.InReader)
+func ProvideCommandExecutor(ctx *grapicmd.Ctx, ui clui.UI) command.Executor {
+	return command.NewExecutor(ctx.OutWriter, ctx.ErrWriter, ctx.InReader)
 }
 
-func ProvideGenerator(cfg *grapicmd.Config, ui clui.UI) module.Generator {
+func ProvideGenerator(ctx *grapicmd.Ctx, ui clui.UI) module.Generator {
 	return generator.New(
-		cfg.Fs,
+		ctx.FS,
 		ui,
-		cfg.RootDir,
-		cfg.ProtocConfig.ProtosDir,
-		cfg.ProtocConfig.OutDir,
-		cfg.ServerDir,
-		cfg.Package,
-		cfg.Version,
+		ctx.RootDir,
+		ctx.ProtocConfig.ProtosDir,
+		ctx.ProtocConfig.OutDir,
+		ctx.Config.Grapi.ServerDir,
+		ctx.Config.Package,
+		ctx.Version,
 	)
 }
 
-func ProvideScriptLoader(cfg *grapicmd.Config, executor command.Executor) module.ScriptLoader {
-	return script.NewLoader(cfg.Fs, executor, cfg.RootDir)
+func ProvideScriptLoader(ctx *grapicmd.Ctx, executor command.Executor) module.ScriptLoader {
+	return script.NewLoader(ctx.FS, executor, ctx.RootDir)
 }
 
-func ProvideGexConfig(cfg *grapicmd.Config) *gex.Config {
+func ProvideGexConfig(ctx *grapicmd.Ctx) *gex.Config {
 	gexCfgMu.Lock()
 	defer gexCfgMu.Unlock()
 	if gexCfg == nil {
 		gexCfg = &gex.Config{
-			OutWriter:  cfg.OutWriter,
-			ErrWriter:  cfg.ErrWriter,
-			InReader:   cfg.InReader,
-			FS:         cfg.Fs,
-			WorkingDir: cfg.RootDir,
+			OutWriter:  ctx.OutWriter,
+			ErrWriter:  ctx.ErrWriter,
+			InReader:   ctx.InReader,
+			FS:         ctx.FS,
+			WorkingDir: ctx.RootDir,
 			// TODO: set verbose flag
 			// TODO: set logger
 		}
@@ -70,23 +70,23 @@ func ProvideGexConfig(cfg *grapicmd.Config) *gex.Config {
 	return gexCfg
 }
 
-func ProvideInitializeProjectUsecase(cfg *grapicmd.Config, gexCfg *gex.Config, ui clui.UI, generator module.Generator) usecase.InitializeProjectUsecase {
+func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui clui.UI, generator module.Generator) usecase.InitializeProjectUsecase {
 	return usecase.NewInitializeProjectUsecase(
 		ui,
 		generator,
 		gexCfg,
-		cfg.Version,
+		ctx.Version,
 	)
 }
 
-func ProvideExecuteProtocUsecase(cfg *grapicmd.Config, gexCfg *gex.Config, ui clui.UI, executor command.Executor, generator module.Generator) usecase.ExecuteProtocUsecase {
+func ProvideExecuteProtocUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui clui.UI, executor command.Executor, generator module.Generator) usecase.ExecuteProtocUsecase {
 	return usecase.NewExecuteProtocUsecase(
-		cfg.ProtocConfig,
-		cfg.Fs,
+		&ctx.ProtocConfig,
+		ctx.FS,
 		ui,
 		executor,
 		gexCfg,
-		cfg.RootDir,
+		ctx.RootDir,
 	)
 }
 

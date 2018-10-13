@@ -15,7 +15,7 @@ var (
 	tmplPaths []string
 )
 
-func newInitCommand(cfg *grapicmd.Config) *cobra.Command {
+func newInitCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	var (
 		headUsed bool
 		pkgName  string
@@ -28,13 +28,13 @@ func newInitCommand(cfg *grapicmd.Config) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			root, err := parseInitArgs(cfg, args)
+			root, err := parseInitArgs(ctx, args)
 			if err != nil {
 				return errors.WithStack(err)
 			}
 			clog.Debug("parseInitArgs", "root", root)
 
-			return errors.WithStack(di.NewInitializeProjectUsecase(cfg).Perform(root, pkgName, headUsed))
+			return errors.WithStack(di.NewInitializeProjectUsecase(ctx).Perform(root, pkgName, headUsed))
 		},
 	}
 
@@ -44,21 +44,21 @@ func newInitCommand(cfg *grapicmd.Config) *cobra.Command {
 	return cmd
 }
 
-func parseInitArgs(cfg *grapicmd.Config, args []string) (root string, err error) {
+func parseInitArgs(ctx *grapicmd.Ctx, args []string) (root string, err error) {
 	if argCnt := len(args); argCnt != 1 {
 		err = errors.Errorf("invalid argument count: want 1, got %d", argCnt)
 		return
 	}
 
 	arg := args[0]
-	root = cfg.CurrentDir
+	root = ctx.CurrentDir
 
 	if arg == "." {
 		return
 	}
 	root = arg
 	if !filepath.IsAbs(arg) {
-		root = filepath.Join(cfg.CurrentDir, arg)
+		root = filepath.Join(ctx.CurrentDir, arg)
 	}
 	return
 }

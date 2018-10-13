@@ -12,20 +12,20 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
-func newUserDefinedCommands(cfg *grapicmd.Config) (cmds []*cobra.Command) {
-	if !cfg.InsideApp {
+func newUserDefinedCommands(ctx *grapicmd.Ctx) (cmds []*cobra.Command) {
+	if !ctx.InsideApp {
 		return
 	}
 
-	scriptLoader := di.NewScriptLoader(cfg)
+	scriptLoader := di.NewScriptLoader(ctx)
 
-	err := scriptLoader.Load(filepath.Join(cfg.RootDir, "cmd"))
+	err := scriptLoader.Load(filepath.Join(ctx.RootDir, "cmd"))
 	if err != nil {
 		// TODO: log
 		return
 	}
 
-	ui := di.NewUI(cfg)
+	ui := di.NewUI(ctx)
 
 	for _, name := range scriptLoader.Names() {
 		cmds = append(cmds, newUserDefinedCommand(ui, scriptLoader, name))
@@ -43,6 +43,7 @@ func newUserDefinedCommand(ui clui.UI, scriptLoader module.ScriptLoader, name st
 			script, ok := scriptLoader.Get(name)
 			if !ok {
 				err = errors.Wrapf(err, "faild to find subcommand %s", name)
+				return
 			}
 
 			pos := len(args)

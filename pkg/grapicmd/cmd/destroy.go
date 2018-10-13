@@ -7,20 +7,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newDestroyCommand(cfg *grapicmd.Config) *cobra.Command {
+func newDestroyCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "destroy GENERATOR",
 		Short:   "Destroy codes",
 		Aliases: []string{"d"},
 	}
 
-	cmd.AddCommand(newDestroyServiceCommand(cfg))
-	cmd.AddCommand(newDestroyCommandCommand(cfg))
+	cmd.AddCommand(newDestroyServiceCommand(ctx))
+	cmd.AddCommand(newDestroyCommandCommand(ctx))
 
 	return cmd
 }
 
-func newDestroyServiceCommand(cfg *grapicmd.Config) *cobra.Command {
+func newDestroyServiceCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	return &cobra.Command{
 		Use:           "service NAME",
 		Short:         "Destroy a service",
@@ -28,16 +28,16 @@ func newDestroyServiceCommand(cfg *grapicmd.Config) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !cfg.InsideApp {
+			if !ctx.InsideApp {
 				return errors.New("destroy command should execute inside a grapi application directory")
 			}
 
-			return errors.WithStack(di.NewGenerator(cfg).DestroyService(args[0]))
+			return errors.WithStack(di.NewGenerator(ctx).DestroyService(args[0]))
 		},
 	}
 }
 
-func newDestroyCommandCommand(cfg *grapicmd.Config) *cobra.Command {
+func newDestroyCommandCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	return &cobra.Command{
 		Use:           "command NAME",
 		Short:         "Destroy a command",
@@ -45,11 +45,11 @@ func newDestroyCommandCommand(cfg *grapicmd.Config) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !cfg.InsideApp {
+			if !ctx.InsideApp {
 				return errors.New("destroy command should execute inside a grapi application directory")
 			}
 
-			return errors.WithStack(di.NewGenerator(cfg).DestroyCommand(args[0]))
+			return errors.WithStack(di.NewGenerator(ctx).DestroyCommand(args[0]))
 		},
 	}
 }

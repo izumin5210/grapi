@@ -6,9 +6,10 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/mattn/go-colorable"
+
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/cmd"
-	"github.com/mattn/go-colorable"
 )
 
 var (
@@ -30,17 +31,18 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	err = cmd.NewGrapiCommand(grapicmd.NewConfig(
-		cwd,
-		name,
-		version,
-		revision,
-		buildDate,
-		prebuilt,
-		inReader,
-		outWriter,
-		errWriter,
-	)).Execute()
+
+	err = cmd.NewGrapiCommand(&grapicmd.Ctx{
+		InReader:   inReader,
+		OutWriter:  outWriter,
+		ErrWriter:  errWriter,
+		CurrentDir: cwd,
+		AppName:    name,
+		Version:    version,
+		Revision:   revision,
+		BuildDate:  buildDate,
+		Prebuilt:   prebuilt,
+	}).Execute()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
