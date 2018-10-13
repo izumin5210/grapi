@@ -4,14 +4,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 )
 
-type buildCmd *cobra.Command
-
-func provideBuildCommand(cfg *grapicmd.Config, ui clui.UI, scriptLoader module.ScriptLoader) buildCmd {
+func newBuildCommand(cfg *grapicmd.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:           "build [TARGET]... [-- BUILD_OPTIONS]",
 		Short:         "Build commands",
@@ -27,6 +24,9 @@ func provideBuildCommand(cfg *grapicmd.Config, ui clui.UI, scriptLoader module.S
 				nameSet[n] = true
 			}
 			isAll := len(args) == 0
+
+			scriptLoader := di.NewScriptLoader(cfg)
+			ui := di.NewUI(cfg)
 
 			for _, name := range scriptLoader.Names() {
 				script, ok := scriptLoader.Get(name)

@@ -4,36 +4,26 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
-type generateCmd *cobra.Command
-type genSvcCmd *cobra.Command
-type genScaffoldSvcCmd *cobra.Command
-type genCmdCmd *cobra.Command
-
-func provideGenerateCommand(
-	genSvcCmd genSvcCmd,
-	genScaffoldSvcCmd genScaffoldSvcCmd,
-	genCmdCmd genCmdCmd,
-) generateCmd {
+func newGenerateCommand(cfg *grapicmd.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "generate GENERATOR",
 		Short:   "Generate new code",
 		Aliases: []string{"g", "gen"},
 	}
 
-	cmd.AddCommand(genSvcCmd)
-	cmd.AddCommand(genScaffoldSvcCmd)
-	cmd.AddCommand(genCmdCmd)
+	cmd.AddCommand(newGenerateServiceCommand(cfg))
+	cmd.AddCommand(newGenerateScaffoldServiceCommand(cfg))
+	cmd.AddCommand(newGenerateCommandCommand(cfg))
 
 	return cmd
 }
 
-func provideGenerateServiceCommand(cfg *grapicmd.Config, ui clui.UI, g module.Generator, u usecase.ExecuteProtocUsecase) genSvcCmd {
+func newGenerateServiceCommand(cfg *grapicmd.Config) *cobra.Command {
 	var (
 		skipTest     bool
 		resourceName string
@@ -50,14 +40,16 @@ func provideGenerateServiceCommand(cfg *grapicmd.Config, ui clui.UI, g module.Ge
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
+			ui := di.NewUI(cfg)
+
 			ui.Section("Generate service")
 			genCfg := module.ServiceGenerationConfig{ResourceName: resourceName, Methods: args[1:], SkipTest: skipTest}
-			err := errors.WithStack(g.GenerateService(args[0], genCfg))
+			err := errors.WithStack(di.NewGenerator(cfg).GenerateService(args[0], genCfg))
 			if err != nil {
 				return err
 			}
 
-			return errors.WithStack(u.Perform())
+			return errors.WithStack(di.NewExecuteProtocUsecase(cfg).Perform())
 		},
 	}
 
@@ -67,7 +59,7 @@ func provideGenerateServiceCommand(cfg *grapicmd.Config, ui clui.UI, g module.Ge
 	return cmd
 }
 
-func provideGenerateScaffoldServiceCommand(cfg *grapicmd.Config, ui clui.UI, g module.Generator, u usecase.ExecuteProtocUsecase) genScaffoldSvcCmd {
+func newGenerateScaffoldServiceCommand(cfg *grapicmd.Config) *cobra.Command {
 	var (
 		skipTest     bool
 		resourceName string
@@ -84,14 +76,16 @@ func provideGenerateScaffoldServiceCommand(cfg *grapicmd.Config, ui clui.UI, g m
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
+			ui := di.NewUI(cfg)
+
 			ui.Section("Scaffold service")
 			genCfg := module.ServiceGenerationConfig{ResourceName: resourceName, SkipTest: skipTest}
-			err := errors.WithStack(g.ScaffoldService(args[0], genCfg))
+			err := errors.WithStack(di.NewGenerator(cfg).ScaffoldService(args[0], genCfg))
 			if err != nil {
 				return err
 			}
 
-			return errors.WithStack(u.Perform())
+			return errors.WithStack(di.NewExecuteProtocUsecase(cfg).Perform())
 		},
 	}
 
@@ -101,7 +95,7 @@ func provideGenerateScaffoldServiceCommand(cfg *grapicmd.Config, ui clui.UI, g m
 	return cmd
 }
 
-func provideGenerateCommandCommand(cfg *grapicmd.Config, g module.Generator) genCmdCmd {
+func newGenerateCommandCommand(cfg *grapicmd.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:           "command NAME",
 		Short:         "Generate a new command",
@@ -113,7 +107,7 @@ func provideGenerateCommandCommand(cfg *grapicmd.Config, g module.Generator) gen
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
-			return errors.WithStack(g.GenerateCommand(args[0]))
+			return errors.WithStack(di.NewGenerator(cfg).GenerateCommand(args[0]))
 		},
 	}
 }

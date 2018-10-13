@@ -8,16 +8,14 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
+	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 )
 
 var (
 	tmplPaths []string
 )
 
-type initCmd *cobra.Command
-
-func provideInitCommand(cfg *grapicmd.Config, u usecase.InitializeProjectUsecase) initCmd {
+func newInitCommand(cfg *grapicmd.Config) *cobra.Command {
 	var (
 		headUsed bool
 		pkgName  string
@@ -36,7 +34,7 @@ func provideInitCommand(cfg *grapicmd.Config, u usecase.InitializeProjectUsecase
 			}
 			clog.Debug("parseInitArgs", "root", root)
 
-			return errors.WithStack(u.Perform(root, pkgName, headUsed))
+			return errors.WithStack(di.NewInitializeProjectUsecase(cfg).Perform(root, pkgName, headUsed))
 		},
 	}
 

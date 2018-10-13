@@ -2,29 +2,25 @@ package cmd
 
 import (
 	grapicmd "github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
-type destroyCmd *cobra.Command
-type destroySvcCmd *cobra.Command
-type destroyCmdCmd *cobra.Command
-
-func provideDestroyCommand(destroySvcCmd destroySvcCmd, destroyCmdCmd destroyCmdCmd) destroyCmd {
+func newDestroyCommand(cfg *grapicmd.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "destroy GENERATOR",
 		Short:   "Destroy codes",
 		Aliases: []string{"d"},
 	}
 
-	cmd.AddCommand(destroySvcCmd)
-	cmd.AddCommand(destroyCmdCmd)
+	cmd.AddCommand(newDestroyServiceCommand(cfg))
+	cmd.AddCommand(newDestroyCommandCommand(cfg))
 
 	return cmd
 }
 
-func provideDestroyServiceCommand(cfg *grapicmd.Config, g module.Generator) destroySvcCmd {
+func newDestroyServiceCommand(cfg *grapicmd.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:           "service NAME",
 		Short:         "Destroy a service",
@@ -36,12 +32,12 @@ func provideDestroyServiceCommand(cfg *grapicmd.Config, g module.Generator) dest
 				return errors.New("destroy command should execute inside a grapi application directory")
 			}
 
-			return errors.WithStack(g.DestroyService(args[0]))
+			return errors.WithStack(di.NewGenerator(cfg).DestroyService(args[0]))
 		},
 	}
 }
 
-func provideDestroyCommandCommand(cfg *grapicmd.Config, g module.Generator) destroyCmdCmd {
+func newDestroyCommandCommand(cfg *grapicmd.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:           "command NAME",
 		Short:         "Destroy a command",
@@ -53,7 +49,7 @@ func provideDestroyCommandCommand(cfg *grapicmd.Config, g module.Generator) dest
 				return errors.New("destroy command should execute inside a grapi application directory")
 			}
 
-			return errors.WithStack(g.DestroyCommand(args[0]))
+			return errors.WithStack(di.NewGenerator(cfg).DestroyCommand(args[0]))
 		},
 	}
 }

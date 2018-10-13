@@ -8,21 +8,24 @@ import (
 
 	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
-type userDefinedCmds []*cobra.Command
-
-func provideUserDefinedCommands(cfg *grapicmd.Config, ui clui.UI, scriptLoader module.ScriptLoader) (cmds userDefinedCmds) {
+func newUserDefinedCommands(cfg *grapicmd.Config) (cmds []*cobra.Command) {
 	if !cfg.InsideApp {
 		return
 	}
+
+	scriptLoader := di.NewScriptLoader(cfg)
 
 	err := scriptLoader.Load(filepath.Join(cfg.RootDir, "cmd"))
 	if err != nil {
 		// TODO: log
 		return
 	}
+
+	ui := di.NewUI(cfg)
 
 	for _, name := range scriptLoader.Names() {
 		cmds = append(cmds, newUserDefinedCommand(ui, scriptLoader, name))
