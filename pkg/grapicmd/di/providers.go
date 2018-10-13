@@ -5,6 +5,8 @@ import (
 
 	"github.com/google/go-cloud/wire"
 	"github.com/izumin5210/gex"
+	"github.com/izumin5210/gex/pkg/tool"
+	"github.com/pkg/errors"
 
 	"github.com/izumin5210/grapi/pkg/clui"
 	"github.com/izumin5210/grapi/pkg/command"
@@ -13,6 +15,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/generator"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/script"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
+	"github.com/izumin5210/grapi/pkg/protoc"
 )
 
 var (
@@ -21,6 +24,9 @@ var (
 
 	gexCfg   *gex.Config
 	gexCfgMu sync.Mutex
+
+	toolRepo   tool.Repository
+	toolRepoMu sync.Mutex
 )
 
 func ProvideUI(ctx *grapicmd.Ctx) clui.UI {
@@ -62,12 +68,38 @@ func ProvideGexConfig(ctx *grapicmd.Ctx) *gex.Config {
 			ErrWriter:  ctx.ErrWriter,
 			InReader:   ctx.InReader,
 			FS:         ctx.FS,
+			Execer:     ctx.Execer,
 			WorkingDir: ctx.RootDir,
 			// TODO: set verbose flag
 			// TODO: set logger
 		}
 	}
 	return gexCfg
+}
+
+func ProvideToolRepository(ctx *grapicmd.Ctx, gexCfg *gex.Config) (tool.Repository, error) {
+	toolRepoMu.Lock()
+	defer toolRepoMu.Unlock()
+	if toolRepo == nil {
+		var err error
+		toolRepo, err = gexCfg.Create()
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+	return toolRepo, nil
+}
+
+func ProvideProtocWrapper(ctx *grapicmd.Ctx, ui clui.UI, toolRepo tool.Repository) protoc.Wrapper {
+	return protoc.NewWrapper(
+		&ctx.ProtocConfig,
+		ctx.FS,
+		ctx.Execer,
+		ui,
+		toolRepo,
+		ctx.RootDir,
+		ctx.BinDir,
+	)
 }
 
 func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui clui.UI, generator module.Generator) usecase.InitializeProjectUsecase {
@@ -79,23 +111,13 @@ func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui c
 	)
 }
 
-func ProvideExecuteProtocUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui clui.UI, executor command.Executor, generator module.Generator) usecase.ExecuteProtocUsecase {
-	return usecase.NewExecuteProtocUsecase(
-		&ctx.ProtocConfig,
-		ctx.FS,
-		ui,
-		executor,
-		gexCfg,
-		ctx.RootDir,
-	)
-}
-
 var Set = wire.NewSet(
 	ProvideUI,
 	ProvideCommandExecutor,
 	ProvideGenerator,
 	ProvideScriptLoader,
 	ProvideGexConfig,
+	ProvideToolRepository,
+	ProvideProtocWrapper,
 	ProvideInitializeProjectUsecase,
-	ProvideExecuteProtocUsecase,
 )

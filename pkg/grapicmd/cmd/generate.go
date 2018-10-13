@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"context"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -49,7 +51,12 @@ func newGenerateServiceCommand(ctx *grapicmd.Ctx) *cobra.Command {
 				return err
 			}
 
-			return errors.WithStack(di.NewExecuteProtocUsecase(ctx).Perform())
+			protocw, err := di.NewProtocWrapper(ctx)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+
+			return errors.WithStack(protocw.Exec(context.TODO()))
 		},
 	}
 
@@ -85,7 +92,12 @@ func newGenerateScaffoldServiceCommand(ctx *grapicmd.Ctx) *cobra.Command {
 				return err
 			}
 
-			return errors.WithStack(di.NewExecuteProtocUsecase(ctx).Perform())
+			protocw, err := di.NewProtocWrapper(ctx)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+
+			return errors.WithStack(protocw.Exec(context.TODO()))
 		},
 	}
 

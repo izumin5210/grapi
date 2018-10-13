@@ -11,6 +11,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
+	"github.com/izumin5210/grapi/pkg/protoc"
 )
 
 // Injectors from wire.go:
@@ -39,19 +40,21 @@ func NewScriptLoader(ctx *grapicmd.Ctx) module.ScriptLoader {
 	return scriptLoader
 }
 
+func NewProtocWrapper(ctx *grapicmd.Ctx) (protoc.Wrapper, error) {
+	cluiUI := ProvideUI(ctx)
+	config := ProvideGexConfig(ctx)
+	repository, err := ProvideToolRepository(ctx, config)
+	if err != nil {
+		return nil, err
+	}
+	wrapper := ProvideProtocWrapper(ctx, cluiUI, repository)
+	return wrapper, nil
+}
+
 func NewInitializeProjectUsecase(ctx *grapicmd.Ctx) usecase.InitializeProjectUsecase {
 	config := ProvideGexConfig(ctx)
 	cluiUI := ProvideUI(ctx)
 	generator := ProvideGenerator(ctx, cluiUI)
 	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, cluiUI, generator)
 	return initializeProjectUsecase
-}
-
-func NewExecuteProtocUsecase(ctx *grapicmd.Ctx) usecase.ExecuteProtocUsecase {
-	config := ProvideGexConfig(ctx)
-	cluiUI := ProvideUI(ctx)
-	executor := ProvideCommandExecutor(ctx, cluiUI)
-	generator := ProvideGenerator(ctx, cluiUI)
-	executeProtocUsecase := ProvideExecuteProtocUsecase(ctx, config, cluiUI, executor, generator)
-	return executeProtocUsecase
 }

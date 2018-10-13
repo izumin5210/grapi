@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"context"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -18,7 +20,11 @@ func newProtocCommand(ctx *grapicmd.Ctx) *cobra.Command {
 			if !ctx.InsideApp {
 				return errors.New("protoc command should be execute inside a grapi application directory")
 			}
-			return errors.WithStack(di.NewExecuteProtocUsecase(ctx).Perform())
+			protocw, err := di.NewProtocWrapper(ctx)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+			return errors.WithStack(protocw.Exec(context.TODO()))
 		},
 	}
 }
