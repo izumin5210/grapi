@@ -19,9 +19,11 @@ func NewGrapiCommand(ctx *grapicmd.Ctx) *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			return errors.WithStack(ctx.Init(cfgFile))
+			return errors.WithStack(ctx.Load(cfgFile))
 		},
 	}
+
+	ctx.Init()
 
 	ccmd.HandleLogFlags(cmd)
 

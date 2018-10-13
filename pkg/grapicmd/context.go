@@ -41,8 +41,8 @@ type Config struct {
 	}
 }
 
-// Init initializes configurations from the config file.
-func (c *Ctx) Init(cfgFile string) error {
+// Init initializes the runtime context.
+func (c *Ctx) Init() {
 	if c.FS == nil {
 		c.FS = afero.NewOsFs()
 	}
@@ -55,7 +55,10 @@ func (c *Ctx) Init(cfgFile string) error {
 	if c.RootDir == "" {
 		c.RootDir, c.InsideApp = fs.LookupRoot(c.FS, c.CurrentDir)
 	}
+}
 
+// Load reads configurations from the config file.
+func (c *Ctx) Load(cfgFile string) error {
 	if !c.InsideApp {
 		return nil
 	}
