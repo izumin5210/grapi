@@ -12,32 +12,32 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
-func NewUI(*grapicmd.Config) clui.UI {
+func NewUI(*grapicmd.Ctx) clui.UI {
 	wire.Build(Set)
 	return nil
 }
 
-func NewCommandExecutor(*grapicmd.Config) command.Executor {
+func NewCommandExecutor(*grapicmd.Ctx) command.Executor {
 	wire.Build(Set)
 	return nil
 }
 
-func NewGenerator(*grapicmd.Config) module.Generator {
+func NewGenerator(*grapicmd.Ctx) module.Generator {
 	wire.Build(Set)
 	return nil
 }
 
-func NewScriptLoader(*grapicmd.Config) module.ScriptLoader {
+func NewScriptLoader(*grapicmd.Ctx) module.ScriptLoader {
 	wire.Build(Set)
 	return nil
 }
 
-func NewInitializeProjectUsecase(*grapicmd.Config) usecase.InitializeProjectUsecase {
+func NewInitializeProjectUsecase(*grapicmd.Ctx) usecase.InitializeProjectUsecase {
 	wire.Build(Set)
 	return nil
 }
 
-func NewExecuteProtocUsecase(*grapicmd.Config) usecase.ExecuteProtocUsecase {
+func NewExecuteProtocUsecase(*grapicmd.Ctx) usecase.ExecuteProtocUsecase {
 	wire.Build(Set)
 	return nil
 }

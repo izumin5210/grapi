@@ -8,17 +8,17 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 )
 
-func newProtocCommand(cfg *grapicmd.Config) *cobra.Command {
+func newProtocCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	return &cobra.Command{
 		Use:           "protoc",
 		Short:         "Run protoc",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !cfg.InsideApp {
+			if !ctx.InsideApp {
 				return errors.New("protoc command should be execute inside a grapi application directory")
 			}
-			return errors.WithStack(di.NewExecuteProtocUsecase(cfg).Perform())
+			return errors.WithStack(di.NewExecuteProtocUsecase(ctx).Perform())
 		},
 	}
 }

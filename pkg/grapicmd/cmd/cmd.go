@@ -9,33 +9,33 @@ import (
 )
 
 // NewGrapiCommand creates a new command object.
-func NewGrapiCommand(cfg *grapicmd.Config) *cobra.Command {
+func NewGrapiCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	var cfgFile string
 
 	cmd := &cobra.Command{
-		Use:           cfg.AppName,
+		Use:           ctx.AppName,
 		Short:         "JSON API framework implemented with gRPC and Gateway",
 		Long:          "",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			return errors.WithStack(cfg.Init(cfgFile))
+			return errors.WithStack(ctx.Init(cfgFile))
 		},
 	}
 
 	ccmd.HandleLogFlags(cmd)
 
-	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+cfg.AppName+".toml", "config file")
+	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+ctx.AppName+".toml", "config file")
 
 	cmd.AddCommand(
-		newInitCommand(cfg),
-		newGenerateCommand(cfg),
-		newDestroyCommand(cfg),
-		newProtocCommand(cfg),
-		newBuildCommand(cfg),
-		newVersionCommand(cfg),
+		newInitCommand(ctx),
+		newGenerateCommand(ctx),
+		newDestroyCommand(ctx),
+		newProtocCommand(ctx),
+		newBuildCommand(ctx),
+		newVersionCommand(ctx),
 	)
-	cmd.AddCommand(newUserDefinedCommands(cfg)...)
+	cmd.AddCommand(newUserDefinedCommands(ctx)...)
 
 	return cmd
 }

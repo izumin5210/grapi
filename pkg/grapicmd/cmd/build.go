@@ -8,14 +8,14 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 )
 
-func newBuildCommand(cfg *grapicmd.Config) *cobra.Command {
+func newBuildCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	return &cobra.Command{
 		Use:           "build [TARGET]... [-- BUILD_OPTIONS]",
 		Short:         "Build commands",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(c *cobra.Command, args []string) (err error) {
-			if !cfg.InsideApp {
+			if !ctx.InsideApp {
 				return errors.New("protoc command should be execute inside a grapi application directory")
 			}
 
@@ -25,8 +25,8 @@ func newBuildCommand(cfg *grapicmd.Config) *cobra.Command {
 			}
 			isAll := len(args) == 0
 
-			scriptLoader := di.NewScriptLoader(cfg)
-			ui := di.NewUI(cfg)
+			scriptLoader := di.NewScriptLoader(ctx)
+			ui := di.NewUI(ctx)
 
 			for _, name := range scriptLoader.Names() {
 				script, ok := scriptLoader.Get(name)

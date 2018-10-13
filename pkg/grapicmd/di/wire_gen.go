@@ -6,52 +6,52 @@
 package di
 
 import (
-	clui "github.com/izumin5210/grapi/pkg/clui"
-	command "github.com/izumin5210/grapi/pkg/command"
-	grapicmd "github.com/izumin5210/grapi/pkg/grapicmd"
-	module "github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
-	usecase "github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
+	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/command"
+	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
 // Injectors from wire.go:
 
-func NewUI(config *grapicmd.Config) clui.UI {
-	ui := ProvideUI(config)
-	return ui
+func NewUI(ctx *grapicmd.Ctx) clui.UI {
+	cluiUI := ProvideUI(ctx)
+	return cluiUI
 }
 
-func NewCommandExecutor(config *grapicmd.Config) command.Executor {
-	ui := ProvideUI(config)
-	executor := ProvideCommandExecutor(config, ui)
+func NewCommandExecutor(ctx *grapicmd.Ctx) command.Executor {
+	cluiUI := ProvideUI(ctx)
+	executor := ProvideCommandExecutor(ctx, cluiUI)
 	return executor
 }
 
-func NewGenerator(config *grapicmd.Config) module.Generator {
-	ui := ProvideUI(config)
-	generator := ProvideGenerator(config, ui)
+func NewGenerator(ctx *grapicmd.Ctx) module.Generator {
+	cluiUI := ProvideUI(ctx)
+	generator := ProvideGenerator(ctx, cluiUI)
 	return generator
 }
 
-func NewScriptLoader(config *grapicmd.Config) module.ScriptLoader {
-	ui := ProvideUI(config)
-	executor := ProvideCommandExecutor(config, ui)
-	scriptLoader := ProvideScriptLoader(config, executor)
+func NewScriptLoader(ctx *grapicmd.Ctx) module.ScriptLoader {
+	cluiUI := ProvideUI(ctx)
+	executor := ProvideCommandExecutor(ctx, cluiUI)
+	scriptLoader := ProvideScriptLoader(ctx, executor)
 	return scriptLoader
 }
 
-func NewInitializeProjectUsecase(config *grapicmd.Config) usecase.InitializeProjectUsecase {
-	config2 := ProvideGexConfig(config)
-	ui := ProvideUI(config)
-	generator := ProvideGenerator(config, ui)
-	initializeProjectUsecase := ProvideInitializeProjectUsecase(config, config2, ui, generator)
+func NewInitializeProjectUsecase(ctx *grapicmd.Ctx) usecase.InitializeProjectUsecase {
+	config := ProvideGexConfig(ctx)
+	cluiUI := ProvideUI(ctx)
+	generator := ProvideGenerator(ctx, cluiUI)
+	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, cluiUI, generator)
 	return initializeProjectUsecase
 }
 
-func NewExecuteProtocUsecase(config *grapicmd.Config) usecase.ExecuteProtocUsecase {
-	config2 := ProvideGexConfig(config)
-	ui := ProvideUI(config)
-	executor := ProvideCommandExecutor(config, ui)
-	generator := ProvideGenerator(config, ui)
-	executeProtocUsecase := ProvideExecuteProtocUsecase(config, config2, ui, executor, generator)
+func NewExecuteProtocUsecase(ctx *grapicmd.Ctx) usecase.ExecuteProtocUsecase {
+	config := ProvideGexConfig(ctx)
+	cluiUI := ProvideUI(ctx)
+	executor := ProvideCommandExecutor(ctx, cluiUI)
+	generator := ProvideGenerator(ctx, cluiUI)
+	executeProtocUsecase := ProvideExecuteProtocUsecase(ctx, config, cluiUI, executor, generator)
 	return executeProtocUsecase
 }
