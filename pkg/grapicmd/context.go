@@ -11,6 +11,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
+// Ctx contains the runtime context of grpai.
 type Ctx struct {
 	FS        afero.Fs
 	Viper     *viper.Viper
@@ -40,6 +41,7 @@ type Config struct {
 	}
 }
 
+// Init initializes configurations from the config file.
 func (c *Ctx) Init(cfgFile string) error {
 	if c.FS == nil {
 		c.FS = afero.NewOsFs()
