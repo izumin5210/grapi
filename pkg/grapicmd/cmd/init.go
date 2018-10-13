@@ -9,14 +9,13 @@ import (
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/di"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
 var (
 	tmplPaths []string
 )
 
-func newInitCommand(ac di.AppComponent) *cobra.Command {
+func newInitCommand(cfg *grapicmd.Config) *cobra.Command {
 	var (
 		headUsed bool
 		pkgName  string
@@ -29,20 +28,13 @@ func newInitCommand(ac di.AppComponent) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			root, err := parseInitArgs(ac.Config(), args)
+			root, err := parseInitArgs(cfg, args)
 			if err != nil {
 				return errors.WithStack(err)
 			}
 			clog.Debug("parseInitArgs", "root", root)
 
-			u := usecase.NewInitializeProjectUsecase(
-				ac.UI(),
-				ac.Generator(),
-				ac.GexConfig(),
-				ac.Config().Version(),
-			)
-
-			return errors.WithStack(u.Perform(root, pkgName, headUsed))
+			return errors.WithStack(di.NewInitializeProjectUsecase(cfg).Perform(root, pkgName, headUsed))
 		},
 	}
 
@@ -52,21 +44,21 @@ func newInitCommand(ac di.AppComponent) *cobra.Command {
 	return cmd
 }
 
-func parseInitArgs(cfg grapicmd.Config, args []string) (root string, err error) {
+func parseInitArgs(cfg *grapicmd.Config, args []string) (root string, err error) {
 	if argCnt := len(args); argCnt != 1 {
 		err = errors.Errorf("invalid argument count: want 1, got %d", argCnt)
 		return
 	}
 
 	arg := args[0]
-	root = cfg.CurrentDir()
+	root = cfg.CurrentDir
 
 	if arg == "." {
 		return
 	}
 	root = arg
 	if !filepath.IsAbs(arg) {
-		root = filepath.Join(cfg.CurrentDir(), arg)
+		root = filepath.Join(cfg.CurrentDir, arg)
 	}
 	return
 }

@@ -4,9 +4,9 @@ require (
 	github.com/BurntSushi/toml v0.3.0 // indirect
 	github.com/bradleyjkemp/cupaloy v2.2.0+incompatible
 	github.com/fatih/color v1.7.0
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/mock v1.1.1
 	github.com/golang/protobuf v1.2.0
+	github.com/google/go-cloud v0.2.0
 	github.com/google/go-cmp v0.2.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/grpc-gateway v1.5.0
@@ -44,12 +44,11 @@ require (
 	go.uber.org/atomic v1.3.1 // indirect
 	go.uber.org/multierr v1.1.0 // indirect
 	go.uber.org/zap v1.7.1 // indirect
-	golang.org/x/crypto v0.0.0-20180228161326-91a49db82a88 // indirect
 	golang.org/x/lint v0.0.0-20180702182130-06c8688daad7
 	golang.org/x/net v0.0.0-20181005035420-146acd28ed58
 	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f
 	golang.org/x/tools v0.0.0-20181008205924-a2b3f7f249e9 // indirect
-	google.golang.org/genproto v0.0.0-20180206005123-2b5a72b8730b
+	google.golang.org/genproto v0.0.0-20180627194029-ff3583edef7d
 	google.golang.org/grpc v1.14.0
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	honnef.co/go/tools v0.0.0-20180920025451-e3ad64cb4ed3
