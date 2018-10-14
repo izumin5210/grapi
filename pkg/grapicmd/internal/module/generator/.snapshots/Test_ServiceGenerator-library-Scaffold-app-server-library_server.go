@@ -11,11 +11,14 @@ import (
 	api_pb "testapp/api"
 )
 
-// NewLibraryServiceServer creates a new LibraryServiceServer instance.
-func NewLibraryServiceServer() interface {
+// LibraryServiceServer is a composite interface of api_pb.LibraryServiceServer and grapiserver.Server.
+type LibraryServiceServer interface {
 	api_pb.LibraryServiceServer
 	grapiserver.Server
-} {
+}
+
+// NewLibraryServiceServer creates a new LibraryServiceServer instance.
+func NewLibraryServiceServer() LibraryServiceServer {
 	return &libraryServiceServerImpl{}
 }
 

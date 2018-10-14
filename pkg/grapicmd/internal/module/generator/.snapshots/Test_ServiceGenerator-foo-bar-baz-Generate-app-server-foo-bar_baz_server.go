@@ -10,11 +10,14 @@ import (
 	foo_pb "testapp/api/foo"
 )
 
-// NewBarBazServiceServer creates a new BarBazServiceServer instance.
-func NewBarBazServiceServer() interface {
+// BarBazServiceServer is a composite interface of foo_pb.BarBazServiceServer and grapiserver.Server.
+type BarBazServiceServer interface {
 	foo_pb.BarBazServiceServer
 	grapiserver.Server
-} {
+}
+
+// NewBarBazServiceServer creates a new BarBazServiceServer instance.
+func NewBarBazServiceServer() BarBazServiceServer {
 	return &barBazServiceServerImpl{}
 }
 

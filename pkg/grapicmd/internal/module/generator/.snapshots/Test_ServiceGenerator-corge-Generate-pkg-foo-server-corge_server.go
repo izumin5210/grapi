@@ -10,11 +10,14 @@ import (
 	api_pb "testapp/api"
 )
 
-// NewCorgeServiceServer creates a new CorgeServiceServer instance.
-func NewCorgeServiceServer() interface {
+// CorgeServiceServer is a composite interface of api_pb.CorgeServiceServer and grapiserver.Server.
+type CorgeServiceServer interface {
 	api_pb.CorgeServiceServer
 	grapiserver.Server
-} {
+}
+
+// NewCorgeServiceServer creates a new CorgeServiceServer instance.
+func NewCorgeServiceServer() CorgeServiceServer {
 	return &corgeServiceServerImpl{}
 }
 
