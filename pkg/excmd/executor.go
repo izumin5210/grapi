@@ -35,7 +35,7 @@ type executor struct {
 func (e *executor) Exec(ctx context.Context, name string, opts ...Option) (out []byte, err error) {
 	var wg sync.WaitGroup
 
-	c := buildCommand(name, opts)
+	c := BuildCommand(name, opts)
 	clog.Debug("execute", "command", c)
 
 	cmd := exec.CommandContext(ctx, c.Name, c.Args...)

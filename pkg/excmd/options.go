@@ -6,7 +6,8 @@ import (
 	"strings"
 )
 
-func buildCommand(name string, opts []Option) *Command {
+// BuildCommand create a new Command object from given options.
+func BuildCommand(name string, opts []Option) *Command {
 	c := &Command{Name: name, Env: os.Environ()}
 	for _, f := range opts {
 		f(c)
