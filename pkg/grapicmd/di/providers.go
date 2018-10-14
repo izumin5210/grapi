@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/izumin5210/grapi/pkg/clui"
-	"github.com/izumin5210/grapi/pkg/command"
+	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/generator"
@@ -38,8 +38,8 @@ func ProvideUI(ctx *grapicmd.Ctx) clui.UI {
 	return ui
 }
 
-func ProvideCommandExecutor(ctx *grapicmd.Ctx, ui clui.UI) command.Executor {
-	return command.NewExecutor(ctx.OutWriter, ctx.ErrWriter, ctx.InReader)
+func ProvideCommandExecutor(ctx *grapicmd.Ctx, ui clui.UI) excmd.Executor {
+	return excmd.NewExecutor(ctx.OutWriter, ctx.ErrWriter, ctx.InReader)
 }
 
 func ProvideGenerator(ctx *grapicmd.Ctx, ui clui.UI) module.Generator {
@@ -55,7 +55,7 @@ func ProvideGenerator(ctx *grapicmd.Ctx, ui clui.UI) module.Generator {
 	)
 }
 
-func ProvideScriptLoader(ctx *grapicmd.Ctx, executor command.Executor) module.ScriptLoader {
+func ProvideScriptLoader(ctx *grapicmd.Ctx, executor excmd.Executor) module.ScriptLoader {
 	return script.NewLoader(ctx.FS, executor, ctx.RootDir)
 }
 

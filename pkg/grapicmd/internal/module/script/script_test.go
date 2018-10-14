@@ -5,14 +5,14 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/izumin5210/grapi/pkg/command"
+	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/spf13/afero"
 )
 
 type testContext struct {
 	fs            afero.Fs
-	executor      *command.FakeExecutor
+	executor      *excmd.FakeExecutor
 	loader        module.ScriptLoader
 	binName       string
 	rootDir       string
@@ -29,7 +29,7 @@ func createTestContext(t *testing.T) *testContext {
 		binName:       binName,
 		rootDir:       rootDir,
 		cmdDir:        filepath.Join(rootDir, "cmd"),
-		executor:      &command.FakeExecutor{},
+		executor:      &excmd.FakeExecutor{},
 		srcsByBinName: map[string][]string{},
 	}
 
