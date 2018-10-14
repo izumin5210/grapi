@@ -10,11 +10,14 @@ import (
 	out_pb "testapp/api/out"
 )
 
-// NewQuuxServiceServer creates a new QuuxServiceServer instance.
-func NewQuuxServiceServer() interface {
+// QuuxServiceServer is a composite interface of out_pb.QuuxServiceServer and grapiserver.Server.
+type QuuxServiceServer interface {
 	out_pb.QuuxServiceServer
 	grapiserver.Server
-} {
+}
+
+// NewQuuxServiceServer creates a new QuuxServiceServer instance.
+func NewQuuxServiceServer() QuuxServiceServer {
 	return &quuxServiceServerImpl{}
 }
 

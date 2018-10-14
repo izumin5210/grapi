@@ -9,11 +9,14 @@ import (
 	{{.PbGo.PackageName}} "{{ .PbGo.PackagePath }}"
 )
 
-// New{{.Go.ServerName}} creates a new {{.Go.ServerName}} instance.
-func New{{.Go.ServerName}}() interface {
+// {{.Go.ServerName}} is a composite interface of {{.PbGo.PackageName }}.{{.Go.ServerName}} and grapiserver.Server.
+type {{.Go.ServerName}} interface {
 	{{.PbGo.PackageName }}.{{.Go.ServerName}}
 	grapiserver.Server
-} {
+}
+
+// New{{.Go.ServerName}} creates a new {{.Go.ServerName}} instance.
+func New{{.Go.ServerName}}() {{.Go.ServerName}} {
 	return &{{.Go.StructName}}{}
 }
 
