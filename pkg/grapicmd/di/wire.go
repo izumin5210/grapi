@@ -10,6 +10,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
+	"github.com/izumin5210/grapi/pkg/protoc"
 )
 
 func NewUI(*grapicmd.Ctx) clui.UI {
@@ -32,12 +33,12 @@ func NewScriptLoader(*grapicmd.Ctx) module.ScriptLoader {
 	return nil
 }
 
-func NewInitializeProjectUsecase(*grapicmd.Ctx) usecase.InitializeProjectUsecase {
+func NewProtocWrapper(*grapicmd.Ctx) (protoc.Wrapper, error) {
 	wire.Build(Set)
-	return nil
+	return nil, nil
 }
 
-func NewExecuteProtocUsecase(*grapicmd.Ctx) usecase.ExecuteProtocUsecase {
+func NewInitializeProjectUsecase(*grapicmd.Ctx) usecase.InitializeProjectUsecase {
 	wire.Build(Set)
 	return nil
 }

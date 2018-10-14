@@ -190,7 +190,7 @@
   version = "v0.1.0"
 
 [[projects]]
-  digest = "1:ec9a8df83b4e8c652da64d9e9b7cb3569123c6600db42afd377df0a11ce7a142"
+  digest = "1:e2ab15cc3be1b606dd7107fcc0ec1ec04371308e057dd5f4313803259d6cf225"
   name = "github.com/izumin5210/gex"
   packages = [
     ".",
@@ -201,8 +201,8 @@
     "pkg/tool",
   ]
   pruneopts = "UT"
-  revision = "9469ada3eaa38501cf216f35dfedd562a3d2814d"
-  version = "v0.3.2"
+  revision = "cd08f32504c4567f31a84f8aef856396b10b5775"
+  version = "v0.4.1"
 
 [[projects]]
   branch = "master"
@@ -672,6 +672,17 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:80a359dc3146cb9edf602d0a672b2f06a3506659301bbd132d4dd181b05bceba"
+  name = "k8s.io/utils"
+  packages = [
+    "exec",
+    "exec/testing",
+  ]
+  pruneopts = "UT"
+  revision = "cd6a8f44fe799a6b69c6dbbb1a930994738a367c"
+
+[[projects]]
+  branch = "master"
   digest = "1:521f15c98723cb42db85f5b83980ffa5f707ddaff12976a0d366e6a6cdd1f791"
   name = "mvdan.cc/lint"
   packages = ["."]
@@ -710,6 +721,7 @@
     "github.com/izumin5210/clicontrib/pkg/clog",
     "github.com/izumin5210/gex",
     "github.com/izumin5210/gex/cmd/gex",
+    "github.com/izumin5210/gex/pkg/tool",
     "github.com/jessevdk/go-assets",
     "github.com/jessevdk/go-assets-builder",
     "github.com/jinzhu/inflection",
@@ -734,6 +746,8 @@
     "google.golang.org/grpc/reflection",
     "google.golang.org/grpc/status",
     "honnef.co/go/tools/cmd/megacheck",
+    "k8s.io/utils/exec",
+    "k8s.io/utils/exec/testing",
     "mvdan.cc/unparam",
   ]
   solver-name = "gps-cdcl"

@@ -2,25 +2,29 @@ package grapicmd
 
 import (
 	"io"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
+	"k8s.io/utils/exec"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/protoc"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
+	"github.com/izumin5210/grapi/pkg/protoc"
 )
 
 // Ctx contains the runtime context of grpai.
 type Ctx struct {
 	FS        afero.Fs
 	Viper     *viper.Viper
+	Execer    exec.Interface
 	InReader  io.Reader
 	OutWriter io.Writer
 	ErrWriter io.Writer
 
 	CurrentDir string
 	RootDir    string
+	BinDir     string
 	InsideApp  bool
 
 	AppName   string
@@ -52,8 +56,16 @@ func (c *Ctx) Init() {
 		c.Viper.SetFs(c.FS)
 	}
 
+	if c.Execer == nil {
+		c.Execer = exec.New()
+	}
+
 	if c.RootDir == "" {
 		c.RootDir, c.InsideApp = fs.LookupRoot(c.FS, c.CurrentDir)
+	}
+
+	if c.InsideApp && c.BinDir == "" {
+		c.BinDir = filepath.Join(c.RootDir, "bin")
 	}
 }
 

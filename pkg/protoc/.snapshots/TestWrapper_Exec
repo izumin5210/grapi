@@ -1,0 +1,68 @@
+([][]string) (len=6) {
+  ([]string) (len=9) {
+    (string) (len=6) "protoc",
+    (string) (len=2) "-I",
+    (string) (len=10) "api/protos",
+    (string) (len=2) "-I",
+    (string) (len=64) "/go/src/awesomeapp/vendor/github.com/grpc-ecosystem/grpc-gateway",
+    (string) (len=2) "-I",
+    (string) (len=29) "/go/src/awesomeapp/api/protos",
+    (string) (len=25) "--go_out=plugins=grpc:api",
+    (string) (len=21) "api/protos/book.proto"
+  },
+  ([]string) (len=9) {
+    (string) (len=6) "protoc",
+    (string) (len=2) "-I",
+    (string) (len=10) "api/protos",
+    (string) (len=2) "-I",
+    (string) (len=64) "/go/src/awesomeapp/vendor/github.com/grpc-ecosystem/grpc-gateway",
+    (string) (len=2) "-I",
+    (string) (len=29) "/go/src/awesomeapp/api/protos",
+    (string) (len=39) "--grpc-gateway_out=logtostderr=true:api",
+    (string) (len=21) "api/protos/book.proto"
+  },
+  ([]string) (len=9) {
+    (string) (len=6) "protoc",
+    (string) (len=2) "-I",
+    (string) (len=10) "api/protos",
+    (string) (len=2) "-I",
+    (string) (len=64) "/go/src/awesomeapp/vendor/github.com/grpc-ecosystem/grpc-gateway",
+    (string) (len=2) "-I",
+    (string) (len=29) "/go/src/awesomeapp/api/protos",
+    (string) (len=34) "--swagger_out=logtostderr=true:api",
+    (string) (len=21) "api/protos/book.proto"
+  },
+  ([]string) (len=9) {
+    (string) (len=6) "protoc",
+    (string) (len=2) "-I",
+    (string) (len=16) "api/protos/types",
+    (string) (len=2) "-I",
+    (string) (len=64) "/go/src/awesomeapp/vendor/github.com/grpc-ecosystem/grpc-gateway",
+    (string) (len=2) "-I",
+    (string) (len=29) "/go/src/awesomeapp/api/protos",
+    (string) (len=31) "--go_out=plugins=grpc:api/types",
+    (string) (len=28) "api/protos/types/users.proto"
+  },
+  ([]string) (len=9) {
+    (string) (len=6) "protoc",
+    (string) (len=2) "-I",
+    (string) (len=16) "api/protos/types",
+    (string) (len=2) "-I",
+    (string) (len=64) "/go/src/awesomeapp/vendor/github.com/grpc-ecosystem/grpc-gateway",
+    (string) (len=2) "-I",
+    (string) (len=29) "/go/src/awesomeapp/api/protos",
+    (string) (len=45) "--grpc-gateway_out=logtostderr=true:api/types",
+    (string) (len=28) "api/protos/types/users.proto"
+  },
+  ([]string) (len=9) {
+    (string) (len=6) "protoc",
+    (string) (len=2) "-I",
+    (string) (len=16) "api/protos/types",
+    (string) (len=2) "-I",
+    (string) (len=64) "/go/src/awesomeapp/vendor/github.com/grpc-ecosystem/grpc-gateway",
+    (string) (len=2) "-I",
+    (string) (len=29) "/go/src/awesomeapp/api/protos",
+    (string) (len=40) "--swagger_out=logtostderr=true:api/types",
+    (string) (len=28) "api/protos/types/users.proto"
+  }
+}
