@@ -7,16 +7,16 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/command"
+	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 type script struct {
-	fs              afero.Fs
-	commandExecutor command.Executor
-	rootDir         string
-	name, binPath   string
-	srcPaths        []string
+	fs            afero.Fs
+	excmd         excmd.Executor
+	rootDir       string
+	name, binPath string
+	srcPaths      []string
 }
 
 func (s *script) Name() string {
@@ -29,7 +29,7 @@ func (s *script) Build(args ...string) error {
 		return errors.WithStack(err)
 	}
 
-	_, err = s.commandExecutor.Exec(context.TODO(), "go", s.buildOpts(args)...)
+	_, err = s.excmd.Exec(context.TODO(), "go", s.buildOpts(args)...)
 	if err != nil {
 		return errors.Wrapf(err, "failed to build %v", s.srcPaths)
 	}
@@ -38,24 +38,24 @@ func (s *script) Build(args ...string) error {
 }
 
 func (s *script) Run(args ...string) error {
-	_, err := s.commandExecutor.Exec(
+	_, err := s.excmd.Exec(
 		context.TODO(),
 		s.binPath,
-		command.WithArgs(args...),
-		command.WithDir(s.rootDir),
-		command.WithIOConnected(),
+		excmd.WithArgs(args...),
+		excmd.WithDir(s.rootDir),
+		excmd.WithIOConnected(),
 	)
 	return errors.WithStack(err)
 }
 
-func (s *script) buildOpts(args []string) []command.Option {
+func (s *script) buildOpts(args []string) []excmd.Option {
 	built := make([]string, 0, 3+len(args)+len(s.srcPaths))
 	built = append(built, "build", "-o="+s.binPath)
 	built = append(built, args...)
 	built = append(built, s.srcPaths...)
-	return []command.Option{
-		command.WithArgs(built...),
-		command.WithDir(s.rootDir),
-		command.WithIOConnected(),
+	return []excmd.Option{
+		excmd.WithArgs(built...),
+		excmd.WithDir(s.rootDir),
+		excmd.WithIOConnected(),
 	}
 }

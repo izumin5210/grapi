@@ -7,7 +7,7 @@ package di
 
 import (
 	"github.com/izumin5210/grapi/pkg/clui"
-	"github.com/izumin5210/grapi/pkg/command"
+	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
@@ -21,7 +21,7 @@ func NewUI(ctx *grapicmd.Ctx) clui.UI {
 	return cluiUI
 }
 
-func NewCommandExecutor(ctx *grapicmd.Ctx) command.Executor {
+func NewCommandExecutor(ctx *grapicmd.Ctx) excmd.Executor {
 	cluiUI := ProvideUI(ctx)
 	executor := ProvideCommandExecutor(ctx, cluiUI)
 	return executor

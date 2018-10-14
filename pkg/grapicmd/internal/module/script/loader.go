@@ -8,29 +8,29 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/command"
+	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 // NewLoader creates a new ScriptLoader instance.
-func NewLoader(fs afero.Fs, commandExecutor command.Executor, rootDir string) module.ScriptLoader {
+func NewLoader(fs afero.Fs, excmd excmd.Executor, rootDir string) module.ScriptLoader {
 	return &scriptLoader{
-		fs:              fs,
-		commandExecutor: commandExecutor,
-		rootDir:         rootDir,
-		binDir:          filepath.Join(rootDir, "bin"),
-		scripts:         make(map[string]module.Script),
+		fs:      fs,
+		excmd:   excmd,
+		rootDir: rootDir,
+		binDir:  filepath.Join(rootDir, "bin"),
+		scripts: make(map[string]module.Script),
 	}
 }
 
 type scriptLoader struct {
-	fs              afero.Fs
-	commandExecutor command.Executor
-	rootDir         string
-	binDir          string
-	scripts         map[string]module.Script
-	names           []string
+	fs      afero.Fs
+	excmd   excmd.Executor
+	rootDir string
+	binDir  string
+	scripts map[string]module.Script
+	names   []string
 }
 
 func (f *scriptLoader) Load(dir string) error {
@@ -49,12 +49,12 @@ func (f *scriptLoader) Load(dir string) error {
 			ext = ".exe"
 		}
 		f.scripts[name] = &script{
-			fs:              f.fs,
-			commandExecutor: f.commandExecutor,
-			srcPaths:        srcPaths,
-			name:            name,
-			binPath:         filepath.Join(f.binDir, name+ext),
-			rootDir:         f.rootDir,
+			fs:       f.fs,
+			excmd:    f.excmd,
+			srcPaths: srcPaths,
+			name:     name,
+			binPath:  filepath.Join(f.binDir, name+ext),
+			rootDir:  f.rootDir,
 		}
 		f.names = append(f.names, name)
 	}

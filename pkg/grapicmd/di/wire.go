@@ -6,7 +6,7 @@ import (
 	"github.com/google/go-cloud/wire"
 
 	"github.com/izumin5210/grapi/pkg/clui"
-	"github.com/izumin5210/grapi/pkg/command"
+	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
@@ -18,7 +18,7 @@ func NewUI(*grapicmd.Ctx) clui.UI {
 	return nil
 }
 
-func NewCommandExecutor(*grapicmd.Ctx) command.Executor {
+func NewCommandExecutor(*grapicmd.Ctx) excmd.Executor {
 	wire.Build(Set)
 	return nil
 }
