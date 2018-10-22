@@ -1,39 +1,27 @@
 package grapicmd
 
 import (
-	"io"
-	"path/filepath"
-
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 	"k8s.io/utils/exec"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/protoc"
 )
 
 // Ctx contains the runtime context of grpai.
 type Ctx struct {
-	FS        afero.Fs
-	Viper     *viper.Viper
-	Execer    exec.Interface
-	InReader  io.Reader
-	OutWriter io.Writer
-	ErrWriter io.Writer
+	FS     afero.Fs
+	Viper  *viper.Viper
+	Execer exec.Interface
+	IO     *cli.IO
 
-	CurrentDir string
-	RootDir    string
-	BinDir     string
-	InsideApp  bool
-
-	AppName   string
-	Version   string
-	Revision  string
-	BuildDate string
-	Prebuilt  bool
+	RootDir   cli.RootDir
+	insideApp bool
 
 	Config       Config
+	Build        BuildConfig
 	ProtocConfig protoc.Config
 }
 
@@ -43,6 +31,14 @@ type Config struct {
 	Grapi   struct {
 		ServerDir string
 	}
+}
+
+type BuildConfig struct {
+	AppName   string
+	Version   string
+	Revision  string
+	BuildDate string
+	Prebuilt  bool
 }
 
 // Init initializes the runtime context.
@@ -60,18 +56,16 @@ func (c *Ctx) Init() {
 		c.Execer = exec.New()
 	}
 
+	cwd := c.RootDir
+	c.RootDir, c.insideApp = cli.LookupRoot(c.FS, string(cwd))
 	if c.RootDir == "" {
-		c.RootDir, c.InsideApp = fs.LookupRoot(c.FS, c.CurrentDir)
-	}
-
-	if c.InsideApp && c.BinDir == "" {
-		c.BinDir = filepath.Join(c.RootDir, "bin")
+		c.RootDir = cwd
 	}
 }
 
 // Load reads configurations from the config file.
 func (c *Ctx) Load(cfgFile string) error {
-	if !c.InsideApp {
+	if !c.IsInsideApp() {
 		return nil
 	}
 
@@ -92,4 +86,8 @@ func (c *Ctx) Load(cfgFile string) error {
 	}
 
 	return nil
+}
+
+func (c *Ctx) IsInsideApp() bool {
+	return c.insideApp
 }
