@@ -6,7 +6,7 @@
 package di
 
 import (
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
@@ -16,45 +16,49 @@ import (
 
 // Injectors from wire.go:
 
-func NewUI(ctx *grapicmd.Ctx) clui.UI {
-	cluiUI := ProvideUI(ctx)
-	return cluiUI
+func NewUI(ctx *grapicmd.Ctx) cli.UI {
+	io := ProvideIO(ctx)
+	ui := cli.UIInstance(io)
+	return ui
 }
 
 func NewCommandExecutor(ctx *grapicmd.Ctx) excmd.Executor {
-	cluiUI := ProvideUI(ctx)
-	executor := ProvideCommandExecutor(ctx, cluiUI)
+	io := ProvideIO(ctx)
+	executor := excmd.NewExecutor(io)
 	return executor
 }
 
 func NewGenerator(ctx *grapicmd.Ctx) module.Generator {
-	cluiUI := ProvideUI(ctx)
-	generator := ProvideGenerator(ctx, cluiUI)
+	io := ProvideIO(ctx)
+	ui := cli.UIInstance(io)
+	generator := ProvideGenerator(ctx, ui)
 	return generator
 }
 
 func NewScriptLoader(ctx *grapicmd.Ctx) module.ScriptLoader {
-	cluiUI := ProvideUI(ctx)
-	executor := ProvideCommandExecutor(ctx, cluiUI)
+	io := ProvideIO(ctx)
+	executor := excmd.NewExecutor(io)
 	scriptLoader := ProvideScriptLoader(ctx, executor)
 	return scriptLoader
 }
 
 func NewProtocWrapper(ctx *grapicmd.Ctx) (protoc.Wrapper, error) {
-	cluiUI := ProvideUI(ctx)
+	io := ProvideIO(ctx)
+	ui := cli.UIInstance(io)
 	config := ProvideGexConfig(ctx)
 	repository, err := ProvideToolRepository(ctx, config)
 	if err != nil {
 		return nil, err
 	}
-	wrapper := ProvideProtocWrapper(ctx, cluiUI, repository)
+	wrapper := ProvideProtocWrapper(ctx, ui, repository)
 	return wrapper, nil
 }
 
 func NewInitializeProjectUsecase(ctx *grapicmd.Ctx) usecase.InitializeProjectUsecase {
 	config := ProvideGexConfig(ctx)
-	cluiUI := ProvideUI(ctx)
-	generator := ProvideGenerator(ctx, cluiUI)
-	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, cluiUI, generator)
+	io := ProvideIO(ctx)
+	ui := cli.UIInstance(io)
+	generator := ProvideGenerator(ctx, ui)
+	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, generator)
 	return initializeProjectUsecase
 }

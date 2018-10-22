@@ -4,7 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/generator/template"
 )
@@ -14,7 +14,7 @@ type commandGenerator struct {
 	rootDir string
 }
 
-func newCommandGenerator(fs afero.Fs, ui clui.UI, rootDir string) module.CommandGenerator {
+func newCommandGenerator(fs afero.Fs, ui cli.UI, rootDir string) module.CommandGenerator {
 	return &commandGenerator{
 		baseGenerator: newBaseGenerator(template.Command, fs, ui),
 		rootDir:       rootDir,

@@ -13,7 +13,7 @@ func NewGrapiCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	var cfgFile string
 
 	cmd := &cobra.Command{
-		Use:           ctx.AppName,
+		Use:           ctx.Build.AppName,
 		Short:         "JSON API framework implemented with gRPC and Gateway",
 		Long:          "",
 		SilenceErrors: true,
@@ -27,7 +27,7 @@ func NewGrapiCommand(ctx *grapicmd.Ctx) *cobra.Command {
 
 	ccmd.HandleLogFlags(cmd)
 
-	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+ctx.AppName+".toml", "config file")
+	cmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+ctx.Build.AppName+".toml", "config file")
 
 	cmd.AddCommand(
 		newInitCommand(ctx),

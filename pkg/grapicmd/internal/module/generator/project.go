@@ -4,7 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/generator/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
@@ -15,7 +15,7 @@ type projectGenerator struct {
 	version string
 }
 
-func newProjectGenerator(fs afero.Fs, ui clui.UI, version string) module.ProjectGenerator {
+func newProjectGenerator(fs afero.Fs, ui cli.UI, version string) module.ProjectGenerator {
 	return &projectGenerator{
 		baseGenerator: newBaseGenerator(template.Init, fs, ui),
 		version:       version,

@@ -10,7 +10,7 @@ import (
 	"github.com/serenize/snaker"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/generator/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
@@ -22,7 +22,7 @@ type serviceGenerator struct {
 	pkgName                                   string
 }
 
-func newServiceGenerator(fs afero.Fs, ui clui.UI, rootDir, protoDir, protoOutDir, serverDir, pkgName string) module.ServiceGenerator {
+func newServiceGenerator(fs afero.Fs, ui cli.UI, rootDir, protoDir, protoOutDir, serverDir, pkgName string) module.ServiceGenerator {
 	if protoDir == "" {
 		protoDir = filepath.Join("api", "protos")
 	}

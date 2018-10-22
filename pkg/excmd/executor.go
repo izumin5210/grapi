@@ -11,25 +11,17 @@ import (
 
 	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
+
+	"github.com/izumin5210/grapi/pkg/cli"
 )
 
 // NewExecutor creates a new Executor instance.
-func NewExecutor(
-	outWriter io.Writer,
-	errWriter io.Writer,
-	inReader io.Reader,
-) Executor {
-	return &executor{
-		outWriter: outWriter,
-		errWriter: errWriter,
-		inReader:  inReader,
-	}
+func NewExecutor(io *cli.IO) Executor {
+	return &executor{io: io}
 }
 
 type executor struct {
-	outWriter io.Writer
-	errWriter io.Writer
-	inReader  io.Reader
+	io *cli.IO
 }
 
 func (e *executor) Exec(ctx context.Context, name string, opts ...Option) (out []byte, err error) {
@@ -93,16 +85,16 @@ func (e *executor) exec(c *Command, cmd *exec.Cmd) (out []byte, err error) {
 		wg.Add(2)
 		go func() {
 			defer wg.Done()
-			io.Copy(e.outWriter, io.TeeReader(outReader, &buf))
+			io.Copy(e.io.Out, io.TeeReader(outReader, &buf))
 		}()
 		closers = append(closers, outReader.Close)
 		go func() {
 			defer wg.Done()
-			io.Copy(e.errWriter, io.TeeReader(errReader, &buf))
+			io.Copy(e.io.Err, io.TeeReader(errReader, &buf))
 		}()
 		closers = append(closers, errReader.Close)
 
-		cmd.Stdin = e.inReader
+		cmd.Stdin = e.io.In
 
 		err = cmd.Run()
 		for _, c := range closers {

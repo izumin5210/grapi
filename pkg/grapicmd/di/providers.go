@@ -8,7 +8,7 @@ import (
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/pkg/errors"
 
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
@@ -19,9 +19,6 @@ import (
 )
 
 var (
-	ui   clui.UI
-	uiMu sync.Mutex
-
 	gexCfg   *gex.Config
 	gexCfgMu sync.Mutex
 
@@ -29,34 +26,25 @@ var (
 	toolRepoMu sync.Mutex
 )
 
-func ProvideUI(ctx *grapicmd.Ctx) clui.UI {
-	uiMu.Lock()
-	defer uiMu.Unlock()
-	if ui == nil {
-		ui = clui.New(ctx.OutWriter, ctx.InReader)
-	}
-	return ui
+func ProvideIO(ctx *grapicmd.Ctx) *cli.IO {
+	return ctx.IO
 }
 
-func ProvideCommandExecutor(ctx *grapicmd.Ctx, ui clui.UI) excmd.Executor {
-	return excmd.NewExecutor(ctx.OutWriter, ctx.ErrWriter, ctx.InReader)
-}
-
-func ProvideGenerator(ctx *grapicmd.Ctx, ui clui.UI) module.Generator {
+func ProvideGenerator(ctx *grapicmd.Ctx, ui cli.UI) module.Generator {
 	return generator.New(
 		ctx.FS,
 		ui,
-		ctx.RootDir,
+		ctx.RootDir.String(),
 		ctx.ProtocConfig.ProtosDir,
 		ctx.ProtocConfig.OutDir,
 		ctx.Config.Grapi.ServerDir,
 		ctx.Config.Package,
-		ctx.Version,
+		ctx.Build.Version,
 	)
 }
 
 func ProvideScriptLoader(ctx *grapicmd.Ctx, executor excmd.Executor) module.ScriptLoader {
-	return script.NewLoader(ctx.FS, executor, ctx.RootDir)
+	return script.NewLoader(ctx.FS, executor, ctx.RootDir.String())
 }
 
 func ProvideGexConfig(ctx *grapicmd.Ctx) *gex.Config {
@@ -64,12 +52,12 @@ func ProvideGexConfig(ctx *grapicmd.Ctx) *gex.Config {
 	defer gexCfgMu.Unlock()
 	if gexCfg == nil {
 		gexCfg = &gex.Config{
-			OutWriter:  ctx.OutWriter,
-			ErrWriter:  ctx.ErrWriter,
-			InReader:   ctx.InReader,
+			OutWriter:  ctx.IO.Out,
+			ErrWriter:  ctx.IO.Err,
+			InReader:   ctx.IO.In,
 			FS:         ctx.FS,
 			Execer:     ctx.Execer,
-			WorkingDir: ctx.RootDir,
+			WorkingDir: ctx.RootDir.String(),
 			// TODO: set verbose flag
 			// TODO: set logger
 		}
@@ -90,7 +78,7 @@ func ProvideToolRepository(ctx *grapicmd.Ctx, gexCfg *gex.Config) (tool.Reposito
 	return toolRepo, nil
 }
 
-func ProvideProtocWrapper(ctx *grapicmd.Ctx, ui clui.UI, toolRepo tool.Repository) protoc.Wrapper {
+func ProvideProtocWrapper(ctx *grapicmd.Ctx, ui cli.UI, toolRepo tool.Repository) protoc.Wrapper {
 	return protoc.NewWrapper(
 		&ctx.ProtocConfig,
 		ctx.FS,
@@ -98,22 +86,22 @@ func ProvideProtocWrapper(ctx *grapicmd.Ctx, ui clui.UI, toolRepo tool.Repositor
 		ui,
 		toolRepo,
 		ctx.RootDir,
-		ctx.BinDir,
 	)
 }
 
-func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui clui.UI, generator module.Generator) usecase.InitializeProjectUsecase {
+func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui cli.UI, generator module.Generator) usecase.InitializeProjectUsecase {
 	return usecase.NewInitializeProjectUsecase(
 		ui,
 		generator,
 		gexCfg,
-		ctx.Version,
+		ctx.Build.Version,
 	)
 }
 
 var Set = wire.NewSet(
-	ProvideUI,
-	ProvideCommandExecutor,
+	ProvideIO,
+	cli.UIInstance,
+	excmd.NewExecutor,
 	ProvideGenerator,
 	ProvideScriptLoader,
 	ProvideGexConfig,

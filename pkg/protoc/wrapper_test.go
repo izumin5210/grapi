@@ -11,7 +11,7 @@ import (
 	"k8s.io/utils/exec"
 	"k8s.io/utils/exec/testing"
 
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/protoc"
 )
 
@@ -37,21 +37,21 @@ func TestWrapper_Exec(t *testing.T) {
 		}
 	}
 
-	rootDir := "/go/src/awesomeapp"
-	binDir := filepath.Join(rootDir, "bin")
-	protosDir := filepath.Join(rootDir, "api", "protos")
+	rootDir := cli.RootDir("/go/src/awesomeapp")
+	binDir := rootDir.BinDir()
+	protosDir := rootDir.Join("api", "protos")
 
 	fs := afero.NewMemMapFs()
 	dieIf(t, fs.MkdirAll(binDir, 0755))
 	dieIf(t, fs.MkdirAll(protosDir, 0755))
-	dieIf(t, afero.WriteFile(fs, filepath.Join(rootDir, "api", "should_be_ignored.proto"), []byte{}, 0644))
-	dieIf(t, afero.WriteFile(fs, filepath.Join(rootDir, "api", "should_be_ignored_proto"), []byte{}, 0644))
+	dieIf(t, afero.WriteFile(fs, rootDir.Join("api", "should_be_ignored.proto"), []byte{}, 0644))
+	dieIf(t, afero.WriteFile(fs, rootDir.Join("api", "should_be_ignored_proto"), []byte{}, 0644))
 	dieIf(t, afero.WriteFile(fs, filepath.Join(protosDir, "book.proto"), []byte{}, 0644))
 	dieIf(t, afero.WriteFile(fs, filepath.Join(protosDir, "types", "users.proto"), []byte{}, 0644))
 
 	cfg := &protoc.Config{
 		ImportDirs: []string{
-			filepath.Join(rootDir, "vendor", "github.com", "grpc-ecosystem", "grpc-gateway"),
+			rootDir.Join("vendor", "github.com", "grpc-ecosystem", "grpc-gateway"),
 			protosDir,
 		},
 		ProtosDir: "./api/protos",
@@ -63,7 +63,7 @@ func TestWrapper_Exec(t *testing.T) {
 		},
 	}
 
-	wrapper := protoc.NewWrapper(cfg, fs, execer, clui.Nop, &fakeToolRepository{}, rootDir, binDir)
+	wrapper := protoc.NewWrapper(cfg, fs, execer, cli.NopUI, &fakeToolRepository{}, rootDir)
 
 	err := wrapper.Exec(context.TODO())
 	if err != nil {

@@ -28,7 +28,7 @@ func TestUI(t *testing.T) {
 `
 
 	out := new(bytes.Buffer)
-	ui := cli.New(out, new(bytes.Buffer))
+	ui := cli.NewUI(&cli.IO{Out: out, In: new(bytes.Buffer)})
 
 	ui.Section("section 1")
 	ui.Subsection("subsection 1.1")
@@ -64,7 +64,7 @@ func TestUI_Confirm(t *testing.T) {
 		return &TestContext{
 			in:  in,
 			out: out,
-			ui:  cli.New(out, in),
+			ui:  cli.NewUI(&cli.IO{Out: out, In: in}),
 		}
 	}
 
@@ -127,7 +127,7 @@ func TestUI_Confirm(t *testing.T) {
 	}
 
 	t.Run("when failed to read", func(t *testing.T) {
-		ui := cli.New(new(bytes.Buffer), &errReader{})
+		ui := cli.NewUI(&cli.IO{Out: new(bytes.Buffer), In: &errReader{}})
 
 		ok, err := ui.Confirm("test")
 

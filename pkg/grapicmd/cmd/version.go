@@ -17,12 +17,13 @@ func newVersionCommand(ctx *grapicmd.Ctx) *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Run: func(cmd *cobra.Command, _ []string) {
-			buf := bytes.NewBufferString(ctx.AppName + " " + ctx.Version)
-			if ctx.Prebuilt {
-				buf.WriteString(" (" + ctx.BuildDate + " " + ctx.Revision + ")")
+			b := ctx.Build
+			buf := bytes.NewBufferString(b.AppName + " " + b.Version)
+			if b.Prebuilt {
+				buf.WriteString(" (" + b.BuildDate + " " + b.Revision + ")")
 			}
 			buf.WriteString("\n")
-			fmt.Fprintf(ctx.OutWriter, buf.String())
+			fmt.Fprintf(ctx.IO.Out, buf.String())
 		},
 	}
 }

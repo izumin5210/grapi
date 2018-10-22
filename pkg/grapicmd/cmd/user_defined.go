@@ -1,25 +1,23 @@
 package cmd
 
 import (
-	"path/filepath"
-
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
 func newUserDefinedCommands(ctx *grapicmd.Ctx) (cmds []*cobra.Command) {
-	if !ctx.InsideApp {
+	if !ctx.IsInsideApp() {
 		return
 	}
 
 	scriptLoader := di.NewScriptLoader(ctx)
 
-	err := scriptLoader.Load(filepath.Join(ctx.RootDir, "cmd"))
+	err := scriptLoader.Load(ctx.RootDir.Join("cmd"))
 	if err != nil {
 		// TODO: log
 		return
@@ -34,7 +32,7 @@ func newUserDefinedCommands(ctx *grapicmd.Ctx) (cmds []*cobra.Command) {
 	return
 }
 
-func newUserDefinedCommand(ui clui.UI, scriptLoader module.ScriptLoader, name string) *cobra.Command {
+func newUserDefinedCommand(ui cli.UI, scriptLoader module.ScriptLoader, name string) *cobra.Command {
 	return &cobra.Command{
 		Use:           name + " [-- BUILD_OPTIONS] [-- RUN_ARGS]",
 		SilenceErrors: true,

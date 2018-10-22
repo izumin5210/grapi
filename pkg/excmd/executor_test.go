@@ -5,6 +5,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/excmd"
 )
 
@@ -37,7 +38,7 @@ func TestExecutor_WithConnectedIO(t *testing.T) {
 			stderr := new(bytes.Buffer)
 			stdin := bytes.NewBufferString("foo\n")
 
-			execer := excmd.NewExecutor(stdout, stderr, stdin)
+			execer := excmd.NewExecutor(&cli.IO{Out: stdout, Err: stderr, In: stdin})
 
 			out, err := execer.Exec(context.TODO(), tc.cmd, tc.opts...)
 			if err != nil {

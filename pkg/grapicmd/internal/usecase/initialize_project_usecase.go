@@ -6,7 +6,7 @@ import (
 	"github.com/izumin5210/gex"
 	"github.com/pkg/errors"
 
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
@@ -18,7 +18,7 @@ type InitializeProjectUsecase interface {
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui clui.UI, generator module.ProjectGenerator, gexCfg *gex.Config, version string) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui cli.UI, generator module.ProjectGenerator, gexCfg *gex.Config, version string) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
 		ui:        ui,
 		generator: generator,
@@ -28,7 +28,7 @@ func NewInitializeProjectUsecase(ui clui.UI, generator module.ProjectGenerator, 
 }
 
 type initializeProjectUsecase struct {
-	ui        clui.UI
+	ui        cli.UI
 	generator module.ProjectGenerator
 	gexCfg    *gex.Config
 	version   string

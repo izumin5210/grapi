@@ -1,6 +1,6 @@
 package generator
 
-import "github.com/izumin5210/grapi/pkg/clui"
+import "github.com/izumin5210/grapi/pkg/cli"
 
 type status int
 
@@ -21,7 +21,7 @@ var (
 	}
 )
 
-func (s status) Fprint(ui clui.UI, msg string) {
+func (s status) Fprint(ui cli.UI, msg string) {
 	switch s {
 	case statusCreate, statusForce, statusDelete:
 		ui.ItemSuccess(msg)
