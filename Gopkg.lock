@@ -126,12 +126,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:145eff5207977eb95c3649a27cdc2e467d8a1c104810bc12b6a53745a91d823a"
+  digest = "1:466594e2922a8ca66af07370ea29726c0d40272baaad1158a36cd94baa6367d1"
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
     "hcl/ast",
     "hcl/parser",
+    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -398,12 +399,12 @@
   version = "v1.0.2"
 
 [[projects]]
-  digest = "1:f8e1a678a2571e265f4bf91a3e5e32aa6b1474a55cb0ea849750cc177b664d96"
+  digest = "1:214775c11fd26da94a100111a62daa25339198a4f9c57cb4aab352da889f5b93"
   name = "github.com/spf13/viper"
   packages = ["."]
   pruneopts = "UT"
-  revision = "25b30aa063fc18e48662b86996252eabdcf2f0c7"
-  version = "v1.0.0"
+  revision = "2c12c60302a5a0e62ee102ca9bc996277c2f64f5"
+  version = "v1.2.1"
 
 [[projects]]
   digest = "1:ba6b1a61040f11451864ea00fbc29fc3f9a29211c630ce94f6141a1d4346f8d7"
