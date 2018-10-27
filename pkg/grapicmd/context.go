@@ -36,6 +36,7 @@ type Config struct {
 	}
 }
 
+// BuildConfig contains the build metadata.
 type BuildConfig struct {
 	AppName   string
 	Version   string
@@ -97,6 +98,7 @@ func (c *Ctx) loadConfig() error {
 	return nil
 }
 
+// IsInsideApp returns true if the current working directory is inside a grapi project.
 func (c *Ctx) IsInsideApp() bool {
 	return c.insideApp
 }

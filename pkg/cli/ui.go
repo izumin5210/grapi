@@ -8,9 +8,11 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/izumin5210/clicontrib/pkg/clog"
+	"github.com/pkg/errors"
 	"github.com/tcnksm/go-input"
 )
 
+// UI is an interface for intaracting with the terminal.
 type UI interface {
 	Section(msg string)
 	Subsection(msg string)
@@ -25,6 +27,7 @@ var (
 	uiMu sync.Mutex
 )
 
+// UIInstance retuens a singleton UI instance.
 func UIInstance(io *IO) UI {
 	uiMu.Lock()
 	defer uiMu.Unlock()
@@ -95,7 +98,7 @@ func (u *uiImpl) Confirm(msg string) (bool, error) {
 		},
 	})
 	if err != nil {
-		return false, err
+		return false, errors.WithStack(err)
 	}
 	return ans == "Y", nil
 }
