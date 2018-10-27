@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
 )
 
@@ -75,7 +75,7 @@ func Test_userDefinedCommand(t *testing.T) {
 		script := moduletesting.NewMockScript(ctrl)
 
 		var verbose bool
-		cmd := newUserDefinedCommand(clui.Nop, loader, name)
+		cmd := newUserDefinedCommand(cli.NopUI, loader, name)
 		cmd.SetArgs(c.args)
 		cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "")
 

@@ -1,4 +1,4 @@
-package clui_test
+package cli_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/fatih/color"
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 )
 
 func TestUI(t *testing.T) {
@@ -28,7 +28,7 @@ func TestUI(t *testing.T) {
 `
 
 	out := new(bytes.Buffer)
-	ui := clui.New(out, new(bytes.Buffer))
+	ui := cli.NewUI(&cli.IO{Out: out, In: new(bytes.Buffer)})
 
 	ui.Section("section 1")
 	ui.Subsection("subsection 1.1")
@@ -55,7 +55,7 @@ func (r *errReader) Read(p []byte) (n int, err error) {
 func TestUI_Confirm(t *testing.T) {
 	type TestContext struct {
 		in, out, err *bytes.Buffer
-		ui           clui.UI
+		ui           cli.UI
 	}
 
 	createTestContext := func() *TestContext {
@@ -64,7 +64,7 @@ func TestUI_Confirm(t *testing.T) {
 		return &TestContext{
 			in:  in,
 			out: out,
-			ui:  clui.New(out, in),
+			ui:  cli.NewUI(&cli.IO{Out: out, In: in}),
 		}
 	}
 
@@ -127,7 +127,7 @@ func TestUI_Confirm(t *testing.T) {
 	}
 
 	t.Run("when failed to read", func(t *testing.T) {
-		ui := clui.New(new(bytes.Buffer), &errReader{})
+		ui := cli.NewUI(&cli.IO{Out: new(bytes.Buffer), In: &errReader{}})
 
 		ok, err := ui.Confirm("test")
 

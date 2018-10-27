@@ -9,7 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -27,7 +27,7 @@ func Test_CommandGenerator(t *testing.T) {
 
 	fs := afero.NewMemMapFs()
 
-	generator := newCommandGenerator(fs, clui.Nop, rootDir)
+	generator := newCommandGenerator(fs, cli.NopUI, rootDir)
 
 	name := "foo"
 	files := []string{

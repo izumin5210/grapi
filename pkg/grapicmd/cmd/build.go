@@ -15,7 +15,7 @@ func newBuildCommand(ctx *grapicmd.Ctx) *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(c *cobra.Command, args []string) (err error) {
-			if !ctx.InsideApp {
+			if !ctx.IsInsideApp() {
 				return errors.New("protoc command should be execute inside a grapi application directory")
 			}
 

@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/afero"
 	"k8s.io/utils/exec"
 
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -23,15 +23,14 @@ type Wrapper interface {
 type wrapperImpl struct {
 	cfg      *Config
 	fs       afero.Fs
-	ui       clui.UI
+	ui       cli.UI
 	execer   exec.Interface
 	toolRepo tool.Repository
-	rootDir  string
-	binDir   string
+	rootDir  cli.RootDir
 }
 
 // NewWrapper creates a new Wrapper instance.
-func NewWrapper(cfg *Config, fs afero.Fs, execer exec.Interface, ui clui.UI, toolRepo tool.Repository, rootDir, binDir string) Wrapper {
+func NewWrapper(cfg *Config, fs afero.Fs, execer exec.Interface, ui cli.UI, toolRepo tool.Repository, rootDir cli.RootDir) Wrapper {
 	return &wrapperImpl{
 		cfg:      cfg,
 		fs:       fs,
@@ -39,7 +38,6 @@ func NewWrapper(cfg *Config, fs afero.Fs, execer exec.Interface, ui clui.UI, too
 		execer:   execer,
 		toolRepo: toolRepo,
 		rootDir:  rootDir,
-		binDir:   binDir,
 	}
 }
 
@@ -63,7 +61,7 @@ func (e *wrapperImpl) installPlugins(ctx context.Context) error {
 }
 
 func (e *wrapperImpl) execProtocAll(ctx context.Context) error {
-	protoFiles, err := e.cfg.ProtoFiles(e.fs, e.rootDir)
+	protoFiles, err := e.cfg.ProtoFiles(e.fs, e.rootDir.String())
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -71,7 +69,7 @@ func (e *wrapperImpl) execProtocAll(ctx context.Context) error {
 	var errs []error
 	for _, path := range protoFiles {
 		err = e.execProtoc(ctx, path)
-		relPath, _ := filepath.Rel(e.rootDir, path)
+		relPath, _ := filepath.Rel(e.rootDir.String(), path)
 		if err == nil {
 			e.ui.ItemSuccess(relPath)
 		} else {
@@ -89,7 +87,7 @@ func (e *wrapperImpl) execProtocAll(ctx context.Context) error {
 }
 
 func (e *wrapperImpl) execProtoc(ctx context.Context, protoPath string) error {
-	outDir, err := e.cfg.OutDirOf(e.rootDir, protoPath)
+	outDir, err := e.cfg.OutDirOf(e.rootDir.String(), protoPath)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -98,18 +96,18 @@ func (e *wrapperImpl) execProtoc(ctx context.Context, protoPath string) error {
 		return errors.WithStack(err)
 	}
 
-	cmds, err := e.cfg.Commands(e.rootDir, protoPath)
+	cmds, err := e.cfg.Commands(e.rootDir.String(), protoPath)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	path := e.binDir + string(filepath.ListSeparator) + os.Getenv("PATH")
+	path := e.rootDir.BinDir() + string(filepath.ListSeparator) + os.Getenv("PATH")
 	env := append(os.Environ(), "PATH="+path)
 
 	for _, args := range cmds {
 		cmd := e.execer.CommandContext(ctx, args[0], args[1:]...)
 		cmd.SetEnv(env)
-		cmd.SetDir(e.rootDir)
+		cmd.SetDir(e.rootDir.String())
 		out, err := cmd.CombinedOutput()
 		if err != nil {
 			return errors.Wrapf(err, "failed to execute command: %v\n%s", args, string(out))

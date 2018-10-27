@@ -38,7 +38,7 @@ func newGenerateServiceCommand(ctx *grapicmd.Ctx) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ctx.InsideApp {
+			if !ctx.IsInsideApp() {
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
@@ -79,7 +79,7 @@ func newGenerateScaffoldServiceCommand(ctx *grapicmd.Ctx) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ctx.InsideApp {
+			if !ctx.IsInsideApp() {
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 
@@ -115,7 +115,7 @@ func newGenerateCommandCommand(ctx *grapicmd.Ctx) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ctx.InsideApp {
+			if !ctx.IsInsideApp() {
 				return errors.New("geneate command should execut inside a grapi application directory")
 			}
 

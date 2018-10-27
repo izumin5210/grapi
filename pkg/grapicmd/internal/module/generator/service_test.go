@@ -10,7 +10,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
@@ -189,7 +189,7 @@ func Test_ServiceGenerator(t *testing.T) {
 			test += " with " + strings.Join(c.args, ",")
 		}
 
-		generator := newServiceGenerator(fs, clui.Nop, rootDir, c.protoDir, c.protoOutDir, c.serverDir, c.pkgName)
+		generator := newServiceGenerator(fs, cli.NopUI, rootDir, c.protoDir, c.protoOutDir, c.serverDir, c.pkgName)
 
 		t.Run(test, func(t *testing.T) {
 			test := "Generate"

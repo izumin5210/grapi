@@ -5,7 +5,7 @@ package di
 import (
 	"github.com/google/go-cloud/wire"
 
-	"github.com/izumin5210/grapi/pkg/clui"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
@@ -13,7 +13,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/protoc"
 )
 
-func NewUI(*grapicmd.Ctx) clui.UI {
+func NewUI(*grapicmd.Ctx) cli.UI {
 	wire.Build(Set)
 	return nil
 }

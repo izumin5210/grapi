@@ -1,39 +1,30 @@
 package grapicmd
 
 import (
-	"io"
 	"path/filepath"
 
+	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 	"k8s.io/utils/exec"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/protoc"
 )
 
 // Ctx contains the runtime context of grpai.
 type Ctx struct {
-	FS        afero.Fs
-	Viper     *viper.Viper
-	Execer    exec.Interface
-	InReader  io.Reader
-	OutWriter io.Writer
-	ErrWriter io.Writer
+	FS     afero.Fs
+	Viper  *viper.Viper
+	Execer exec.Interface
+	IO     *cli.IO
 
-	CurrentDir string
-	RootDir    string
-	BinDir     string
-	InsideApp  bool
-
-	AppName   string
-	Version   string
-	Revision  string
-	BuildDate string
-	Prebuilt  bool
+	RootDir   cli.RootDir
+	insideApp bool
 
 	Config       Config
+	Build        BuildConfig
 	ProtocConfig protoc.Config
 }
 
@@ -45,51 +36,69 @@ type Config struct {
 	}
 }
 
+// BuildConfig contains the build metadata.
+type BuildConfig struct {
+	AppName   string
+	Version   string
+	Revision  string
+	BuildDate string
+	Prebuilt  bool
+}
+
 // Init initializes the runtime context.
-func (c *Ctx) Init() {
+func (c *Ctx) Init() error {
 	if c.FS == nil {
 		c.FS = afero.NewOsFs()
 	}
 
 	if c.Viper == nil {
 		c.Viper = viper.New()
-		c.Viper.SetFs(c.FS)
 	}
+
+	c.Viper.SetFs(c.FS)
 
 	if c.Execer == nil {
 		c.Execer = exec.New()
 	}
 
-	if c.RootDir == "" {
-		c.RootDir, c.InsideApp = fs.LookupRoot(c.FS, c.CurrentDir)
+	if c.Build.AppName == "" {
+		c.Build.AppName = "grapi"
 	}
 
-	if c.InsideApp && c.BinDir == "" {
-		c.BinDir = filepath.Join(c.RootDir, "bin")
-	}
+	return errors.WithStack(c.loadConfig())
 }
 
-// Load reads configurations from the config file.
-func (c *Ctx) Load(cfgFile string) error {
-	if !c.InsideApp {
+func (c *Ctx) loadConfig() error {
+	c.Viper.SetConfigName(c.Build.AppName)
+	for dir := c.RootDir.String(); dir != "/"; dir = filepath.Dir(dir) {
+		c.Viper.AddConfigPath(dir)
+	}
+
+	err := c.Viper.ReadInConfig()
+	if err != nil {
+		clog.Info("failed to find config file", "error", err)
 		return nil
 	}
 
-	c.Viper.SetConfigFile(cfgFile)
-	err := c.Viper.ReadInConfig()
-	if err != nil {
-		return errors.WithStack(err)
-	}
+	c.insideApp = true
+	c.RootDir = cli.RootDir(filepath.Dir(c.Viper.ConfigFileUsed()))
 
-	err = c.Viper.UnmarshalKey("config", &c.Config)
+	err = c.Viper.Unmarshal(&c.Config)
 	if err != nil {
+		clog.Warn("failed to parse config", "error", err)
 		return errors.WithStack(err)
 	}
 
 	err = c.Viper.UnmarshalKey("protoc", &c.ProtocConfig)
 	if err != nil {
+		clog.Warn("failed to parse protoc config", "error", err)
 		return errors.WithStack(err)
 	}
 
 	return nil
+}
+
+// IsInsideApp returns true if the current working directory is inside a grapi project.
+func (c *Ctx) IsInsideApp() bool {
+	return c.insideApp
 }

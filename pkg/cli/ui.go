@@ -1,12 +1,107 @@
-package clui
+package cli
 
 import (
 	"fmt"
 	"io"
 	"strconv"
+	"sync"
 
 	"github.com/fatih/color"
+	"github.com/izumin5210/clicontrib/pkg/clog"
+	"github.com/pkg/errors"
+	"github.com/tcnksm/go-input"
 )
+
+// UI is an interface for intaracting with the terminal.
+type UI interface {
+	Section(msg string)
+	Subsection(msg string)
+	ItemSuccess(msg string)
+	ItemSkipped(msg string)
+	ItemFailure(msg string)
+	Confirm(msg string) (bool, error)
+}
+
+var (
+	ui   UI
+	uiMu sync.Mutex
+)
+
+// UIInstance retuens a singleton UI instance.
+func UIInstance(io *IO) UI {
+	uiMu.Lock()
+	defer uiMu.Unlock()
+	if ui == nil {
+		ui = NewUI(io)
+	}
+	return ui
+}
+
+// NewUI creates a new UI instance.
+func NewUI(io *IO) UI {
+	return &uiImpl{
+		out: io.Out,
+		inputUI: &input.UI{
+			Reader: io.In,
+			Writer: io.Out,
+		},
+	}
+}
+
+type uiImpl struct {
+	out       io.Writer
+	inSection bool
+	inputUI   *input.UI
+}
+
+func (u *uiImpl) Section(msg string) {
+	if u.inSection {
+		fmt.Fprintln(u.out)
+		u.inSection = false
+	}
+	printTypeSection.Fprintln(u.out, msg)
+}
+
+func (u *uiImpl) Subsection(msg string) {
+	if u.inSection {
+		fmt.Fprintln(u.out)
+		u.inSection = false
+	}
+	printTypeSubsection.Fprintln(u.out, msg)
+}
+
+func (u *uiImpl) ItemSuccess(msg string) {
+	u.inSection = true
+	printTypeItemSuccess.Fprintln(u.out, msg)
+}
+
+func (u *uiImpl) ItemSkipped(msg string) {
+	u.inSection = true
+	printTypeItemSkipped.Fprintln(u.out, msg)
+}
+
+func (u *uiImpl) ItemFailure(msg string) {
+	u.inSection = true
+	printTypeItemFailure.Fprintln(u.out, msg)
+}
+
+func (u *uiImpl) Confirm(msg string) (bool, error) {
+	ans, err := u.inputUI.Ask(fmt.Sprintf("%s [Y/n]", msg), &input.Options{
+		HideOrder: true,
+		Loop:      true,
+		ValidateFunc: func(ans string) error {
+			clog.Debug("receive user input", "query", msg, "input", ans)
+			if ans != "Y" && ans != "n" {
+				return fmt.Errorf("input must be Y or n")
+			}
+			return nil
+		},
+	})
+	if err != nil {
+		return false, errors.WithStack(err)
+	}
+	return ans == "Y", nil
+}
 
 type fprintFunc func(w io.Writer, msg string)
 
