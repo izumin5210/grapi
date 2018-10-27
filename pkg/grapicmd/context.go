@@ -1,6 +1,9 @@
 package grapicmd
 
 import (
+	"path/filepath"
+
+	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
@@ -42,46 +45,52 @@ type BuildConfig struct {
 }
 
 // Init initializes the runtime context.
-func (c *Ctx) Init() {
+func (c *Ctx) Init() error {
 	if c.FS == nil {
 		c.FS = afero.NewOsFs()
 	}
 
 	if c.Viper == nil {
 		c.Viper = viper.New()
-		c.Viper.SetFs(c.FS)
 	}
+
+	c.Viper.SetFs(c.FS)
 
 	if c.Execer == nil {
 		c.Execer = exec.New()
 	}
 
-	cwd := c.RootDir
-	c.RootDir, c.insideApp = cli.LookupRoot(c.FS, string(cwd))
-	if c.RootDir == "" {
-		c.RootDir = cwd
+	if c.Build.AppName == "" {
+		c.Build.AppName = "grapi"
 	}
+
+	return errors.WithStack(c.loadConfig())
 }
 
-// Load reads configurations from the config file.
-func (c *Ctx) Load(cfgFile string) error {
-	if !c.IsInsideApp() {
+func (c *Ctx) loadConfig() error {
+	c.Viper.SetConfigName(c.Build.AppName)
+	for dir := c.RootDir.String(); dir != "/"; dir = filepath.Dir(dir) {
+		c.Viper.AddConfigPath(dir)
+	}
+
+	err := c.Viper.ReadInConfig()
+	if err != nil {
+		clog.Info("failed to find config file", "error", err)
 		return nil
 	}
 
-	c.Viper.SetConfigFile(cfgFile)
-	err := c.Viper.ReadInConfig()
-	if err != nil {
-		return errors.WithStack(err)
-	}
+	c.insideApp = true
+	c.RootDir = cli.RootDir(filepath.Dir(c.Viper.ConfigFileUsed()))
 
-	err = c.Viper.UnmarshalKey("config", &c.Config)
+	err = c.Viper.Unmarshal(&c.Config)
 	if err != nil {
+		clog.Warn("failed to parse config", "error", err)
 		return errors.WithStack(err)
 	}
 
 	err = c.Viper.UnmarshalKey("protoc", &c.ProtocConfig)
 	if err != nil {
+		clog.Warn("failed to parse protoc config", "error", err)
 		return errors.WithStack(err)
 	}
 
