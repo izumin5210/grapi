@@ -64,7 +64,7 @@
   version = "v1.1.0"
 
 [[projects]]
-  digest = "1:df952a62d984399a73ad0790d068685c97df728775f37085fc4e4a722702e90f"
+  digest = "1:5361c1ca82d15ece55f64e81138758cfaa45dcbd67566ecb837e1f7f686f645a"
   name = "github.com/google/go-cloud"
   packages = [
     "wire",
@@ -72,8 +72,8 @@
     "wire/internal/wire",
   ]
   pruneopts = "UT"
-  revision = "d51dabf6bc34d700251536a5e943a85a0339bc58"
-  version = "0.3.0"
+  revision = "573424055b8e657474e034cdb3a8d5f9210010b7"
+  version = "v0.4.0"
 
 [[projects]]
   digest = "1:2e3c336fc7fde5c984d2841455a658a6d626450b1754a854b3b32e7a8f49a07a"
