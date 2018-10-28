@@ -3,6 +3,7 @@ package grapicmd
 import (
 	"path/filepath"
 
+	"github.com/google/go-cloud/wire"
 	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
@@ -47,6 +48,10 @@ type BuildConfig struct {
 
 // Init initializes the runtime context.
 func (c *Ctx) Init() error {
+	if c.IO == nil {
+		c.IO = cli.DefaultIO()
+	}
+
 	if c.FS == nil {
 		c.FS = afero.NewOsFs()
 	}
@@ -102,3 +107,24 @@ func (c *Ctx) loadConfig() error {
 func (c *Ctx) IsInsideApp() bool {
 	return c.insideApp
 }
+
+// CtxSet is a provider set that includes modules contained in Ctx.
+var CtxSet = wire.NewSet(
+	ProvideFS,
+	ProvideViper,
+	ProvideExecer,
+	ProvideIO,
+	ProvideRootDir,
+	ProvideConfig,
+	ProvideBuildConfig,
+	ProvideProtocConfig,
+)
+
+func ProvideFS(c *Ctx) afero.Fs                 { return c.FS }
+func ProvideViper(c *Ctx) *viper.Viper          { return c.Viper }
+func ProvideExecer(c *Ctx) exec.Interface       { return c.Execer }
+func ProvideIO(c *Ctx) *cli.IO                  { return c.IO }
+func ProvideRootDir(c *Ctx) cli.RootDir         { return c.RootDir }
+func ProvideConfig(c *Ctx) *Config              { return &c.Config }
+func ProvideBuildConfig(c *Ctx) *BuildConfig    { return &c.Build }
+func ProvideProtocConfig(c *Ctx) *protoc.Config { return &c.ProtocConfig }
