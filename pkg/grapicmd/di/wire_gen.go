@@ -17,46 +17,53 @@ import (
 // Injectors from wire.go:
 
 func NewUI(ctx *grapicmd.Ctx) cli.UI {
-	io := ProvideIO(ctx)
+	io := grapicmd.ProvideIO(ctx)
 	ui := cli.UIInstance(io)
 	return ui
 }
 
 func NewCommandExecutor(ctx *grapicmd.Ctx) excmd.Executor {
-	io := ProvideIO(ctx)
+	io := grapicmd.ProvideIO(ctx)
 	executor := excmd.NewExecutor(io)
 	return executor
 }
 
 func NewGenerator(ctx *grapicmd.Ctx) module.Generator {
-	io := ProvideIO(ctx)
+	io := grapicmd.ProvideIO(ctx)
 	ui := cli.UIInstance(io)
 	generator := ProvideGenerator(ctx, ui)
 	return generator
 }
 
 func NewScriptLoader(ctx *grapicmd.Ctx) module.ScriptLoader {
-	io := ProvideIO(ctx)
+	io := grapicmd.ProvideIO(ctx)
 	executor := excmd.NewExecutor(io)
 	scriptLoader := ProvideScriptLoader(ctx, executor)
 	return scriptLoader
 }
 
 func NewProtocWrapper(ctx *grapicmd.Ctx) (protoc.Wrapper, error) {
-	io := ProvideIO(ctx)
+	config := grapicmd.ProvideProtocConfig(ctx)
+	fs := grapicmd.ProvideFS(ctx)
+	execInterface := grapicmd.ProvideExecer(ctx)
+	io := grapicmd.ProvideIO(ctx)
 	ui := cli.UIInstance(io)
-	config := ProvideGexConfig(ctx)
-	repository, err := ProvideToolRepository(ctx, config)
+	rootDir := grapicmd.ProvideRootDir(ctx)
+	gexConfig := protoc.ProvideGexConfig(fs, execInterface, io, rootDir)
+	repository, err := protoc.ProvideToolRepository(gexConfig)
 	if err != nil {
 		return nil, err
 	}
-	wrapper := ProvideProtocWrapper(ctx, ui, repository)
+	wrapper := protoc.NewWrapper(config, fs, execInterface, ui, repository, rootDir)
 	return wrapper, nil
 }
 
 func NewInitializeProjectUsecase(ctx *grapicmd.Ctx) usecase.InitializeProjectUsecase {
-	config := ProvideGexConfig(ctx)
-	io := ProvideIO(ctx)
+	fs := grapicmd.ProvideFS(ctx)
+	execInterface := grapicmd.ProvideExecer(ctx)
+	io := grapicmd.ProvideIO(ctx)
+	rootDir := grapicmd.ProvideRootDir(ctx)
+	config := protoc.ProvideGexConfig(fs, execInterface, io, rootDir)
 	ui := cli.UIInstance(io)
 	generator := ProvideGenerator(ctx, ui)
 	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, generator)
