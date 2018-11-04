@@ -23,7 +23,6 @@ func ProvideGenerator(ctx *grapicmd.Ctx, ui cli.UI) module.Generator {
 		ctx.ProtocConfig.OutDir,
 		ctx.Config.Grapi.ServerDir,
 		ctx.Config.Package,
-		ctx.Build.Version,
 	)
 }
 
@@ -36,7 +35,6 @@ func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui c
 		ui,
 		generator,
 		gexCfg,
-		ctx.Build.Version,
 	)
 }
 

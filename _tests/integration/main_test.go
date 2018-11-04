@@ -34,7 +34,15 @@ func Test_Integration(t *testing.T) {
 	fs.MkdirAll(srcDir, 0755)
 	defer fs.RemoveAll(gopath)
 
-	cmd := exec.Command(bin, "--debug", "init", "--HEAD", name)
+	args := []string{"--debug", "init"}
+	if commit, ok := os.LookupEnv("TRAVIS_COMMIT"); ok {
+		args = append(args, "--revision="+commit)
+	} else {
+		args = append(args, "--HEAD")
+	}
+	args = append(args, name)
+
+	cmd := exec.Command(bin, args...)
 	cmd.Dir = srcDir
 	cmd.Env = append(os.Environ(), "GOPATH="+gopath)
 	out, err := cmd.CombinedOutput()

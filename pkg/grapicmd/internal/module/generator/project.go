@@ -12,17 +12,15 @@ import (
 
 type projectGenerator struct {
 	baseGenerator
-	version string
 }
 
-func newProjectGenerator(fs afero.Fs, ui cli.UI, version string) module.ProjectGenerator {
+func newProjectGenerator(fs afero.Fs, ui cli.UI) module.ProjectGenerator {
 	return &projectGenerator{
 		baseGenerator: newBaseGenerator(template.Init, fs, ui),
-		version:       version,
 	}
 }
 
-func (g *projectGenerator) GenerateProject(rootDir, pkgName string, cfg module.ProjectGenerationConfig) error {
+func (g *projectGenerator) GenerateProject(rootDir, pkgName string) error {
 	importPath, err := fs.GetImportPath(rootDir)
 	if err != nil {
 		return errors.WithStack(err)
@@ -38,8 +36,6 @@ func (g *projectGenerator) GenerateProject(rootDir, pkgName string, cfg module.P
 	data := map[string]interface{}{
 		"packageName": pkgName,
 		"importPath":  importPath,
-		"version":     g.version,
-		"headUsed":    cfg.UseHEAD,
 	}
 	return g.Generate(rootDir, data, generationConfig{})
 }
