@@ -348,6 +348,14 @@
   revision = "a683aaf2d516deecd70cad0c72e3ca773ecfcef0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:7ca2584fa7da0520cd2d1136a10194fe5a5b220bdb215074ab6f7b5ad91115f4"
+  name = "github.com/shurcooL/httpfs"
+  packages = ["vfsutil"]
+  pruneopts = "UT"
+  revision = "809beceb23714880abc4a382a00c05f89d13b1cc"
+
+[[projects]]
   digest = "1:30e06e6d62a1d694e3cdbff29d8a9a96022e05a487d0c6eaf0ef898965ef28fb"
   name = "github.com/soheilhy/cmux"
   packages = ["."]
@@ -731,9 +739,11 @@
     "github.com/mitchellh/gox",
     "github.com/pkg/errors",
     "github.com/serenize/snaker",
+    "github.com/shurcooL/httpfs/vfsutil",
     "github.com/soheilhy/cmux",
     "github.com/spf13/afero",
     "github.com/spf13/cobra",
+    "github.com/spf13/pflag",
     "github.com/spf13/viper",
     "github.com/srvc/wraperr/cmd/wraperr",
     "github.com/tcnksm/go-input",
