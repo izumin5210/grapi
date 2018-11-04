@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package {{ .Proto.Package }};
+
+option go_package = "{{ .PbGo.PackagePath }};{{ .PbGo.PackageName }}";
+
+{{range .Proto.Imports}}
+import "{{.}}";
+{{- end}}
+
+service {{ .ServiceName }}Service {	
+{{- range .Methods}}
+  rpc {{.Method}} ({{.RequestProto}}) returns ({{.ResponseProto}}) {
+    option (google.api.http) = {
+      {{.HTTP.Method}}: "/{{.HTTP.Path}}"
+      {{- if .HTTP.Body}}
+      body: "{{.HTTP.Body}}"
+      {{- end}}
+    };
+  }
+{{- end}}
+}
+{{range .Proto.Messages}}
+message {{.Name}} {
+  {{- range .Fields}}
+  {{- if .Repeated}}
+  repeated {{.Type}} {{.Name}} = {{.Tag}};
+  {{- else}}
+  {{.Type}} {{.Name}} = {{.Tag}};
+  {{- end}}
+  {{- end}}
+}
+{{end -}}

@@ -104,4 +104,8 @@ required = [
 
 [[constraint]]
   branch = "master"
+  name = "github.com/shurcooL/vfsgen"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/shurcooL/httpfs"

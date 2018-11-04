@@ -356,6 +356,14 @@
   revision = "809beceb23714880abc4a382a00c05f89d13b1cc"
 
 [[projects]]
+  branch = "master"
+  digest = "1:da947121c0a7abeab824f2bf6732762af118aa17b292e2d77886921eeedd6c51"
+  name = "github.com/shurcooL/vfsgen"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a97a25d856cadfe6481325baeb35a70d6723ca0c"
+
+[[projects]]
   digest = "1:30e06e6d62a1d694e3cdbff29d8a9a96022e05a487d0c6eaf0ef898965ef28fb"
   name = "github.com/soheilhy/cmux"
   packages = ["."]
@@ -740,6 +748,7 @@
     "github.com/pkg/errors",
     "github.com/serenize/snaker",
     "github.com/shurcooL/httpfs/vfsutil",
+    "github.com/shurcooL/vfsgen",
     "github.com/soheilhy/cmux",
     "github.com/spf13/afero",
     "github.com/spf13/cobra",
