@@ -9,12 +9,11 @@ import (
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/di"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
 func newInitCommand(ctx *grapicmd.Ctx) *cobra.Command {
-	var (
-		pkgName  string
-	)
+	var cfg usecase.InitConfig
 
 	cmd := &cobra.Command{
 		Use:           "init [name]",
@@ -33,7 +32,12 @@ func newInitCommand(ctx *grapicmd.Ctx) *cobra.Command {
 		},
 	}
 
-	cmd.PersistentFlags().StringVarP(&pkgName, "package", "p", "", `Package name of the application(default: "<parent_package_or_username>.<app_name>")`)
+	cmd.PersistentFlags().StringVar(&cfg.Source, "source", "", "Specify grapi repository")
+	cmd.PersistentFlags().StringVar(&cfg.Revision, "revision", "", "Specify grapi revision")
+	cmd.PersistentFlags().StringVar(&cfg.Branch, "branch", "", "Specify grapi branch")
+	cmd.PersistentFlags().StringVar(&cfg.Version, "version", "", "Specify grapi version")
+	cmd.PersistentFlags().BoolVar(&cfg.HEAD, "HEAD", false, "Use HEAD grapi")
+	cmd.PersistentFlags().StringVarP(&cfg.Package, "package", "p", "", `Package name of the application(default: "<parent_package_or_username>.<app_name>")`)
 
 	return cmd
 }
