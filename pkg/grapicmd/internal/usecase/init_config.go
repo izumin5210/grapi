@@ -3,7 +3,6 @@ package usecase
 import "bytes"
 
 type InitConfig struct {
-	Source   string
 	Revision string
 	Branch   string
 	Version  string
@@ -13,9 +12,6 @@ type InitConfig struct {
 
 func (c *InitConfig) BuildSpec() string {
 	buf := bytes.NewBufferString("")
-	if c.Source != "" {
-		buf.WriteString(":" + c.Source)
-	}
 	var constraint string
 	switch {
 	case c.Revision != "":

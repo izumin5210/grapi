@@ -31,16 +31,6 @@ func TestInitConfig_BuildSpec(t *testing.T) {
 			cfg:  InitConfig{Revision: "a2489d2"},
 			out:  "@a2489d2",
 		},
-		{
-			test: "source",
-			cfg:  InitConfig{Source: "github.com/izumin5210-sandbox/grapi"},
-			out:  ":github.com/izumin5210-sandbox/grapi",
-		},
-		{
-			test: "source and branch",
-			cfg:  InitConfig{Source: "github.com/izumin5210-sandbox/grapi", Branch: "fix-bugs"},
-			out:  ":github.com/izumin5210-sandbox/grapi@fix-bugs",
-		},
 	}
 
 	for _, tc := range cases {

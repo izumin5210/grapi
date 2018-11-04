@@ -32,7 +32,6 @@ func newInitCommand(ctx *grapicmd.Ctx) *cobra.Command {
 		},
 	}
 
-	cmd.PersistentFlags().StringVar(&cfg.Source, "source", "", "Specify grapi repository")
 	cmd.PersistentFlags().StringVar(&cfg.Revision, "revision", "", "Specify grapi revision")
 	cmd.PersistentFlags().StringVar(&cfg.Branch, "branch", "", "Specify grapi branch")
 	cmd.PersistentFlags().StringVar(&cfg.Version, "version", "", "Specify grapi version")
