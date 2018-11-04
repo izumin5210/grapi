@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/afero"
 
 	"github.com/izumin5210/grapi/pkg/cli"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
@@ -24,22 +23,17 @@ func TestProjectGenerator_GenerateProject(t *testing.T) {
 
 	cases := []struct {
 		test string
-		cfg  module.ProjectGenerationConfig
 	}{
 		{
 			test: "no config",
-		},
-		{
-			test: "with UseHEAD",
-			cfg:  module.ProjectGenerationConfig{UseHEAD: true},
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.test, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			generator := newProjectGenerator(fs, cli.NopUI, "v1.0.0")
-			err := generator.GenerateProject(rootDir, "", tc.cfg)
+			generator := newProjectGenerator(fs, cli.NopUI)
+			err := generator.GenerateProject(rootDir, "")
 
 			if err != nil {
 				t.Errorf("returned an error %v", err)

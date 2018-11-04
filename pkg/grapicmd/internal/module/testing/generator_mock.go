@@ -34,15 +34,15 @@ func (m *MockGenerator) EXPECT() *MockGeneratorMockRecorder {
 }
 
 // GenerateProject mocks base method
-func (m *MockGenerator) GenerateProject(rootDir, pkgName string, cfg module.ProjectGenerationConfig) error {
-	ret := m.ctrl.Call(m, "GenerateProject", rootDir, pkgName, cfg)
+func (m *MockGenerator) GenerateProject(rootDir, pkgName string) error {
+	ret := m.ctrl.Call(m, "GenerateProject", rootDir, pkgName)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // GenerateProject indicates an expected call of GenerateProject
-func (mr *MockGeneratorMockRecorder) GenerateProject(rootDir, pkgName, cfg interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateProject", reflect.TypeOf((*MockGenerator)(nil).GenerateProject), rootDir, pkgName, cfg)
+func (mr *MockGeneratorMockRecorder) GenerateProject(rootDir, pkgName interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateProject", reflect.TypeOf((*MockGenerator)(nil).GenerateProject), rootDir, pkgName)
 }
 
 // GenerateService mocks base method
@@ -129,15 +129,15 @@ func (m *MockProjectGenerator) EXPECT() *MockProjectGeneratorMockRecorder {
 }
 
 // GenerateProject mocks base method
-func (m *MockProjectGenerator) GenerateProject(rootDir, pkgName string, cfg module.ProjectGenerationConfig) error {
-	ret := m.ctrl.Call(m, "GenerateProject", rootDir, pkgName, cfg)
+func (m *MockProjectGenerator) GenerateProject(rootDir, pkgName string) error {
+	ret := m.ctrl.Call(m, "GenerateProject", rootDir, pkgName)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // GenerateProject indicates an expected call of GenerateProject
-func (mr *MockProjectGeneratorMockRecorder) GenerateProject(rootDir, pkgName, cfg interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateProject", reflect.TypeOf((*MockProjectGenerator)(nil).GenerateProject), rootDir, pkgName, cfg)
+func (mr *MockProjectGeneratorMockRecorder) GenerateProject(rootDir, pkgName interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateProject", reflect.TypeOf((*MockProjectGenerator)(nil).GenerateProject), rootDir, pkgName)
 }
 
 // MockServiceGenerator is a mock of ServiceGenerator interface

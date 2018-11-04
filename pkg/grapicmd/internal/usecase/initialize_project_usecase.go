@@ -12,18 +12,17 @@ import (
 
 // InitializeProjectUsecase is an interface to create a new grapi project.
 type InitializeProjectUsecase interface {
-	Perform(rootDir, pkgName string, headUsed bool) error
-	GenerateProject(rootDir, pkgName string, headUsed bool) error
+	Perform(rootDir string, pkgName string) error
+	GenerateProject(rootDir, pkgName string) error
 	InstallDeps(rootDir string) error
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui cli.UI, generator module.ProjectGenerator, gexCfg *gex.Config, version string) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui cli.UI, generator module.ProjectGenerator, gexCfg *gex.Config) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
 		ui:        ui,
 		generator: generator,
 		gexCfg:    gexCfg,
-		version:   version,
 	}
 }
 
@@ -31,14 +30,13 @@ type initializeProjectUsecase struct {
 	ui        cli.UI
 	generator module.ProjectGenerator
 	gexCfg    *gex.Config
-	version   string
 }
 
-func (u *initializeProjectUsecase) Perform(rootDir, pkgName string, headUsed bool) error {
+func (u *initializeProjectUsecase) Perform(rootDir, pkgName string) error {
 	u.ui.Section("Initialize project")
 
 	var err error
-	err = u.GenerateProject(rootDir, pkgName, headUsed)
+	err = u.GenerateProject(rootDir, pkgName)
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize project")
 	}
@@ -52,8 +50,8 @@ func (u *initializeProjectUsecase) Perform(rootDir, pkgName string, headUsed boo
 	return nil
 }
 
-func (u *initializeProjectUsecase) GenerateProject(rootDir, pkgName string, headUsed bool) error {
-	return errors.WithStack(u.generator.GenerateProject(rootDir, pkgName, module.ProjectGenerationConfig{UseHEAD: true}))
+func (u *initializeProjectUsecase) GenerateProject(rootDir, pkgName string) error {
+	return errors.WithStack(u.generator.GenerateProject(rootDir, pkgName))
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string) error {
