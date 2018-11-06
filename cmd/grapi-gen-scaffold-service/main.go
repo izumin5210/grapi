@@ -24,17 +24,19 @@ func NewGenerateCommand(createApp CreateAppFunc) *gencmd.Command {
 	var (
 		skipTest bool
 		resName  string
+		app      *svcgen.App
 	)
 
 	cmd := &gencmd.Command{
 		Short:      "Generate a new service with standard methods",
 		Args:       cobra.ExactArgs(1),
 		TemplateFS: template.FS,
+		PreRun: func(c *gencmd.Command, args []string) error {
+			var err error
+			app, err = createApp(c.Ctx(), c)
+			return errors.WithStack(err)
+		},
 		BuildParams: func(c *gencmd.Command, args []string) (interface{}, error) {
-			app, err := createApp(c.Ctx(), c)
-			if err != nil {
-				return nil, errors.WithStack(err)
-			}
 			svcName := args[0]
 			methods := []string{"list", "get", "create", "update", "delete"}
 
@@ -42,10 +44,6 @@ func NewGenerateCommand(createApp CreateAppFunc) *gencmd.Command {
 			return params, errors.WithStack(err)
 		},
 		PostRun: func(c *gencmd.Command, args []string) error {
-			app, err := createApp(c.Ctx(), c)
-			if err != nil {
-				return errors.WithStack(err)
-			}
 			return errors.WithStack(app.ProtocWrapper.Exec(context.TODO()))
 		},
 	}

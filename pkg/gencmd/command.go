@@ -1,9 +1,9 @@
 package gencmd
 
 import (
-	"errors"
 	"net/http"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -23,6 +23,7 @@ type Command struct {
 	Example         string
 	Args            cobra.PositionalArgs
 	BuildParams     func(c *Command, args []string) (interface{}, error)
+	PreRun          func(c *Command, args []string) error
 	PostRun         func(c *Command, args []string) error
 	ShouldRun       ShouldRunFunc
 	ShouldInsideApp bool
@@ -53,6 +54,12 @@ func (c *Command) newCobraCommand() *cobra.Command {
 		PreRunE: func(_ *cobra.Command, args []string) error {
 			if c.ShouldInsideApp && !c.Ctx().IsInsideApp() {
 				return errors.New("should execute inside grapi project")
+			}
+			if c.PreRun != nil {
+				err := c.PreRun(c, args)
+				if err != nil {
+					return errors.WithStack(err)
+				}
 			}
 			return nil
 		},
