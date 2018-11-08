@@ -14,9 +14,15 @@ func defaultCtx() *Ctx {
 type Ctx struct {
 	*grapicmd.Ctx
 
-	CreateAppFunc func(*Ctx, *Command) (*App, error)
+	CreateAppFunc CreateAppFunc
 	GenerateCmd   *Command
 	DestroyCmd    *Command
+}
+
+func (c *Ctx) Apply(opts []Option) {
+	for _, f := range opts {
+		f(c)
+	}
 }
 
 func (c *Ctx) CreateApp(cmd *Command) (*App, error) {

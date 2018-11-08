@@ -12,15 +12,19 @@ import (
 )
 
 func main() {
-	gencmd.Main(
+	buildCommand(svcgen.NewApp).MustExecute()
+}
+
+func buildCommand(createAppFunc svcgen.CreateAppFunc, opts ...gencmd.Option) gencmd.Executor {
+	return gencmd.New(
 		"scaffold-service",
-		gencmd.WithGenerateCommand(NewGenerateCommand(svcgen.NewApp)),
+		newGenerateCommand(createAppFunc),
+		nil,
+		opts...,
 	)
 }
 
-type CreateAppFunc func(*gencmd.Ctx, *gencmd.Command) (*svcgen.App, error)
-
-func NewGenerateCommand(createApp CreateAppFunc) *gencmd.Command {
+func newGenerateCommand(createApp svcgen.CreateAppFunc) *gencmd.Command {
 	var (
 		skipTest bool
 		resName  string

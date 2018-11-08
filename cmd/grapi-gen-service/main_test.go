@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/spf13/afero"
-	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/gencmd"
@@ -165,7 +164,7 @@ func TestRun(t *testing.T) {
 	createGenApp := func(ctx *gencmd.Ctx, cmd *gencmd.Command) (*gencmd.App, error) {
 		return gencmdtesting.NewTestApp(ctx, cmd, cli.NopUI)
 	}
-	createCmd := func(t *testing.T, fs afero.Fs, tc svcgentesting.Case) *cobra.Command {
+	createCmd := func(t *testing.T, fs afero.Fs, tc svcgentesting.Case) gencmd.Executor {
 		ctx := &grapicmd.Ctx{
 			FS:      fs,
 			RootDir: rootDir,
@@ -178,11 +177,7 @@ func TestRun(t *testing.T) {
 			},
 		}
 		ctx.Config.Grapi.ServerDir = tc.ServerDir
-		return gencmd.NewCommand("service", &gencmd.Ctx{
-			Ctx:           ctx,
-			CreateAppFunc: createGenApp,
-			GenerateCmd:   NewGenerateCommand(createSvcApp),
-		})
+		return buildCommand(createSvcApp, gencmd.WithGrapiCtx(ctx), gencmd.WithCreateAppFunc(createGenApp))
 	}
 
 	ctx := &svcgentesting.Ctx{

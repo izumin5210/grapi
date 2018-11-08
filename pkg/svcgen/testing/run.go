@@ -6,15 +6,15 @@ import (
 
 	"github.com/bradleyjkemp/cupaloy"
 	"github.com/izumin5210/grapi/pkg/cli"
+	"github.com/izumin5210/grapi/pkg/gencmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 	"github.com/spf13/afero"
-	"github.com/spf13/cobra"
 )
 
 type Ctx struct {
 	GOPATH    string
 	RootDir   cli.RootDir
-	CreateCmd func(*testing.T, afero.Fs, Case) *cobra.Command
+	CreateCmd func(*testing.T, afero.Fs, Case) gencmd.Executor
 	Cases     []Case
 }
 
@@ -41,7 +41,7 @@ func Run(t *testing.T, ctx *Ctx) {
 			cmd := ctx.CreateCmd(t, fs, tc)
 
 			t.Run("generate", func(t *testing.T) {
-				cmd.SetArgs(append([]string{"generate"}, tc.Args...))
+				cmd.Command().SetArgs(append([]string{"generate"}, tc.Args...))
 				err := cmd.Execute()
 
 				if err != nil {

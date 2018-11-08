@@ -1,15 +1,19 @@
 package gencmd
 
+import (
+	"github.com/izumin5210/grapi/pkg/grapicmd"
+)
+
 type Option func(*Ctx)
 
-func WithGenerateCommand(c *Command) Option {
+func WithGrapiCtx(gctx *grapicmd.Ctx) Option {
 	return func(ctx *Ctx) {
-		ctx.GenerateCmd = c
+		ctx.Ctx = gctx
 	}
 }
 
-func WithDestroyCommand(c *Command) Option {
+func WithCreateAppFunc(f CreateAppFunc) Option {
 	return func(ctx *Ctx) {
-		ctx.DestroyCmd = c
+		ctx.CreateAppFunc = f
 	}
 }
