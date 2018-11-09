@@ -87,6 +87,8 @@ func (g *generatorImpl) Destroy(params interface{}) error {
 			return errors.Wrapf(err, "failed to parse path: %s", tmplPath)
 		}
 
+		path = g.rootDir.Join(path)
+
 		paths, err := afero.Glob(g.fs, path)
 		if err != nil {
 			return errors.WithStack(err)

@@ -20,7 +20,8 @@ type Ctx struct {
 
 type Case struct {
 	Test         string
-	Args         []string
+	GArgs        []string
+	DArgs        []string
 	Files        []string
 	SkippedFiles map[string]struct{}
 	ProtoDir     string
@@ -38,10 +39,10 @@ func Run(t *testing.T, ctx *Ctx) {
 	for _, tc := range ctx.Cases {
 		t.Run(tc.Test, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			cmd := ctx.CreateCmd(t, fs, tc)
 
 			t.Run("generate", func(t *testing.T) {
-				cmd.Command().SetArgs(append([]string{"generate"}, tc.Args...))
+				cmd := ctx.CreateCmd(t, fs, tc)
+				cmd.Command().SetArgs(append([]string{"generate"}, tc.GArgs...))
 				err := cmd.Execute()
 
 				if err != nil {
@@ -74,26 +75,27 @@ func Run(t *testing.T, ctx *Ctx) {
 			})
 
 			t.Run("destroy", func(t *testing.T) {
-				t.SkipNow()
-				// err := generator.DestroyService(c.name)
+				cmd := ctx.CreateCmd(t, fs, tc)
+				cmd.Command().SetArgs(append([]string{"destroy"}, tc.DArgs...))
+				err := cmd.Execute()
 
-				// if err != nil {
-				// 	t.Errorf("returned an error: %v", err)
-				// }
+				if err != nil {
+					t.Errorf("returned an error: %+v", err)
+				}
 
-				// for _, file := range c.files {
-				// 	t.Run(file, func(t *testing.T) {
-				// 		ok, err := afero.Exists(fs, filepath.Join(rootDir, file))
+				for _, file := range tc.Files {
+					t.Run(file, func(t *testing.T) {
+						ok, err := afero.Exists(fs, ctx.RootDir.Join(file))
 
-				// 		if err != nil {
-				// 			t.Errorf("Exists(fs, %q) returned an error: %v", file, err)
-				// 		}
+						if err != nil {
+							t.Errorf("Exists(fs, %q) returned an error: %v", file, err)
+						}
 
-				// 		if ok {
-				// 			t.Errorf("%q should not exist", file)
-				// 		}
-				// 	})
-				// }
+						if ok {
+							t.Errorf("%q should not exist", file)
+						}
+					})
+				}
 			})
 		})
 	}

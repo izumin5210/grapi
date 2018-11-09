@@ -18,8 +18,9 @@ import (
 func TestRun(t *testing.T) {
 	cases := []svcgentesting.Case{
 		{
-			Test: "simple",
-			Args: []string{"book"},
+			Test:  "simple",
+			GArgs: []string{"book"},
+			DArgs: []string{"book"},
 			Files: []string{
 				"api/protos/book.proto",
 				"app/server/book_server.go",
@@ -28,8 +29,9 @@ func TestRun(t *testing.T) {
 			},
 		},
 		{
-			Test: "specify resource name",
-			Args: []string{"library", "--resource-name=book"},
+			Test:  "specify resource name",
+			GArgs: []string{"library", "--resource-name=book"},
+			DArgs: []string{"library"},
 			Files: []string{
 				"api/protos/library.proto",
 				"app/server/library_server.go",

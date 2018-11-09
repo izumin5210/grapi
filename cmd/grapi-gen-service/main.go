@@ -19,7 +19,7 @@ func buildCommand(createAppFunc svcgen.CreateAppFunc, opts ...gencmd.Option) gen
 	return gencmd.New(
 		"service",
 		newGenerateCommand(createAppFunc),
-		nil,
+		newDestroyCommand(createAppFunc),
 		opts...,
 	)
 }
@@ -54,6 +54,29 @@ func newGenerateCommand(createApp svcgen.CreateAppFunc) *gencmd.Command {
 
 	cmd.Flags().BoolVarP(&skipTest, "skip-test", "T", false, "Skip test files")
 	cmd.Flags().StringVar(&resName, "resource-name", "", "ResourceName to be used")
+
+	return cmd
+}
+
+func newDestroyCommand(createApp svcgen.CreateAppFunc) *gencmd.Command {
+	var (
+		app *svcgen.App
+	)
+
+	cmd := &gencmd.Command{
+		Short:      "Destroy an existing service",
+		Args:       cobra.MinimumNArgs(1),
+		TemplateFS: template.FS,
+		PreRun: func(c *gencmd.Command, args []string) error {
+			var err error
+			app, err = createApp(c.Ctx(), c)
+			return errors.WithStack(err)
+		},
+		BuildParams: func(c *gencmd.Command, args []string) (interface{}, error) {
+			params, err := app.ParamsBuilder.Build(args[0], "", nil)
+			return params, errors.WithStack(err)
+		},
+	}
 
 	return cmd
 }
