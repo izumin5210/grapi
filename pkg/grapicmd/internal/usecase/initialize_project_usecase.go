@@ -62,9 +62,9 @@ func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) e
 		err = repo.Add(
 			context.TODO(),
 			"github.com/izumin5210/grapi/cmd/grapi"+spec,
-			"github.com/izumin5210/grapi/cmd/grapi-gen-command"+spec,
-			"github.com/izumin5210/grapi/cmd/grapi-gen-service"+spec,
-			"github.com/izumin5210/grapi/cmd/grapi-gen-scaffold-service"+spec,
+			"github.com/izumin5210/grapi/cmd/grapi-gen-command",
+			"github.com/izumin5210/grapi/cmd/grapi-gen-service",
+			"github.com/izumin5210/grapi/cmd/grapi-gen-scaffold-service",
 			// TODO: make configurable
 			"github.com/golang/protobuf/protoc-gen-go",
 			"github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway",
