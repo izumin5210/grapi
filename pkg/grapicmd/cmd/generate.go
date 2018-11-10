@@ -56,8 +56,8 @@ func newGenerateCommand(repo tool.Repository, t tool.Tool, subCmd string) *cobra
 			return repo.Run(context.TODO(), t.Name(), append([]string{subCmd}, args...)...)
 		},
 	}
-	cmd.SetHelpFunc(func(_ *cobra.Command, _ []string) {
-		repo.Run(context.TODO(), t.Name(), subCmd, "--help")
+	cmd.SetUsageFunc(func(*cobra.Command) error {
+		return repo.Run(context.TODO(), t.Name(), subCmd, "--help")
 	})
 	return cmd
 }
