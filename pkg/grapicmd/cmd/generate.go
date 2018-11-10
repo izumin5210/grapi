@@ -2,124 +2,62 @@ package cmd
 
 import (
 	"context"
+	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
+	"github.com/izumin5210/clicontrib/pkg/clog"
+	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/di"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
-func newGenerateCommand(ctx *grapicmd.Ctx) *cobra.Command {
-	cmd := &cobra.Command{
+func newGenerateCommands(ctx *grapicmd.Ctx) (cmds []*cobra.Command) {
+	toolRepo, err := di.NewToolRepository(ctx)
+	if err != nil {
+		clog.Debug("failed to initialize tools repository", "error", err)
+		return
+	}
+
+	tools, err := toolRepo.List(context.TODO())
+	if err != nil {
+		clog.Debug("failed to retrieve tools", "error", err)
+		return
+	}
+
+	gCmd := &cobra.Command{
 		Use:     "generate GENERATOR",
-		Short:   "Generate new code",
+		Short:   "Generate a new code",
 		Aliases: []string{"g", "gen"},
 	}
+	dCmd := &cobra.Command{
+		Use:     "destroy GENERATOR",
+		Short:   "Destroy an existing new code",
+		Aliases: []string{"d"},
+	}
 
-	cmd.AddCommand(newGenerateServiceCommand(ctx))
-	cmd.AddCommand(newGenerateScaffoldServiceCommand(ctx))
-	cmd.AddCommand(newGenerateCommandCommand(ctx))
+	for _, t := range tools {
+		if strings.HasPrefix(t.Name(), "grapi-gen-") {
+			gCmd.AddCommand(newGenerateCommand(toolRepo, t, "generate"))
+			dCmd.AddCommand(newGenerateCommand(toolRepo, t, "destroy"))
+		}
+	}
 
-	return cmd
+	cmds = append(cmds, gCmd, dCmd)
+
+	return
 }
 
-func newGenerateServiceCommand(ctx *grapicmd.Ctx) *cobra.Command {
-	var (
-		skipTest     bool
-		resourceName string
-	)
-
+func newGenerateCommand(repo tool.Repository, t tool.Tool, subCmd string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:           "service NAME [METHODS...]",
-		Short:         "Generate a new service",
-		SilenceErrors: true,
-		SilenceUsage:  true,
-		Args:          cobra.MinimumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ctx.IsInsideApp() {
-				return errors.New("geneate command should execut inside a grapi application directory")
-			}
-
-			ui := di.NewUI(ctx)
-
-			ui.Section("Generate service")
-			genCfg := module.ServiceGenerationConfig{ResourceName: resourceName, Methods: args[1:], SkipTest: skipTest}
-			err := errors.WithStack(di.NewGenerator(ctx).GenerateService(args[0], genCfg))
-			if err != nil {
-				return err
-			}
-
-			protocw, err := di.NewProtocWrapper(ctx)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-
-			return errors.WithStack(protocw.Exec(context.TODO()))
+		Use:  strings.TrimPrefix(t.Name(), "grapi-gen-"),
+		Args: cobra.ArbitraryArgs,
+		RunE: func(_ *cobra.Command, args []string) error {
+			return repo.Run(context.TODO(), t.Name(), append([]string{subCmd}, args...)...)
 		},
 	}
-
-	cmd.PersistentFlags().BoolVarP(&skipTest, "skip-test", "T", false, "Skip test files")
-	cmd.PersistentFlags().StringVar(&resourceName, "resource-name", "", "ResourceName to be used")
-
+	cmd.SetHelpFunc(func(_ *cobra.Command, _ []string) {
+		repo.Run(context.TODO(), t.Name(), subCmd, "--help")
+	})
 	return cmd
-}
-
-func newGenerateScaffoldServiceCommand(ctx *grapicmd.Ctx) *cobra.Command {
-	var (
-		skipTest     bool
-		resourceName string
-	)
-
-	cmd := &cobra.Command{
-		Use:           "scaffold-service NAME",
-		Short:         "Generate a new service with standard methods",
-		SilenceErrors: true,
-		SilenceUsage:  true,
-		Args:          cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ctx.IsInsideApp() {
-				return errors.New("geneate command should execut inside a grapi application directory")
-			}
-
-			ui := di.NewUI(ctx)
-
-			ui.Section("Scaffold service")
-			genCfg := module.ServiceGenerationConfig{ResourceName: resourceName, SkipTest: skipTest}
-			err := errors.WithStack(di.NewGenerator(ctx).ScaffoldService(args[0], genCfg))
-			if err != nil {
-				return err
-			}
-
-			protocw, err := di.NewProtocWrapper(ctx)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-
-			return errors.WithStack(protocw.Exec(context.TODO()))
-		},
-	}
-
-	cmd.PersistentFlags().BoolVarP(&skipTest, "skip-test", "T", false, "Skip test files")
-	cmd.PersistentFlags().StringVar(&resourceName, "resource-name", "", "ResourceName to be used")
-
-	return cmd
-}
-
-func newGenerateCommandCommand(ctx *grapicmd.Ctx) *cobra.Command {
-	return &cobra.Command{
-		Use:           "command NAME",
-		Short:         "Generate a new command",
-		SilenceErrors: true,
-		SilenceUsage:  true,
-		Args:          cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if !ctx.IsInsideApp() {
-				return errors.New("geneate command should execut inside a grapi application directory")
-			}
-
-			return errors.WithStack(di.NewGenerator(ctx).GenerateCommand(args[0]))
-		},
-	}
 }
