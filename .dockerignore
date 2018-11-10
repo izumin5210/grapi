@@ -1,0 +1,8 @@
+.travis.yml
+.reviewdog.yml
+_tests
+_script
+bin
+vendor
+README.md
+LICENSE

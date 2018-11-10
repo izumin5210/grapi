@@ -8,7 +8,6 @@ BUILD_DATE ?= $(shell date +'%Y-%m-%dT%H:%M:%SZ')
 
 GO_BUILD_FLAGS := -v
 GO_TEST_FLAGS := -v -timeout 30s
-GO_TEST_INTEGRATION_FLAGS := -v
 GO_COVER_FLAGS := -coverprofile coverage.txt -covermode atomic
 SRC_FILES := $(shell go list -f '{{range .GoFiles}}{{printf "%s/%s\n" $$.Dir .}}{{end}}' ./...)
 
@@ -88,8 +87,8 @@ cover:
 	go test $(GO_TEST_FLAGS) $(GO_COVER_FLAGS) ./...
 
 .PHONY: test-integration
-test-integration: $(GENERATED_BINS)
-	cd _tests && go test $(GO_TEST_INTEGRATION_FLAGS) ./...
+test-integration:
+	@./_tests/integration/run_test.sh
 
 .PHONY: all
 all: $(GENERATED_BINS)
