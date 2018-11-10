@@ -5,8 +5,8 @@ set -o pipefail
 
 cd "$(dirname $0)/../.."
 
-DIR=_tests/integration
-IMAGE_NAME=grapi-integration-test:go$GO_VERSION
+DIR=_tests/e2e
+IMAGE_NAME=grapi-e2e-test:go$GO_VERSION
 
 TARGET_REVISION=${TRAVIS_COMMIT:-$(git symbolic-ref --short HEAD)}
 

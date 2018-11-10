@@ -86,9 +86,9 @@ test:
 cover:
 	go test $(GO_TEST_FLAGS) $(GO_COVER_FLAGS) ./...
 
-.PHONY: test-integration
-test-integration:
-	@./_tests/integration/run_test.sh
+.PHONY: test-e2e
+test-e2e:
+	@./_tests/e2e/run_test.sh
 
 .PHONY: all
 all: $(GENERATED_BINS)
