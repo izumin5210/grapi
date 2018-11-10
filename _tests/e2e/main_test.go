@@ -8,77 +8,59 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"testing"
 	"time"
-
-	"github.com/spf13/afero"
 )
 
 func Test_Integration(t *testing.T) {
-	_, testfilepath, _, _ := runtime.Caller(0)
-	wd := filepath.Dir(testfilepath)
-	bin := filepath.Join(wd, "..", "..", "bin", "grapi")
-	gopath := filepath.Join(wd, "go")
-	srcDir := filepath.Join(gopath, "src")
+	wd, err := os.Getwd()
+	orDie(t, err)
 
-	fs := afero.NewOsFs()
+	srcDir := filepath.Dir(wd)
+
 	name := "sample"
 	rootPath := filepath.Join(srcDir, name)
 
-	fs.MkdirAll(srcDir, 0755)
-	defer fs.RemoveAll(gopath)
+	// defer os.RemoveAll(rootPath)
 
 	args := []string{"--debug", "init"}
-	if commit, ok := os.LookupEnv("TRAVIS_COMMIT"); ok {
+	if commit, ok := os.LookupEnv("TARGET_REVISION"); ok {
 		args = append(args, "--revision="+commit)
 	} else {
 		args = append(args, "--HEAD")
 	}
 	args = append(args, name)
 
-	cmd := exec.Command(bin, args...)
-	cmd.Dir = srcDir
-	cmd.Env = append(os.Environ(), "GOPATH="+gopath)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		t.Fatalf("failed to initialize project: %v\n%s", err, string(out))
-	}
+	run(t, srcDir, exec.Command("grapi", args...))
 
-	if ok, err := afero.DirExists(fs, rootPath); err != nil || !ok {
+	if !exists(t, rootPath) {
 		t.Fatalf("%s does not exist: %v", rootPath, err)
 	}
 	t.Log("Initialize a project successfully")
 
-	cmd = exec.Command(bin, "--debug", "g", "service", "book", "list")
-	cmd.Dir = rootPath
-	cmd.Env = append(os.Environ(), "GOPATH="+gopath)
-	out, err = cmd.CombinedOutput()
-	if err != nil {
-		t.Fatalf("failed to generate service: %v\n%s", err, string(out))
-	}
+	run(t, rootPath, exec.Command("grapi", "--debug", "g", "service", "book", "list"))
 
 	svrPath := filepath.Join(rootPath, "app", "server", "book_server.go")
-	if ok, err := afero.Exists(fs, svrPath); err != nil || !ok {
+	if !exists(t, svrPath) {
 		t.Fatalf("%s does not exist: %v", svrPath, err)
 	}
 	t.Log("Generate a service successfully")
 
 	port := 15261
 
-	updateRun(t, fs, rootPath, port)
-	updateServerImpl(t, fs, rootPath)
+	updateRun(t, rootPath, port)
+	updateServerImpl(t, rootPath)
 
 	t.Log("Start the server")
 	svrCtx, cancel := context.WithCancel(context.Background())
-	cmd = exec.CommandContext(svrCtx, bin, "--debug", "server")
+	cmd := exec.CommandContext(svrCtx, "grapi", "--debug", "server")
 	cmd.Dir = rootPath
-	cmd.Env = append(os.Environ(), "GOPATH="+gopath)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Start()
@@ -138,8 +120,8 @@ func (v *visitor) Visit(node ast.Node) ast.Visitor {
 	return v.VisitFunc(v, node)
 }
 
-func updateRun(t *testing.T, fs afero.Fs, rootPath string, port int) {
-	data, err := afero.ReadFile(fs, filepath.Join(rootPath, "app", "run.go"))
+func updateRun(t *testing.T, rootPath string, port int) {
+	data, err := ioutil.ReadFile(filepath.Join(rootPath, "app", "run.go"))
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -202,14 +184,14 @@ func updateRun(t *testing.T, fs afero.Fs, rootPath string, port int) {
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	err = afero.WriteFile(fs, filepath.Join(rootPath, "app", "run.go"), buf.Bytes(), 0755)
+	err = ioutil.WriteFile(filepath.Join(rootPath, "app", "run.go"), buf.Bytes(), 0755)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 }
 
-func updateServerImpl(t *testing.T, fs afero.Fs, rootPath string) {
-	data, err := afero.ReadFile(fs, filepath.Join(rootPath, "app", "server", "book_server.go"))
+func updateServerImpl(t *testing.T, rootPath string) {
+	data, err := ioutil.ReadFile(filepath.Join(rootPath, "app", "server", "book_server.go"))
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -276,8 +258,38 @@ func updateServerImpl(t *testing.T, fs afero.Fs, rootPath string) {
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	err = afero.WriteFile(fs, filepath.Join(rootPath, "app", "server", "book_server.go"), buf.Bytes(), 0755)
+	err = ioutil.WriteFile(filepath.Join(rootPath, "app", "server", "book_server.go"), buf.Bytes(), 0755)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
+}
+
+func run(t *testing.T, dir string, cmd *exec.Cmd) {
+	t.Helper()
+	cmd.Dir = dir
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		t.Fatalf("failed to execute command %v: %v", cmd, err)
+	}
+}
+
+func orDie(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+}
+
+func exists(t *testing.T, path string) bool {
+	t.Helper()
+	_, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+		t.Fatalf("failed to check file existence: %v", err)
+	}
+	return true
 }
