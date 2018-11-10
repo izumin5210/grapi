@@ -191,7 +191,7 @@
   version = "v0.1.0"
 
 [[projects]]
-  digest = "1:e2ab15cc3be1b606dd7107fcc0ec1ec04371308e057dd5f4313803259d6cf225"
+  digest = "1:41918da4644125b34a1918691ca50916e5e2cdfeb9995c157e3f982c50bfb231"
   name = "github.com/izumin5210/gex"
   packages = [
     ".",
@@ -202,8 +202,8 @@
     "pkg/tool",
   ]
   pruneopts = "UT"
-  revision = "cd08f32504c4567f31a84f8aef856396b10b5775"
-  version = "v0.4.1"
+  revision = "33da6eb3cb894727a7498934e09e2bd937279257"
+  version = "v0.4.2"
 
 [[projects]]
   branch = "master"
