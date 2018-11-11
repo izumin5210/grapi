@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	waitForServer = func() { time.Sleep(15) }
+	waitForServer = func() { time.Sleep(1 * time.Second) }
 )
 
 func orDie(t *testing.T, err error) {
