@@ -28,7 +28,7 @@ func (c *Ctx) apply(opts []Option) {
 func (c *Ctx) CreateApp(cmd *Command) (*App, error) {
 	f := c.CreateAppFunc
 	if c.CreateAppFunc == nil {
-		f = NewApp
+		f = newApp
 	}
 	app, err := f(c, cmd)
 	if err != nil {

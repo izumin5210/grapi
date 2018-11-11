@@ -12,6 +12,7 @@ func ProvideGrapiCtx(ctx *Ctx) *grapicmd.Ctx         { return ctx.Ctx }
 func ProvideTemplateFS(cmd *Command) http.FileSystem { return cmd.TemplateFS }
 func ProvideShouldRun(cmd *Command) ShouldRunFunc    { return cmd.ShouldRun }
 
+// Set contains providers for DI.
 var Set = wire.NewSet(
 	grapicmd.CtxSet,
 	ProvideGrapiCtx,
