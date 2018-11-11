@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	api_pb "github.com/izumin5210/grapi/testing/api"
+	api_pb "github.com/izumin5210/grapi/pkg/grapiserver/testing/api"
 )
 
 // NewLibraryServiceServer creates a new LibraryServiceServer instance.
