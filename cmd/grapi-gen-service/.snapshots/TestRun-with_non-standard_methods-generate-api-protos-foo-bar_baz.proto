@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package testapp.api.foo;
+
+option go_package = "testapp/api/foo;foo_pb";
+
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service BarBazService {
+  rpc ListBarBazs (ListBarBazsRequest) returns (ListBarBazsResponse) {
+    option (google.api.http) = {
+      get: "/bar_bazs"
+    };
+  }
+  rpc CreateBarBaz (CreateBarBazRequest) returns (BarBaz) {
+    option (google.api.http) = {
+      post: "/bar_bazs"
+      body: "bar_baz"
+    };
+  }
+  rpc DeleteBarBaz (DeleteBarBazRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/bar_bazs/{bar_baz_id}"
+    };
+  }
+  rpc Rename (RenameRequest) returns (RenameResponse) {
+    option (google.api.http) = {
+      get: "/bar_bazs/rename"
+    };
+  }
+  rpc MoveMove (MoveMoveRequest) returns (MoveMoveResponse) {
+    option (google.api.http) = {
+      get: "/bar_bazs/move_move"
+    };
+  }
+}
+
+message BarBaz {
+  string bar_baz_id = 1;
+}
+
+message ListBarBazsRequest {
+}
+
+message ListBarBazsResponse {
+  repeated BarBaz bar_bazs = 1;
+}
+
+message CreateBarBazRequest {
+  BarBaz bar_baz = 1;
+}
+
+message DeleteBarBazRequest {
+  string bar_baz_id = 1;
+}
+
+message RenameRequest {
+}
+
+message RenameResponse {
+}
+
+message MoveMoveRequest {
+}
+
+message MoveMoveResponse {
+}
+

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package testapp.api;
+
+option go_package = "testapp/api;api_pb";
+
+
+import "google/api/annotations.proto";
+
+service CorgeService {
+}
+

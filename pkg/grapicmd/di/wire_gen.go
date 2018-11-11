@@ -6,6 +6,7 @@
 package di
 
 import (
+	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
@@ -40,6 +41,19 @@ func NewScriptLoader(ctx *grapicmd.Ctx) module.ScriptLoader {
 	executor := excmd.NewExecutor(io)
 	scriptLoader := ProvideScriptLoader(ctx, executor)
 	return scriptLoader
+}
+
+func NewToolRepository(ctx *grapicmd.Ctx) (tool.Repository, error) {
+	fs := grapicmd.ProvideFS(ctx)
+	execInterface := grapicmd.ProvideExecer(ctx)
+	io := grapicmd.ProvideIO(ctx)
+	rootDir := grapicmd.ProvideRootDir(ctx)
+	config := protoc.ProvideGexConfig(fs, execInterface, io, rootDir)
+	repository, err := protoc.ProvideToolRepository(config)
+	if err != nil {
+		return nil, err
+	}
+	return repository, nil
 }
 
 func NewProtocWrapper(ctx *grapicmd.Ctx) (protoc.Wrapper, error) {

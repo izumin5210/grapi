@@ -27,12 +27,11 @@ func NewGrapiCommand(ctx *grapicmd.Ctx) *cobra.Command {
 
 	cmd.AddCommand(
 		newInitCommand(ctx),
-		newGenerateCommand(ctx),
-		newDestroyCommand(ctx),
 		newProtocCommand(ctx),
 		newBuildCommand(ctx),
 		newVersionCommand(ctx),
 	)
+	cmd.AddCommand(newGenerateCommands(ctx)...)
 	cmd.AddCommand(newUserDefinedCommands(ctx)...)
 
 	return cmd
