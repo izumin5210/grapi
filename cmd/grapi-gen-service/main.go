@@ -32,6 +32,7 @@ func newGenerateCommand(createApp svcgen.CreateAppFunc) *gencmd.Command {
 	)
 
 	cmd := &gencmd.Command{
+		Use:        "generate NAME [flags] [METHODS...]",
 		Short:      "Generate a new service",
 		Args:       cobra.MinimumNArgs(1),
 		TemplateFS: template.FS,
@@ -64,6 +65,7 @@ func newDestroyCommand(createApp svcgen.CreateAppFunc) *gencmd.Command {
 	)
 
 	cmd := &gencmd.Command{
+		Use:        "destroy NAME",
 		Short:      "Destroy an existing service",
 		Args:       cobra.MinimumNArgs(1),
 		TemplateFS: template.FS,

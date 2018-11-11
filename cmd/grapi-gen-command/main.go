@@ -21,6 +21,7 @@ func buildCommand(opts ...gencmd.Option) gencmd.Executor {
 
 func newGenerateCommand() *gencmd.Command {
 	return &gencmd.Command{
+		Use:        "generate NAME",
 		Short:      "Generate a new command",
 		Args:       cobra.ExactArgs(1),
 		TemplateFS: template.FS,
@@ -32,6 +33,7 @@ func newGenerateCommand() *gencmd.Command {
 
 func newDestroyCommand() *gencmd.Command {
 	return &gencmd.Command{
+		Use:        "destroy NAME",
 		Short:      "Destroy a existing command",
 		Args:       cobra.ExactArgs(1),
 		TemplateFS: template.FS,
