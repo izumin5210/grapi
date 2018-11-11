@@ -18,11 +18,6 @@ func ProvideGenerator(ctx *grapicmd.Ctx, ui cli.UI) module.Generator {
 	return generator.New(
 		ctx.FS,
 		ui,
-		ctx.RootDir.String(),
-		ctx.ProtocConfig.ProtosDir,
-		ctx.ProtocConfig.OutDir,
-		ctx.Config.Grapi.ServerDir,
-		ctx.Config.Package,
 	)
 }
 
