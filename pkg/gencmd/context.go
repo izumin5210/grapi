@@ -11,20 +11,20 @@ func defaultCtx() *Ctx {
 	}
 }
 
+// Ctx defines a context of a generator.
 type Ctx struct {
 	*grapicmd.Ctx
 
 	CreateAppFunc CreateAppFunc
-	GenerateCmd   *Command
-	DestroyCmd    *Command
 }
 
-func (c *Ctx) Apply(opts []Option) {
+func (c *Ctx) apply(opts []Option) {
 	for _, f := range opts {
 		f(c)
 	}
 }
 
+// CreateApp initializes dependencies.
 func (c *Ctx) CreateApp(cmd *Command) (*App, error) {
 	f := c.CreateAppFunc
 	if c.CreateAppFunc == nil {

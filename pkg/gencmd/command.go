@@ -8,31 +8,38 @@ import (
 	"github.com/spf13/pflag"
 )
 
-type CommandType int
-
-const (
-	CommandUnknown CommandType = iota
-	CommandGenerate
-	CommandDestroy
-)
-
+// Command represents a subcommand of a generator plugin. It will be converted to a *cobra.Command object internally.
 type Command struct {
-	Use             string
-	Short           string
-	Long            string
-	Example         string
-	Args            cobra.PositionalArgs
-	BuildParams     func(c *Command, args []string) (interface{}, error)
-	PreRun          func(c *Command, args []string) error
-	PostRun         func(c *Command, args []string) error
-	ShouldRun       ShouldRunFunc
+	// Use, Short, Long, Example and Args are pass-through into *cobra.Command object.
+	Use     string
+	Short   string
+	Long    string
+	Example string
+	Args    cobra.PositionalArgs
+
+	// BuildParams returns parameters to generate/destroy files(required).
+	BuildParams func(c *Command, args []string) (interface{}, error)
+
+	// PreRun is executed in *cobra.Command.PreRunE.
+	PreRun func(c *Command, args []string) error
+
+	// PostRun is executed in *cobra.Command.PostRunE.
+	PostRun func(c *Command, args []string) error
+
+	// ShouldRun is executed for each generated files. When it returns false, the file will be skipped.
+	ShouldRun ShouldRunFunc
+
+	// ShouldInsideApp will disable the command when a current working directory is not inside of a grapi project.
 	ShouldInsideApp bool
-	TemplateFS      http.FileSystem
+
+	// TemplateFS contains file templates(required).
+	TemplateFS http.FileSystem
 
 	flags *pflag.FlagSet
 	ctx   *Ctx
 }
 
+// Flags returns a FlagSet that applies to this commmand.
 func (c *Command) Flags() *pflag.FlagSet {
 	if c.flags == nil {
 		c.flags = new(pflag.FlagSet)
@@ -40,6 +47,7 @@ func (c *Command) Flags() *pflag.FlagSet {
 	return c.flags
 }
 
+// Ctx returns the context object.
 func (c *Command) Ctx() *Ctx {
 	return c.ctx
 }
@@ -71,11 +79,13 @@ func (c *Command) newCobraCommand() *cobra.Command {
 	return cc
 }
 
+// File represents a file content.
 type File struct {
 	Path string
 	Body string
 }
 
+// Entry represents a file that will be generated.
 type Entry struct {
 	File
 	Template File

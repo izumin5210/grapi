@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// New creates an Executor instnace.
 func New(
 	name string,
 	generateCmd *Command,
@@ -12,7 +13,7 @@ func New(
 	opts ...Option,
 ) Executor {
 	ctx := defaultCtx()
-	ctx.Apply(opts)
+	ctx.apply(opts)
 
 	rootCmd := &cobra.Command{
 		Use: "grapi-gen-" + name,
