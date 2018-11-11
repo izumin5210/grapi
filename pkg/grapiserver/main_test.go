@@ -24,6 +24,29 @@ var (
 	waitForServer = func() { time.Sleep(15) }
 )
 
+func orDie(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func startServer(t *testing.T, s *grapiserver.Engine) func() {
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := s.Serve(); err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
+			t.Errorf("Engine.Serve returned an error: %v", err)
+		}
+	}()
+	waitForServer()
+	return func() {
+		s.Shutdown()
+		wg.Wait()
+	}
+}
+
 func Test_server_onlyGateway(t *testing.T) {
 	var port int64 = 15261
 	s := grapiserver.New(
@@ -33,41 +56,21 @@ func Test_server_onlyGateway(t *testing.T) {
 		),
 	)
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := s.Serve(); err != nil {
-			t.Errorf("Engine.Serve returned an error: %v", err)
-		}
-	}()
-
-	defer wg.Wait()
-	defer s.Shutdown()
-
-	waitForServer()
+	defer startServer(t, s)()
 
 	resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", port))
-
-	if err != nil {
-		t.Fatalf("failed to fetch book resources: %v", err)
-	}
+	orDie(t, err)
 	defer resp.Body.Close()
 
 	if got, want := resp.StatusCode, 200; got != want {
-		t.Fatalf("Response status is %d, want %d", got, want)
+		t.Errorf("Response status is %d, want %d", got, want)
 	}
 
 	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatalf("failed to read response body: %v", err)
-	}
+	orDie(t, err)
 
 	got := map[string]interface{}{}
-	err = json.Unmarshal(data, &got)
-	if err != nil {
-		t.Fatalf("failed to parse response body: %v", err)
-	}
+	orDie(t, json.Unmarshal(data, &got))
 	want := map[string]interface{}{
 		"books": []interface{}{
 			map[string]interface{}{"book_id": "The Go Programming Language"},
@@ -90,43 +93,22 @@ func Test_server_samePort(t *testing.T) {
 		),
 	)
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		// https://github.com/soheilhy/cmux/blob/v0.1.4/example_test.go#L131
-		if err := s.Serve(); err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
-			t.Errorf("Engine.Serve returned an error: %v", err)
-		}
-	}()
-
-	defer wg.Wait()
-	defer s.Shutdown()
-
-	waitForServer()
+	defer startServer(t, s)()
 
 	t.Run("http", func(t *testing.T) {
 		resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", port))
-
-		if err != nil {
-			t.Fatalf("failed to fetch book resources: %v", err)
-		}
+		orDie(t, err)
 		defer resp.Body.Close()
 
 		if got, want := resp.StatusCode, 200; got != want {
-			t.Fatalf("Response status is %d, want %d", got, want)
+			t.Errorf("Response status is %d, want %d", got, want)
 		}
 
 		data, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			t.Fatalf("failed to read response body: %v", err)
-		}
+		orDie(t, err)
 
 		got := map[string]interface{}{}
-		err = json.Unmarshal(data, &got)
-		if err != nil {
-			t.Fatalf("failed to parse response body: %v", err)
-		}
+		orDie(t, json.Unmarshal(data, &got))
 		want := map[string]interface{}{
 			"books": []interface{}{
 				map[string]interface{}{"book_id": "The Go Programming Language"},
@@ -141,17 +123,12 @@ func Test_server_samePort(t *testing.T) {
 
 	t.Run("gRPC", func(t *testing.T) {
 		conn, err := grpc.Dial(addr, grpc.WithInsecure())
-		if err != nil {
-			t.Fatalf("failed to connect with gRPC server: %v", err)
-		}
+		orDie(t, err)
 		defer conn.Close()
 
 		cli := api_pb.NewLibraryServiceClient(conn)
 		resp, err := cli.ListBooks(context.Background(), &api_pb.ListBooksRequest{})
-
-		if err != nil {
-			t.Fatalf("failed to fetch book resources: %v", err)
-		}
+		orDie(t, err)
 
 		want := &api_pb.ListBooksResponse{
 			Books: []*api_pb.Book{
@@ -182,42 +159,22 @@ func Test_server_differentPort(t *testing.T) {
 		),
 	)
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := s.Serve(); err != nil {
-			t.Errorf("Engine.Serve returned an error: %v", err)
-		}
-	}()
-
-	defer wg.Wait()
-	defer s.Shutdown()
-
-	waitForServer()
+	defer startServer(t, s)()
 
 	t.Run("http", func(t *testing.T) {
 		resp, err := http.Get(fmt.Sprintf("http://localhost:%d/books", httpPort))
-
-		if err != nil {
-			t.Fatalf("failed to fetch book resources: %v", err)
-		}
+		orDie(t, err)
 		defer resp.Body.Close()
 
 		if got, want := resp.StatusCode, 200; got != want {
-			t.Fatalf("Response status is %d, want %d", got, want)
+			t.Errorf("Response status is %d, want %d", got, want)
 		}
 
 		data, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			t.Fatalf("failed to read response body: %v", err)
-		}
+		orDie(t, err)
 
 		got := map[string]interface{}{}
-		err = json.Unmarshal(data, &got)
-		if err != nil {
-			t.Fatalf("failed to parse response body: %v", err)
-		}
+		orDie(t, json.Unmarshal(data, &got))
 		want := map[string]interface{}{
 			"books": []interface{}{
 				map[string]interface{}{"book_id": "The Go Programming Language"},
@@ -232,17 +189,12 @@ func Test_server_differentPort(t *testing.T) {
 
 	t.Run("gRPC", func(t *testing.T) {
 		conn, err := grpc.Dial(grpcAddr, grpc.WithInsecure())
-		if err != nil {
-			t.Fatalf("failed to connect with gRPC server: %v", err)
-		}
+		orDie(t, err)
 		defer conn.Close()
 
 		cli := api_pb.NewLibraryServiceClient(conn)
 		resp, err := cli.ListBooks(context.Background(), &api_pb.ListBooksRequest{})
-
-		if err != nil {
-			t.Fatalf("failed to fetch book resources: %v", err)
-		}
+		orDie(t, err)
 
 		want := &api_pb.ListBooksResponse{
 			Books: []*api_pb.Book{
