@@ -1,6 +1,7 @@
 package grapicmd
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/google/go-cloud/wire"
@@ -48,6 +49,11 @@ type BuildConfig struct {
 
 // Init initializes the runtime context.
 func (c *Ctx) Init() error {
+	if c.RootDir == "" {
+		dir, _ := os.Getwd()
+		c.RootDir = cli.RootDir(dir)
+	}
+
 	if c.IO == nil {
 		c.IO = cli.DefaultIO()
 	}
