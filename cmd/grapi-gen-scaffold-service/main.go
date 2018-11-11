@@ -32,10 +32,11 @@ func newGenerateCommand(createApp svcgen.CreateAppFunc) *gencmd.Command {
 	)
 
 	cmd := &gencmd.Command{
-		Use:        "generate NAME [flags]",
-		Short:      "Generate a new service with standard methods",
-		Args:       cobra.ExactArgs(1),
-		TemplateFS: template.FS,
+		Use:             "generate NAME [flags]",
+		Short:           "Generate a new service with standard methods",
+		Args:            cobra.ExactArgs(1),
+		TemplateFS:      template.FS,
+		ShouldInsideApp: true,
 		PreRun: func(c *gencmd.Command, args []string) error {
 			var err error
 			app, err = createApp(c.Ctx(), c)
@@ -65,10 +66,11 @@ func newDestroyCommand(createApp svcgen.CreateAppFunc) *gencmd.Command {
 	)
 
 	cmd := &gencmd.Command{
-		Use:        "destroy NAME",
-		Short:      "Destroy an existing service",
-		Args:       cobra.ExactArgs(1),
-		TemplateFS: template.FS,
+		Use:             "destroy NAME",
+		Short:           "Destroy an existing service",
+		Args:            cobra.ExactArgs(1),
+		TemplateFS:      template.FS,
+		ShouldInsideApp: true,
 		PreRun: func(c *gencmd.Command, args []string) error {
 			var err error
 			app, err = createApp(c.Ctx(), c)
