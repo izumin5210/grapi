@@ -42,6 +42,7 @@ jobs:
 
   - <<: *test
     name: "coverage (go 1.11)"
+    script: make cover
     after_success: bash <(curl -s https://codecov.io/bash)
 
   - <<: *test
