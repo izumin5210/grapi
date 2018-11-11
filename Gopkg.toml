@@ -24,12 +24,6 @@
 #   go-tests = true
 #   unused-packages = true
 
-required = [
-  "github.com/golang/mock/mockgen",
-  "github.com/jessevdk/go-assets-builder",
-  "github.com/mitchellh/gox",
-]
-
 [prune]
   go-tests = true
   unused-packages = true
