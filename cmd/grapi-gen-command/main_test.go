@@ -40,6 +40,7 @@ func TestCommand(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.test, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
+			afero.WriteFile(fs, rootDir.Join("grapi.toml"), []byte{}, 0755)
 
 			t.Run("generate", func(t *testing.T) {
 				cmd := createCmd(t, fs)

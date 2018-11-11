@@ -39,6 +39,7 @@ func Run(t *testing.T, ctx *Ctx) {
 	for _, tc := range ctx.Cases {
 		t.Run(tc.Test, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
+			afero.WriteFile(fs, ctx.RootDir.Join("grapi.toml"), []byte{}, 0755)
 
 			t.Run("generate", func(t *testing.T) {
 				cmd := ctx.CreateCmd(t, fs, tc)
