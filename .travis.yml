@@ -15,7 +15,6 @@ env:
 cache:
   directories:
   - $GOPATH/pkg/dep
-  - $HOME/include
   - $HOME/bin
 
 jobs:
@@ -42,6 +41,7 @@ jobs:
     if: type != 'pull_request'
 
   - <<: *test
+    name: "coverage (go 1.11)"
     after_success: bash <(curl -s https://codecov.io/bash)
 
   - <<: *test
@@ -53,9 +53,8 @@ jobs:
     - GO_VERSION=1.10.5
 
   - stage: deploy
-    script: skip
-    before_deploy:
-    - make packages
+    install: make setup
+    script: make packages -j4
     deploy:
     - provider: releases
       skip_cleanup: true
