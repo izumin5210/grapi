@@ -1,4 +1,4 @@
-package testing
+package grapiserver_test
 
 import (
 	"context"
@@ -16,8 +16,8 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/izumin5210/grapi/pkg/grapiserver"
-	"github.com/izumin5210/grapi/testing/api"
-	"github.com/izumin5210/grapi/testing/app/server"
+	"github.com/izumin5210/grapi/pkg/grapiserver/testing/api"
+	"github.com/izumin5210/grapi/pkg/grapiserver/testing/app/server"
 )
 
 var (
