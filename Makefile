@@ -7,7 +7,7 @@ REVISION ?= $(shell git describe --always)
 BUILD_DATE ?= $(shell date +'%Y-%m-%dT%H:%M:%SZ')
 
 GO_BUILD_FLAGS := -v
-GO_TEST_FLAGS := -v -timeout 30s
+GO_TEST_FLAGS := -v -timeout 2m
 GO_COVER_FLAGS := -coverprofile coverage.txt -covermode atomic
 SRC_FILES := $(shell go list -f '{{range .GoFiles}}{{printf "%s/%s\n" $$.Dir .}}{{end}}' ./...)
 
