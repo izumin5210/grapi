@@ -59,10 +59,13 @@ func (g *generatorImpl) Generate(params interface{}) error {
 		}
 
 		path := g.rootDir.Join(e.Path)
+		dir := filepath.Dir(path)
 
-		err := g.fs.MkdirAll(path, 0755)
-		if err != nil {
-			return errors.Wrapf(err, "failed to create directory")
+		if ok, _ := afero.DirExists(g.fs, dir); !ok {
+			err := g.fs.MkdirAll(dir, 0755)
+			if err != nil {
+				return errors.Wrapf(err, "failed to create directory")
+			}
 		}
 
 		err = afero.WriteFile(g.fs, path, []byte(e.Body), 0644)
