@@ -65,6 +65,7 @@ func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) e
 			"github.com/izumin5210/grapi/cmd/grapi-gen-command",
 			"github.com/izumin5210/grapi/cmd/grapi-gen-service",
 			"github.com/izumin5210/grapi/cmd/grapi-gen-scaffold-service",
+			"github.com/izumin5210/grapi/cmd/grapi-gen-type",
 			// TODO: make configurable
 			"github.com/golang/protobuf/protoc-gen-go",
 			"github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway",
