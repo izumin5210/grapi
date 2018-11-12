@@ -9,7 +9,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/gencmd"
 )
 
-func NewTestApp(*gencmd.Ctx, *gencmd.Command, cli.UI) (*gencmd.App, error) {
+func NewTestApp(*gencmd.Command, cli.UI) (*gencmd.App, error) {
 	wire.Build(
 		gencmd.Set,
 	)

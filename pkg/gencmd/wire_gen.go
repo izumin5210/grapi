@@ -12,7 +12,8 @@ import (
 
 // Injectors from wire.go:
 
-func newApp(ctx *Ctx, command *Command) (*App, error) {
+func newApp(command *Command) (*App, error) {
+	ctx := ProvideCtx(command)
 	grapicmdCtx := ProvideGrapiCtx(ctx)
 	fs := grapicmd.ProvideFS(grapicmdCtx)
 	io := grapicmd.ProvideIO(grapicmdCtx)

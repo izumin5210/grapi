@@ -15,7 +15,8 @@ import (
 
 // Injectors from wire.go:
 
-func NewTestApp(ctx *gencmd.Ctx, command *gencmd.Command, wrapper protoc.Wrapper, ui cli.UI) (*svcgen.App, error) {
+func NewTestApp(command *gencmd.Command, wrapper protoc.Wrapper, ui cli.UI) (*svcgen.App, error) {
+	ctx := gencmd.ProvideCtx(command)
 	grapicmdCtx := gencmd.ProvideGrapiCtx(ctx)
 	rootDir := grapicmd.ProvideRootDir(grapicmdCtx)
 	config := grapicmd.ProvideProtocConfig(grapicmdCtx)

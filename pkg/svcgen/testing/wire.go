@@ -11,7 +11,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/svcgen"
 )
 
-func NewTestApp(*gencmd.Ctx, *gencmd.Command, protoc.Wrapper, cli.UI) (*svcgen.App, error) {
+func NewTestApp(*gencmd.Command, protoc.Wrapper, cli.UI) (*svcgen.App, error) {
 	wire.Build(
 		gencmd.Set,
 		svcgen.ProvideParamsBuilder,
