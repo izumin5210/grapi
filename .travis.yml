@@ -15,7 +15,8 @@ env:
 cache:
   directories:
   - $GOPATH/pkg/dep
-  - $HOME/bin
+  - $GOPATH/pkg/mod
+  - $HOME/.cache/go-build
 
 jobs:
   include:
