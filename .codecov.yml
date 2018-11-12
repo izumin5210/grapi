@@ -1,0 +1,10 @@
+coverage:
+  status:
+    project:
+      default:
+        threshold: 1%
+      server:
+        threshold: 1%
+        paths:
+          - pkg/grapiserver/*
+    patch: off
