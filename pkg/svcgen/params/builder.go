@@ -5,10 +5,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/izumin5210/grapi/pkg/cli"
-	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 	"github.com/pkg/errors"
 	"github.com/serenize/snaker"
+
+	"github.com/izumin5210/grapi/pkg/cli"
+	gencmdutil "github.com/izumin5210/grapi/pkg/gencmd/util"
 )
 
 type Builder interface {
@@ -43,22 +44,21 @@ type builderImpl struct {
 }
 
 func (b *builderImpl) Build(path string, resName string, methodNames []string) (*Params, error) {
-	// github.com/foo/bar
-	importPath, err := fs.GetImportPath(b.rootDir.String())
+	protoParams, err := gencmdutil.BuildProtoParams(path, b.rootDir, b.protoOutDir, b.pkgName)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
 	// path => baz/qux/quux
-	path = strings.Replace(path, "-", "_", -1)
+	path = protoParams.Proto.Path
 
 	// quux
 	name := filepath.Base(path)
 
-	names := inflect(name)
+	names := gencmdutil.Inflect(name)
 
 	// Quux
-	serviceName := names.singularCamel
+	serviceName := names.Camel.Singular
 	// quux
 	localServiceName := strings.ToLower(string(serviceName[0])) + serviceName[1:]
 
@@ -67,34 +67,10 @@ func (b *builderImpl) Build(path string, resName string, methodNames []string) (
 	// qux
 	packageName := filepath.Base(packagePath)
 
-	// api/baz/qux
-	pbgoPackagePath := filepath.Join(b.protoOutDir, packagePath)
-	// qux_pb
-	pbgoPackageName := filepath.Base(pbgoPackagePath) + "_pb"
-
 	if packagePath == "." {
 		packagePath = filepath.Base(b.serverDir)
 		packageName = packagePath
-		pbgoPackagePath = b.protoOutDir
-		pbgoPackageName = filepath.Base(pbgoPackagePath) + "_pb"
 	}
-
-	protoPackage := b.pkgName
-	if protoPackage == "" {
-		protoPackageChunks := []string{}
-		for _, pkg := range strings.Split(filepath.ToSlash(filepath.Join(importPath, b.protoOutDir)), "/") {
-			chunks := strings.Split(pkg, ".")
-			for i := len(chunks) - 1; i >= 0; i-- {
-				protoPackageChunks = append(protoPackageChunks, chunks[i])
-			}
-		}
-		// com.github.foo.bar.baz.qux
-		protoPackage = strings.Join(protoPackageChunks, ".")
-	}
-	if dir := filepath.Dir(path); dir != "." {
-		protoPackage = protoPackage + "." + strings.Replace(dir, string(filepath.Separator), ".", -1)
-	}
-	protoPackage = strings.Replace(protoPackage, "-", "_", -1)
 
 	protoImports := []string{
 		"google/api/annotations.proto",
@@ -108,7 +84,7 @@ func (b *builderImpl) Build(path string, resName string, methodNames []string) (
 
 	resNames := names
 	if resName != "" {
-		resNames = inflect(resName)
+		resNames = gencmdutil.Inflect(resName)
 	}
 	methods := b.buildMethodParams(resNames, methodNames)
 
@@ -127,13 +103,13 @@ func (b *builderImpl) Build(path string, resName string, methodNames []string) (
 		ServiceName: serviceName,
 		Methods:     methods.Methods,
 		Proto: ProtoParams{
-			Package:  protoPackage,
+			Package:  protoParams.Proto.Package,
 			Imports:  protoImports,
 			Messages: methods.Messages,
 		},
 		PbGo: PbGoParams{
-			PackageName: pbgoPackageName,
-			PackagePath: filepath.ToSlash(filepath.Join(importPath, pbgoPackagePath)),
+			PackagePath: protoParams.PbGo.Package,
+			PackageName: protoParams.PbGo.ImportName,
 		},
 		Go: GoParams{
 			Package:     packageName,
@@ -147,12 +123,12 @@ func (b *builderImpl) Build(path string, resName string, methodNames []string) (
 	return params, nil
 }
 
-func (b *builderImpl) buildMethodParams(name inflectableString, methods []string) (
+func (b *builderImpl) buildMethodParams(name gencmdutil.String, methods []string) (
 	params MethodsParams,
 ) {
-	id := name.singularSnake + "_id"
+	id := name.Snake.Singular + "_id"
 	resource := &MethodMessage{
-		Name:   name.singularCamel,
+		Name:   name.Camel.Singular,
 		Fields: []MethodMessageField{{Name: id, Type: "string", Tag: 1}},
 	}
 
@@ -164,29 +140,29 @@ func (b *builderImpl) buildMethodParams(name inflectableString, methods []string
 	for _, meth := range methods {
 		switch strings.ToLower(meth) {
 		case "list":
-			methodName := "List" + name.pluralCamel
+			methodName := "List" + name.Camel.Plural
 			reqName := methodName + "Request"
 			respName := methodName + "Response"
 			basicMethods[0] = &MethodParams{
 				Method:         methodName,
 				requestCommon:  reqName,
 				responseCommon: respName,
-				HTTP:           MethodHTTPParams{Method: "get", Path: name.pluralSnake},
+				HTTP:           MethodHTTPParams{Method: "get", Path: name.Snake.Plural},
 			}
 			basicMessages[0] = resource
 			basicMessages[1] = &MethodMessage{Name: reqName}
 			basicMessages[2] = &MethodMessage{
 				Name:   respName,
-				Fields: []MethodMessageField{{Name: name.pluralSnake, Type: name.singularCamel, Repeated: true, Tag: 1}},
+				Fields: []MethodMessageField{{Name: name.Snake.Plural, Type: name.Camel.Singular, Repeated: true, Tag: 1}},
 			}
 		case "get":
-			methodName := "Get" + name.singularCamel
+			methodName := "Get" + name.Camel.Singular
 			reqName := methodName + "Request"
 			basicMethods[1] = &MethodParams{
 				Method:         methodName,
 				requestCommon:  reqName,
 				responseCommon: resource.Name,
-				HTTP:           MethodHTTPParams{Method: "get", Path: name.pluralSnake + "/{" + id + "}"},
+				HTTP:           MethodHTTPParams{Method: "get", Path: name.Snake.Plural + "/{" + id + "}"},
 			}
 			basicMessages[0] = resource
 			basicMessages[3] = &MethodMessage{
@@ -194,42 +170,42 @@ func (b *builderImpl) buildMethodParams(name inflectableString, methods []string
 				Fields: []MethodMessageField{{Name: id, Type: "string", Tag: 1}},
 			}
 		case "create":
-			methodName := "Create" + name.singularCamel
+			methodName := "Create" + name.Camel.Singular
 			reqName := methodName + "Request"
 			basicMethods[2] = &MethodParams{
 				Method:         methodName,
 				requestCommon:  reqName,
 				responseCommon: resource.Name,
-				HTTP:           MethodHTTPParams{Method: "post", Path: name.pluralSnake, Body: name.singularSnake},
+				HTTP:           MethodHTTPParams{Method: "post", Path: name.Snake.Plural, Body: name.Snake.Singular},
 			}
 			basicMessages[0] = resource
 			basicMessages[4] = &MethodMessage{
 				Name:   reqName,
-				Fields: []MethodMessageField{{Name: name.singularSnake, Type: name.singularCamel, Tag: 1}},
+				Fields: []MethodMessageField{{Name: name.Snake.Singular, Type: name.Camel.Singular, Tag: 1}},
 			}
 		case "update":
-			methodName := "Update" + name.singularCamel
+			methodName := "Update" + name.Camel.Singular
 			reqName := methodName + "Request"
 			basicMethods[3] = &MethodParams{
 				Method:         methodName,
 				requestCommon:  reqName,
 				responseCommon: resource.Name,
-				HTTP:           MethodHTTPParams{Method: "patch", Path: name.pluralSnake + "/{" + name.singularSnake + "." + id + "}", Body: name.singularSnake},
+				HTTP:           MethodHTTPParams{Method: "patch", Path: name.Snake.Plural + "/{" + name.Snake.Singular + "." + id + "}", Body: name.Snake.Singular},
 			}
 			basicMessages[0] = resource
 			basicMessages[5] = &MethodMessage{
 				Name:   reqName,
-				Fields: []MethodMessageField{{Name: name.singularSnake, Type: name.singularCamel, Tag: 1}},
+				Fields: []MethodMessageField{{Name: name.Snake.Singular, Type: name.Camel.Singular, Tag: 1}},
 			}
 		case "delete":
-			methodName := "Delete" + name.singularCamel
+			methodName := "Delete" + name.Camel.Singular
 			reqName := methodName + "Request"
 			basicMethods[4] = &MethodParams{
 				Method:        methodName,
 				requestCommon: reqName,
 				responseProto: "google.protobuf.Empty",
 				responseGo:    "empty.Empty",
-				HTTP:          MethodHTTPParams{Method: "delete", Path: name.pluralSnake + "/{" + id + "}"},
+				HTTP:          MethodHTTPParams{Method: "delete", Path: name.Snake.Plural + "/{" + id + "}"},
 			}
 			basicMessages[6] = &MethodMessage{
 				Name:   reqName,
@@ -245,7 +221,7 @@ func (b *builderImpl) buildMethodParams(name inflectableString, methods []string
 				Method:         methodName,
 				requestCommon:  reqName,
 				responseCommon: respName,
-				HTTP:           MethodHTTPParams{Method: "get", Path: name.pluralSnake + "/" + snaker.CamelToSnake(meth)},
+				HTTP:           MethodHTTPParams{Method: "get", Path: name.Snake.Plural + "/" + snaker.CamelToSnake(meth)},
 			})
 			customMessages = append(
 				customMessages,
