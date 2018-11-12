@@ -39,7 +39,7 @@ func newGenerateCommand(createApp svcgen.CreateAppFunc) *gencmd.Command {
 		ShouldInsideApp: true,
 		PreRun: func(c *gencmd.Command, args []string) error {
 			var err error
-			app, err = createApp(c.Ctx(), c)
+			app, err = createApp(c)
 			return errors.WithStack(err)
 		},
 		BuildParams: func(c *gencmd.Command, args []string) (interface{}, error) {
@@ -73,7 +73,7 @@ func newDestroyCommand(createApp svcgen.CreateAppFunc) *gencmd.Command {
 		ShouldInsideApp: true,
 		PreRun: func(c *gencmd.Command, args []string) error {
 			var err error
-			app, err = createApp(c.Ctx(), c)
+			app, err = createApp(c)
 			return errors.WithStack(err)
 		},
 		BuildParams: func(c *gencmd.Command, args []string) (interface{}, error) {

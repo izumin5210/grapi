@@ -43,11 +43,11 @@ func TestRun(t *testing.T) {
 
 	rootDir := cli.RootDir("/home/src/testapp")
 
-	createSvcApp := func(ctx *gencmd.Ctx, cmd *gencmd.Command) (*svcgen.App, error) {
-		return svcgentesting.NewTestApp(ctx, cmd, &fakeProtocWrapper{}, cli.NopUI)
+	createSvcApp := func(cmd *gencmd.Command) (*svcgen.App, error) {
+		return svcgentesting.NewTestApp(cmd, &fakeProtocWrapper{}, cli.NopUI)
 	}
-	createGenApp := func(ctx *gencmd.Ctx, cmd *gencmd.Command) (*gencmd.App, error) {
-		return gencmdtesting.NewTestApp(ctx, cmd, cli.NopUI)
+	createGenApp := func(cmd *gencmd.Command) (*gencmd.App, error) {
+		return gencmdtesting.NewTestApp(cmd, cli.NopUI)
 	}
 	createCmd := func(t *testing.T, fs afero.Fs, tc svcgentesting.Case) gencmd.Executor {
 		ctx := &grapicmd.Ctx{

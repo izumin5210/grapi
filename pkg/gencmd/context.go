@@ -30,7 +30,7 @@ func (c *Ctx) CreateApp(cmd *Command) (*App, error) {
 	if c.CreateAppFunc == nil {
 		f = newApp
 	}
-	app, err := f(c, cmd)
+	app, err := f(cmd)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
