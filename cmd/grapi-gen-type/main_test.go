@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"go/build"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy"
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/grapi/cmd/grapi-gen-type/di"
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/gencmd"
 	gencmdtesting "github.com/izumin5210/grapi/pkg/gencmd/testing"
@@ -51,15 +53,18 @@ func TestType(t *testing.T) {
 	fs.BuildContext = build.Context{GOPATH: "/go"}
 	rootDir := cli.RootDir("/go/src/testapp")
 
-	createGenApp := func(ctx *gencmd.Ctx, cmd *gencmd.Command) (*gencmd.App, error) {
-		return gencmdtesting.NewTestApp(ctx, cmd, cli.NopUI)
+	createApp := func(cmd *gencmd.Command) (*di.App, error) {
+		return &di.App{Protoc: &fakeProtocWrapper{}}, nil
+	}
+	createGenApp := func(cmd *gencmd.Command) (*gencmd.App, error) {
+		return gencmdtesting.NewTestApp(cmd, cli.NopUI)
 	}
 	createCmd := func(t *testing.T, fs afero.Fs) gencmd.Executor {
 		ctx := &grapicmd.Ctx{
 			FS:      fs,
 			RootDir: rootDir,
 		}
-		return buildCommand(gencmd.WithGrapiCtx(ctx), gencmd.WithCreateAppFunc(createGenApp))
+		return buildCommand(createApp, gencmd.WithGrapiCtx(ctx), gencmd.WithCreateAppFunc(createGenApp))
 	}
 
 	for _, tc := range cases {
@@ -115,3 +120,7 @@ func TestType(t *testing.T) {
 		})
 	}
 }
+
+type fakeProtocWrapper struct{}
+
+func (*fakeProtocWrapper) Exec(context.Context) error { return nil }
