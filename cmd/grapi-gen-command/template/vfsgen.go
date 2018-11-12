@@ -5,8 +5,9 @@ package main
 import (
 	"log"
 
-	"github.com/izumin5210/grapi/pkg/svcgen/template"
 	"github.com/shurcooL/vfsgen"
+
+	"github.com/izumin5210/grapi/cmd/grapi-gen-command/template"
 )
 
 func main() {

@@ -21,19 +21,19 @@ var FS = func() http.FileSystem {
 	fs := vfsgen۰FS{
 		"/": &vfsgen۰DirInfo{
 			name:    "/",
-			modTime: time.Date(2018, 11, 9, 1, 5, 41, 0, time.UTC),
+			modTime: time.Date(2018, 11, 11, 11, 16, 29, 0, time.UTC),
 		},
 		"/cmd": &vfsgen۰DirInfo{
 			name:    "cmd",
-			modTime: time.Date(2018, 11, 9, 1, 5, 41, 0, time.UTC),
+			modTime: time.Date(2018, 11, 11, 11, 16, 29, 0, time.UTC),
 		},
 		"/cmd/{{ .name }}": &vfsgen۰DirInfo{
 			name:    "{{ .name }}",
-			modTime: time.Date(2018, 11, 9, 1, 5, 41, 0, time.UTC),
+			modTime: time.Date(2018, 11, 11, 11, 16, 29, 0, time.UTC),
 		},
 		"/cmd/{{ .name }}/run.go.tmpl": &vfsgen۰FileInfo{
 			name:    "run.go.tmpl",
-			modTime: time.Date(2018, 11, 9, 1, 5, 41, 0, time.UTC),
+			modTime: time.Date(2018, 11, 11, 11, 16, 29, 0, time.UTC),
 			content: []byte("\x70\x61\x63\x6b\x61\x67\x65\x20\x6d\x61\x69\x6e\x0a\x0a\x69\x6d\x70\x6f\x72\x74\x20\x28\x0a\x09\x22\x66\x6d\x74\x22\x0a\x09\x22\x6f\x73\x22\x0a\x29\x0a\x0a\x66\x75\x6e\x63\x20\x6d\x61\x69\x6e\x28\x29\x20\x7b\x0a\x09\x6f\x73\x2e\x45\x78\x69\x74\x28\x72\x75\x6e\x28\x29\x29\x0a\x7d\x0a\x0a\x66\x75\x6e\x63\x20\x72\x75\x6e\x28\x29\x20\x69\x6e\x74\x20\x7b\x0a\x09\x66\x6d\x74\x2e\x50\x72\x69\x6e\x74\x6c\x6e\x28\x22\x49\x74\x20\x77\x6f\x72\x6b\x73\x21\x22\x29\x0a\x09\x72\x65\x74\x75\x72\x6e\x20\x30\x0a\x7d\x0a"),
 		},
 	}
