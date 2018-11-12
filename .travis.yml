@@ -47,6 +47,9 @@ jobs:
     after_success: bash <(curl -s https://codecov.io/bash)
 
   - <<: *test
+    go: master
+
+  - <<: *test
     go: '1.10'
 
   - <<: *test-e2e
