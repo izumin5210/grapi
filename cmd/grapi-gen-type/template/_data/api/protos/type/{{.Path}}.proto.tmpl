@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package {{ .Proto.Package }};
+
+option go_package = "{{ .PbGo.PackagePath }};{{ .PbGo.PackageName }}";
+
+messagge {{.Name}} {
+  string id = 1;
+}
