@@ -6,7 +6,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/svcgen/params"
 )
 
-type CreateAppFunc func(*gencmd.Ctx, *gencmd.Command) (*App, error)
+type CreateAppFunc func(*gencmd.Command) (*App, error)
 
 type App struct {
 	ProtocWrapper protoc.Wrapper

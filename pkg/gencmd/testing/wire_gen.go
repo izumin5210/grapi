@@ -13,7 +13,8 @@ import (
 
 // Injectors from wire.go:
 
-func NewTestApp(ctx *gencmd.Ctx, command *gencmd.Command, ui cli.UI) (*gencmd.App, error) {
+func NewTestApp(command *gencmd.Command, ui cli.UI) (*gencmd.App, error) {
+	ctx := gencmd.ProvideCtx(command)
 	grapicmdCtx := gencmd.ProvideGrapiCtx(ctx)
 	fs := grapicmd.ProvideFS(grapicmdCtx)
 	rootDir := grapicmd.ProvideRootDir(grapicmdCtx)

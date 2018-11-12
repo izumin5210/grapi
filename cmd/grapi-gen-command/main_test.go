@@ -26,8 +26,8 @@ func TestCommand(t *testing.T) {
 
 	rootDir := cli.RootDir("/home/src/testapp")
 
-	createGenApp := func(ctx *gencmd.Ctx, cmd *gencmd.Command) (*gencmd.App, error) {
-		return gencmdtesting.NewTestApp(ctx, cmd, cli.NopUI)
+	createGenApp := func(cmd *gencmd.Command) (*gencmd.App, error) {
+		return gencmdtesting.NewTestApp(cmd, cli.NopUI)
 	}
 	createCmd := func(t *testing.T, fs afero.Fs) gencmd.Executor {
 		ctx := &grapicmd.Ctx{
