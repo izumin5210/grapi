@@ -10,7 +10,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/protoc"
 )
 
-func NewApp(*gencmd.Ctx, *gencmd.Command) (*App, error) {
+func NewApp(*gencmd.Command) (*App, error) {
 	wire.Build(
 		Set,
 		gencmd.Set,

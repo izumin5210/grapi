@@ -7,7 +7,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/cli"
 )
 
-func newApp(*Ctx, *Command) (*App, error) {
+func newApp(*Command) (*App, error) {
 	wire.Build(
 		Set,
 		cli.UIInstance,
