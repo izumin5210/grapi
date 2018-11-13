@@ -18,6 +18,69 @@
 
 [![asciicast](https://asciinema.org/a/176280.png)](https://asciinema.org/a/176280)
 
+
+## :warning: Migrate 0.2.x -> 0.3.x :warning:
+grapi v0.3.0 has some breaking changes. If you have a grapi project <=v0.2.x, you should migrate it.
+
+1. Introduce [gex](https://github.com/izumin5210/gex)
+    - ```
+      go get github.com/izumin5210/gex/cmd/gex
+      ```
+1. Add defualt generator plugins:
+    - ```
+      gex \
+        --add github.com/izumin5210/grapi/cmd/grapi \
+        --add github.com/izumin5210/grapi/cmd/grapi-gen-command \
+        --add github.com/izumin5210/grapi/cmd/grapi-gen-service \
+        --add github.com/izumin5210/grapi/cmd/grapi-gen-scaffold-service \
+        --add github.com/izumin5210/grapi/cmd/grapi-gen-type
+      ```
+1. Add protoc plugins via gex
+    - ```
+      gex \
+        --add github.com/golang/protobuf/protoc-gen-go \
+        --add github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
+        --add github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+      ```
+1. Update `grapi.toml`
+    - <details>
+      <summary>diff</summary>
+
+      ```diff
+      +package = "yourcompany.yourappname"
+      +
+       [grapi]
+       server_dir = "./app/server"
+
+       [protoc]
+       protos_dir = "./api/protos"
+       out_dir = "./api"
+       import_dirs = [
+      +  "./api/protos",
+         "./vendor/github.com/grpc-ecosystem/grpc-gateway",
+         "./vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis",
+       ]
+
+         [[protoc.plugins]]
+      -  path = "./vendor/github.com/golang/protobuf/protoc-gen-go"
+         name = "go"
+         args = { plugins = "grpc", paths = "source_relative" }
+
+         [[protoc.plugins]]
+      -  path = "./vendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway"
+         name = "grpc-gateway"
+      -  args = { logtostderr = true }
+      +  args = { logtostderr = true, paths = "source_relative" }
+
+         [[protoc.plugins]]
+      -  path = "./vendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger"
+         name = "swagger"
+         args = { logtostderr = true }
+      ```
+
+      </details>
+
+
 ## Getting Started
 
 ### Create a new application
