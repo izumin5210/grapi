@@ -2,6 +2,7 @@ package grapiserver
 
 import (
 	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	pkg_runtime "runtime"
@@ -22,6 +23,11 @@ func createDefaultConfig() *Config {
 		GatewayAddr: &Address{
 			Network: "tcp",
 			Addr:    ":3000",
+		},
+		GatewayHTTPServer: http.Server{
+			ReadTimeout:  8 * time.Second,
+			WriteTimeout: 8 * time.Second,
+			IdleTimeout:  2 * time.Minute,
 		},
 		MaxConcurrentStreams: 1000,
 	}
@@ -70,6 +76,7 @@ type Config struct {
 	GatewayServerUnaryInterceptors  []grpc.UnaryClientInterceptor
 	GatewayServerStreamInterceptors []grpc.StreamClientInterceptor
 	GrpcServerOption                []grpc.ServerOption
+	GatewayHTTPServer               http.Server
 	GatewayDialOption               []grpc.DialOption
 	GatewayMuxOptions               []runtime.ServeMuxOption
 	MaxConcurrentStreams            uint32

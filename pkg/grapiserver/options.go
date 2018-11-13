@@ -1,6 +1,7 @@
 package grapiserver
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -96,6 +97,14 @@ func WithGatewayServerStreamInterceptors(interceptors ...grpc.StreamClientInterc
 func WithGrpcServerOptions(opts ...grpc.ServerOption) Option {
 	return func(c *Config) {
 		c.GrpcServerOption = append(c.GrpcServerOption, opts...)
+	}
+}
+
+// WithGatewayHTTPServer returns an Option that specifies http.Server configuration to a gateway server.
+// But if you specify Addr or  Handler, they are ignored.
+func WithGatewayHTTPServer(s http.Server) Option {
+	return func(c *Config) {
+		c.GatewayHTTPServer = s
 	}
 }
 
