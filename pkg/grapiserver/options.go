@@ -1,7 +1,6 @@
 package grapiserver
 
 import (
-	"net/http"
 	"os"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -100,14 +99,6 @@ func WithGrpcServerOptions(opts ...grpc.ServerOption) Option {
 	}
 }
 
-// WithGatewayHTTPServer returns an Option that specifies http.Server configuration to a gateway server.
-// But if you specify Addr or  Handler, they are ignored.
-func WithGatewayHTTPServer(s http.Server) Option {
-	return func(c *Config) {
-		c.GatewayHTTPServer = s
-	}
-}
-
 // WithGatewayDialOptions returns an Option that sets grpc.DialOption(s) to a gRPC clinet used by a gateway server.
 func WithGatewayDialOptions(opts ...grpc.DialOption) Option {
 	return func(c *Config) {
@@ -126,6 +117,13 @@ func WithGatewayMuxOptions(opts ...runtime.ServeMuxOption) Option {
 func WithGatewayServerMiddlewares(middlewares ...HTTPServerMiddleware) Option {
 	return func(c *Config) {
 		c.GatewayServerMiddlewares = append(c.GatewayServerMiddlewares, middlewares...)
+	}
+}
+
+// WithGatewayServerConfig returns an Option that specifies http.Server configuration to a gateway server.
+func WithGatewayServerConfig(cfg *HTTPServerConfig) Option {
+	return func(c *Config) {
+		c.GatewayServerConfig = cfg
 	}
 }
 

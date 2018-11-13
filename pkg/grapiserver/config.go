@@ -1,6 +1,7 @@
 package grapiserver
 
 import (
+	"crypto/tls"
 	"net"
 	"net/http"
 	"os"
@@ -24,7 +25,7 @@ func createDefaultConfig() *Config {
 			Network: "tcp",
 			Addr:    ":3000",
 		},
-		GatewayHTTPServer: http.Server{
+		GatewayServerConfig: &HTTPServerConfig{
 			ReadTimeout:  8 * time.Second,
 			WriteTimeout: 8 * time.Second,
 			IdleTimeout:  2 * time.Minute,
@@ -65,6 +66,28 @@ func (a *Address) createListener() (net.Listener, error) {
 	return lis, nil
 }
 
+type HTTPServerConfig struct {
+	TLSConfig         *tls.Config
+	ReadTimeout       time.Duration
+	ReadHeaderTimeout time.Duration
+	WriteTimeout      time.Duration
+	IdleTimeout       time.Duration
+	MaxHeaderBytes    int
+	TLSNextProto      map[string]func(*http.Server, *tls.Conn, http.Handler)
+	ConnState         func(net.Conn, http.ConnState)
+}
+
+func (c *HTTPServerConfig) applyTo(s *http.Server) {
+	s.TLSConfig = c.TLSConfig
+	s.ReadTimeout = c.ReadTimeout
+	s.ReadHeaderTimeout = c.ReadHeaderTimeout
+	s.WriteTimeout = c.WriteTimeout
+	s.IdleTimeout = c.IdleTimeout
+	s.MaxHeaderBytes = c.MaxHeaderBytes
+	s.TLSNextProto = c.TLSNextProto
+	s.ConnState = c.ConnState
+}
+
 // Config contains configurations of gRPC and Gateway server.
 type Config struct {
 	GrpcAddr                        *Address
@@ -76,9 +99,9 @@ type Config struct {
 	GatewayServerUnaryInterceptors  []grpc.UnaryClientInterceptor
 	GatewayServerStreamInterceptors []grpc.StreamClientInterceptor
 	GrpcServerOption                []grpc.ServerOption
-	GatewayHTTPServer               http.Server
 	GatewayDialOption               []grpc.DialOption
 	GatewayMuxOptions               []runtime.ServeMuxOption
+	GatewayServerConfig             *HTTPServerConfig
 	MaxConcurrentStreams            uint32
 	GatewayServerMiddlewares        []HTTPServerMiddleware
 }
