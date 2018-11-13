@@ -64,6 +64,18 @@
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:ab5c9f9d24aa14569408f4e74cd89eeb5661b120436face35ac067bcf8b8d617"
+  name = "github.com/google/go-cloud"
+  packages = [
+    "wire",
+    "wire/cmd/wire",
+    "wire/internal/wire",
+  ]
+  pruneopts = "UT"
+  revision = "2152f209f3c907645f7ebdcacdb2c18cd89e6fa8"
+  version = "0.5.0"
+
+[[projects]]
   digest = "1:2e3c336fc7fde5c984d2841455a658a6d626450b1754a854b3b32e7a8f49a07a"
   name = "github.com/google/go-cmp"
   packages = [
@@ -114,12 +126,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:145eff5207977eb95c3649a27cdc2e467d8a1c104810bc12b6a53745a91d823a"
+  digest = "1:466594e2922a8ca66af07370ea29726c0d40272baaad1158a36cd94baa6367d1"
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
     "hcl/ast",
     "hcl/parser",
+    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -178,16 +191,19 @@
   version = "v0.1.0"
 
 [[projects]]
-  digest = "1:90d34344be1899b2c4f614a5bb59ed829346f3f00d8a2009c254b1d060578240"
+  digest = "1:41918da4644125b34a1918691ca50916e5e2cdfeb9995c157e3f982c50bfb231"
   name = "github.com/izumin5210/gex"
   packages = [
+    ".",
     "cmd/gex",
-    "pkg/command",
+    "pkg/manager",
+    "pkg/manager/dep",
+    "pkg/manager/mod",
     "pkg/tool",
   ]
   pruneopts = "UT"
-  revision = "c4c75fc151408fb0f769b01a333c904774eb65d7"
-  version = "v0.2.0"
+  revision = "33da6eb3cb894727a7498934e09e2bd937279257"
+  version = "v0.4.2"
 
 [[projects]]
   branch = "master"
@@ -332,6 +348,22 @@
   revision = "a683aaf2d516deecd70cad0c72e3ca773ecfcef0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:7ca2584fa7da0520cd2d1136a10194fe5a5b220bdb215074ab6f7b5ad91115f4"
+  name = "github.com/shurcooL/httpfs"
+  packages = ["vfsutil"]
+  pruneopts = "UT"
+  revision = "809beceb23714880abc4a382a00c05f89d13b1cc"
+
+[[projects]]
+  branch = "master"
+  digest = "1:da947121c0a7abeab824f2bf6732762af118aa17b292e2d77886921eeedd6c51"
+  name = "github.com/shurcooL/vfsgen"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a97a25d856cadfe6481325baeb35a70d6723ca0c"
+
+[[projects]]
   digest = "1:30e06e6d62a1d694e3cdbff29d8a9a96022e05a487d0c6eaf0ef898965ef28fb"
   name = "github.com/soheilhy/cmux"
   packages = ["."]
@@ -383,12 +415,12 @@
   version = "v1.0.2"
 
 [[projects]]
-  digest = "1:f8e1a678a2571e265f4bf91a3e5e32aa6b1474a55cb0ea849750cc177b664d96"
+  digest = "1:214775c11fd26da94a100111a62daa25339198a4f9c57cb4aab352da889f5b93"
   name = "github.com/spf13/viper"
   packages = ["."]
   pruneopts = "UT"
-  revision = "25b30aa063fc18e48662b86996252eabdcf2f0c7"
-  version = "v1.0.0"
+  revision = "2c12c60302a5a0e62ee102ca9bc996277c2f64f5"
+  version = "v1.2.1"
 
 [[projects]]
   digest = "1:ba6b1a61040f11451864ea00fbc29fc3f9a29211c630ce94f6141a1d4346f8d7"
@@ -657,6 +689,17 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:80a359dc3146cb9edf602d0a672b2f06a3506659301bbd132d4dd181b05bceba"
+  name = "k8s.io/utils"
+  packages = [
+    "exec",
+    "exec/testing",
+  ]
+  pruneopts = "UT"
+  revision = "cd6a8f44fe799a6b69c6dbbb1a930994738a367c"
+
+[[projects]]
+  branch = "master"
   digest = "1:521f15c98723cb42db85f5b83980ffa5f707ddaff12976a0d366e6a6cdd1f791"
   name = "mvdan.cc/lint"
   packages = ["."]
@@ -684,6 +727,8 @@
     "github.com/golang/mock/mockgen",
     "github.com/golang/protobuf/proto",
     "github.com/golang/protobuf/ptypes/empty",
+    "github.com/google/go-cloud/wire",
+    "github.com/google/go-cloud/wire/cmd/wire",
     "github.com/google/go-cmp/cmp",
     "github.com/grpc-ecosystem/go-grpc-middleware",
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
@@ -691,7 +736,9 @@
     "github.com/haya14busa/reviewdog/cmd/reviewdog",
     "github.com/izumin5210/clicontrib/pkg/ccmd",
     "github.com/izumin5210/clicontrib/pkg/clog",
+    "github.com/izumin5210/gex",
     "github.com/izumin5210/gex/cmd/gex",
+    "github.com/izumin5210/gex/pkg/tool",
     "github.com/jessevdk/go-assets",
     "github.com/jessevdk/go-assets-builder",
     "github.com/jinzhu/inflection",
@@ -700,9 +747,12 @@
     "github.com/mitchellh/gox",
     "github.com/pkg/errors",
     "github.com/serenize/snaker",
+    "github.com/shurcooL/httpfs/vfsutil",
+    "github.com/shurcooL/vfsgen",
     "github.com/soheilhy/cmux",
     "github.com/spf13/afero",
     "github.com/spf13/cobra",
+    "github.com/spf13/pflag",
     "github.com/spf13/viper",
     "github.com/srvc/wraperr/cmd/wraperr",
     "github.com/tcnksm/go-input",
@@ -716,6 +766,8 @@
     "google.golang.org/grpc/reflection",
     "google.golang.org/grpc/status",
     "honnef.co/go/tools/cmd/megacheck",
+    "k8s.io/utils/exec",
+    "k8s.io/utils/exec/testing",
     "mvdan.cc/unparam",
   ]
   solver-name = "gps-cdcl"

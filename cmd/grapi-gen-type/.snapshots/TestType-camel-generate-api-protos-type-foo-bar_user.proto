@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package testapp.api.type.foo;
+
+option go_package = "testapp/api/type/foo;foo_pb";
+
+messagge BarUser {
+  string id = 1;
+}
+

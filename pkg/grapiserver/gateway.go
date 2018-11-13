@@ -94,10 +94,12 @@ func (s *GatewayServer) createServer(conn *grpc.ClientConn) (*http.Server, error
 		handler = (s.GatewayServerMiddlewares[i])(handler)
 	}
 
-	return &http.Server{
-		ReadTimeout:  8 * time.Second,
-		WriteTimeout: 8 * time.Second,
-		IdleTimeout:  2 * time.Minute,
-		Handler:      handler,
-	}, nil
+	svr := &http.Server{
+		Handler: handler,
+	}
+	if cfg := s.GatewayServerConfig; cfg != nil {
+		cfg.applyTo(svr)
+	}
+
+	return svr, nil
 }

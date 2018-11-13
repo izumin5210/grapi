@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package testapp.api.type;
+
+option go_package = "testapp/api/type;type_pb";
+
+messagge Book {
+  string id = 1;
+}
+

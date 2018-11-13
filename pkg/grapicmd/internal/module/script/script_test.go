@@ -5,19 +5,15 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/spf13/afero"
-)
 
-type execution struct {
-	nameAndArgs []string
-	dir         string
-	connected   bool
-}
+	"github.com/izumin5210/grapi/pkg/excmd/testing"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+)
 
 type testContext struct {
 	fs            afero.Fs
-	executions    []*execution
+	executor      *testingexcmd.FakeExecutor
 	loader        module.ScriptLoader
 	binName       string
 	rootDir       string
@@ -34,7 +30,7 @@ func createTestContext(t *testing.T) *testContext {
 		binName:       binName,
 		rootDir:       rootDir,
 		cmdDir:        filepath.Join(rootDir, "cmd"),
-		executions:    []*execution{},
+		executor:      &testingexcmd.FakeExecutor{},
 		srcsByBinName: map[string][]string{},
 	}
 
@@ -60,22 +56,7 @@ func createTestContext(t *testing.T) *testContext {
 		ctx.srcsByBinName[binName] = srcPaths
 	}
 
-	commandFactory := &fakeCommandFactory{
-		fakeCreate: func(nameAndArgs []string) module.Command {
-			c := &fakeCommand{}
-			c.fakeExec = func() ([]byte, error) {
-				ctx.executions = append(ctx.executions, &execution{
-					nameAndArgs: nameAndArgs,
-					dir:         c.dir,
-					connected:   c.ioConnected,
-				})
-				return []byte{}, nil
-			}
-			return c
-		},
-	}
-
-	ctx.loader = NewLoader(fs, commandFactory, rootDir)
+	ctx.loader = NewLoader(fs, ctx.executor, rootDir)
 
 	return ctx
 }
@@ -103,15 +84,15 @@ func Test_Script(t *testing.T) {
 
 	err = s.Build("-v")
 	binPath := filepath.Join(ctx.rootDir, "bin", ctx.binName)
-	exec := ctx.executions[0]
+	cmd := ctx.executor.Commands[0]
 
 	srcs := ctx.srcsByBinName[ctx.binName]
-	if got, want := exec.nameAndArgs, append([]string{"go", "build", "-o=" + binPath, "-v"}, srcs...); !reflect.DeepEqual(got, want) {
-		t.Errorf("Build() executed %v, want %v", got, want)
+	if got, want := cmd.Args, append([]string{"build", "-o=" + binPath, "-v"}, srcs...); !reflect.DeepEqual(got, want) {
+		t.Errorf("Build() cmduted %v, want %v", got, want)
 	}
 
-	if got, want := exec.dir, "/home/app"; got != want {
-		t.Errorf("Build() executed a command in %v, want %v", got, want)
+	if got, want := cmd.Dir, "/home/app"; got != want {
+		t.Errorf("Build() cmduted a command in %v, want %v", got, want)
 	}
 
 	if err != nil {
@@ -119,49 +100,17 @@ func Test_Script(t *testing.T) {
 	}
 
 	err = s.Run("-v")
-	exec = ctx.executions[1]
+	cmd = ctx.executor.Commands[1]
 
-	if got, want := exec.nameAndArgs, []string{binPath, "-v"}; !reflect.DeepEqual(got, want) {
-		t.Errorf("Run() executed %v, want %v", got, want)
+	if got, want := cmd.Name, binPath; got != want {
+		t.Errorf("Run() cmduted %v, want %v", got, want)
 	}
 
-	if got, want := exec.dir, "/home/app"; got != want {
-		t.Errorf("Run() executed a command in %v, want %v", got, want)
+	if got, want := cmd.Dir, "/home/app"; got != want {
+		t.Errorf("Run() cmduted a command in %v, want %v", got, want)
 	}
 
 	if err != nil {
 		t.Errorf("Run() returned an error %v", err)
 	}
-}
-
-// fake impls
-
-type fakeCommandFactory struct {
-	module.CommandFactory
-	fakeCreate func([]string) module.Command
-}
-
-func (f *fakeCommandFactory) Create(nameAndArgs []string) module.Command {
-	return f.fakeCreate(nameAndArgs)
-}
-
-type fakeCommand struct {
-	module.Command
-	dir         string
-	ioConnected bool
-	fakeExec    func() ([]byte, error)
-}
-
-func (c *fakeCommand) SetDir(dir string) module.Command {
-	c.dir = dir
-	return c
-}
-
-func (c *fakeCommand) ConnectIO() module.Command {
-	c.ioConnected = true
-	return c
-}
-
-func (c *fakeCommand) Exec() ([]byte, error) {
-	return c.fakeExec()
 }

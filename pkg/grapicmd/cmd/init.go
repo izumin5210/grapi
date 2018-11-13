@@ -12,16 +12,8 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 )
 
-var (
-	tmplPaths []string
-)
-
-func newInitCommand(ac di.AppComponent) *cobra.Command {
-	var (
-		depSkipped bool
-		headUsed   bool
-		pkgName    string
-	)
+func newInitCommand(ctx *grapicmd.Ctx) *cobra.Command {
+	var cfg usecase.InitConfig
 
 	cmd := &cobra.Command{
 		Use:           "init [name]",
@@ -30,45 +22,40 @@ func newInitCommand(ac di.AppComponent) *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			root, err := parseInitArgs(ac.Config(), args)
+			root, err := parseInitArgs(ctx, args)
 			if err != nil {
 				return errors.WithStack(err)
 			}
 			clog.Debug("parseInitArgs", "root", root)
 
-			u := usecase.NewInitializeProjectUsecase(
-				ac.UI(),
-				ac.Generator(),
-				ac.CommandFactory(),
-				ac.Config().Version(),
-			)
-
-			return errors.WithStack(u.Perform(root, pkgName, depSkipped, headUsed))
+			return errors.WithStack(di.NewInitializeProjectUsecase(ctx).Perform(root, cfg))
 		},
 	}
 
-	cmd.PersistentFlags().BoolVarP(&depSkipped, "skip-dep", "D", false, "Don't run dep ensure")
-	cmd.PersistentFlags().BoolVar(&headUsed, "HEAD", false, "Use HEAD grapi")
-	cmd.PersistentFlags().StringVarP(&pkgName, "package", "p", "", `Package name of the application(default: "<parent_package_or_username>.<app_name>")`)
+	cmd.PersistentFlags().StringVar(&cfg.Revision, "revision", "", "Specify grapi revision")
+	cmd.PersistentFlags().StringVar(&cfg.Branch, "branch", "", "Specify grapi branch")
+	cmd.PersistentFlags().StringVar(&cfg.Version, "version", "", "Specify grapi version")
+	cmd.PersistentFlags().BoolVar(&cfg.HEAD, "HEAD", false, "Use HEAD grapi")
+	cmd.PersistentFlags().StringVarP(&cfg.Package, "package", "p", "", `Package name of the application(default: "<parent_package_or_username>.<app_name>")`)
 
 	return cmd
 }
 
-func parseInitArgs(cfg grapicmd.Config, args []string) (root string, err error) {
+func parseInitArgs(ctx *grapicmd.Ctx, args []string) (root string, err error) {
 	if argCnt := len(args); argCnt != 1 {
 		err = errors.Errorf("invalid argument count: want 1, got %d", argCnt)
 		return
 	}
 
 	arg := args[0]
-	root = cfg.CurrentDir()
+	root = ctx.RootDir.String()
 
 	if arg == "." {
 		return
 	}
 	root = arg
 	if !filepath.IsAbs(arg) {
-		root = filepath.Join(cfg.CurrentDir(), arg)
+		root = ctx.RootDir.Join(arg)
 	}
 	return
 }

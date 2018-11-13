@@ -7,8 +7,7 @@ REVISION ?= $(shell git describe --always)
 BUILD_DATE ?= $(shell date +'%Y-%m-%dT%H:%M:%SZ')
 
 GO_BUILD_FLAGS := -v
-GO_TEST_FLAGS := -v -timeout 30s
-GO_TEST_INTEGRATION_FLAGS := -v
+GO_TEST_FLAGS := -v -timeout 2m
 GO_COVER_FLAGS := -coverprofile coverage.txt -covermode atomic
 SRC_FILES := $(shell go list -f '{{range .GoFiles}}{{printf "%s/%s\n" $$.Dir .}}{{end}}' ./...)
 
@@ -56,14 +55,10 @@ $(foreach src,$(wildcard ./cmd/*),$(eval $(call cmd-tmpl,$(src))))
 #----------------------------------------------------------------
 .PHONY: setup
 setup:
-ifeq ($(shell go env GOMOD),)
 ifdef CI
 	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 endif
 	dep ensure -v -vendor-only
-else
-	go get -v ./...
-endif
 	@go get github.com/izumin5210/gex/cmd/gex
 	gex --build --verbose
 
@@ -91,9 +86,9 @@ test:
 cover:
 	go test $(GO_TEST_FLAGS) $(GO_COVER_FLAGS) ./...
 
-.PHONY: test-integration
-test-integration: $(GENERATED_BINS)
-	cd _tests && go test $(GO_TEST_INTEGRATION_FLAGS) ./...
+.PHONY: test-e2e
+test-e2e:
+	@./_tests/e2e/run_test.sh
 
 .PHONY: all
 all: $(GENERATED_BINS)
