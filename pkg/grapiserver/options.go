@@ -120,6 +120,13 @@ func WithGatewayServerMiddlewares(middlewares ...HTTPServerMiddleware) Option {
 	}
 }
 
+// WithGatewayServerConfig returns an Option that specifies http.Server configuration to a gateway server.
+func WithGatewayServerConfig(cfg *HTTPServerConfig) Option {
+	return func(c *Config) {
+		c.GatewayServerConfig = cfg
+	}
+}
+
 // WithPassedHeader returns an Option that sets configurations about passed headers for a gateway server.
 func WithPassedHeader(decider PassedHeaderDeciderFunc) Option {
 	return WithGatewayServerMiddlewares(createPassingHeaderMiddleware(decider))
