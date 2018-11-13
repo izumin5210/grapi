@@ -15,7 +15,8 @@ env:
 cache:
   directories:
   - $GOPATH/pkg/dep
-  - $HOME/bin
+  - $GOPATH/pkg/mod
+  - $HOME/.cache/go-build
 
 jobs:
   include:
@@ -44,6 +45,9 @@ jobs:
     name: "coverage (go 1.11)"
     script: make cover
     after_success: bash <(curl -s https://codecov.io/bash)
+
+  - <<: *test
+    go: master
 
   - <<: *test
     go: '1.10'
