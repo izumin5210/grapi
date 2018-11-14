@@ -53,26 +53,19 @@ func (g *generatorImpl) Generate(params interface{}) error {
 
 	for _, e := range entries {
 		if ok, err := g.shouldRun(e); err != nil {
+			g.ui.ItemFailure(e.Path[1:])
 			return errors.WithStack(err)
 		} else if !ok {
+			g.ui.ItemSkipped(e.Path[1:])
 			continue
 		}
 
-		path := g.rootDir.Join(e.Path)
-		dir := filepath.Dir(path)
-
-		if ok, _ := afero.DirExists(g.fs, dir); !ok {
-			err := g.fs.MkdirAll(dir, 0755)
-			if err != nil {
-				return errors.Wrapf(err, "failed to create directory")
-			}
-		}
-
-		err = afero.WriteFile(g.fs, path, []byte(e.Body), 0644)
+		err := g.writeFile(e)
 		if err != nil {
-			return errors.Wrapf(err, "failed to write %s", e.Path)
+			g.ui.ItemFailure(e.Path[1:])
+			return errors.WithStack(err)
 		}
-		// TODO: print "Created"
+		g.ui.ItemSuccess(e.Path[1:])
 	}
 
 	return nil
@@ -90,20 +83,21 @@ func (g *generatorImpl) Destroy(params interface{}) error {
 			return errors.Wrapf(err, "failed to parse path: %s", tmplPath)
 		}
 
-		path = g.rootDir.Join(path)
+		absPath := g.rootDir.Join(path)
+		if ok, err := afero.Exists(g.fs, absPath); err != nil {
+			g.ui.ItemFailure(path)
+			return errors.WithStack(err)
+		} else if !ok {
+			g.ui.ItemSkipped(path)
+			continue
+		}
 
-		paths, err := afero.Glob(g.fs, path)
+		err = g.fs.Remove(absPath)
 		if err != nil {
+			g.ui.ItemFailure(path)
 			return errors.WithStack(err)
 		}
-
-		for _, path := range paths {
-			err = g.fs.Remove(path)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-			// TODO: print "Delete"
-		}
+		g.ui.ItemSuccess(path)
 	}
 
 	return nil
@@ -160,7 +154,6 @@ func (g *generatorImpl) listPathTemplates() (tmplPaths []string, err error) {
 
 func (g *generatorImpl) shouldRun(e *Entry) (bool, error) {
 	if g.shouldRunFunc != nil && !g.shouldRunFunc(e) {
-		// TODO: print "Skipped"
 		return false, nil
 	}
 
@@ -178,7 +171,6 @@ func (g *generatorImpl) shouldRun(e *Entry) (bool, error) {
 	}
 
 	if string(existed) == e.Body {
-		// TODO: print  "Identical"
 		return false, nil
 	}
 
@@ -191,4 +183,25 @@ func (g *generatorImpl) shouldRun(e *Entry) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func (g *generatorImpl) writeFile(e *Entry) error {
+	path := g.rootDir.Join(e.Path)
+	dir := filepath.Dir(path)
+
+	if ok, err := afero.DirExists(g.fs, dir); err != nil {
+		return errors.WithStack(err)
+	} else if !ok {
+		err := g.fs.MkdirAll(dir, 0755)
+		if err != nil {
+			return errors.Wrapf(err, "failed to create directory")
+		}
+	}
+
+	err := afero.WriteFile(g.fs, path, []byte(e.Body), 0644)
+	if err != nil {
+		return errors.Wrapf(err, "failed to write %s", e.Path)
+	}
+
+	return nil
 }
