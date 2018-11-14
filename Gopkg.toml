@@ -86,7 +86,7 @@
 
 [[constraint]]
   name = "github.com/izumin5210/gex"
-  version = "^0.4.2"
+  version = "^0.4.4"
 
 [[constraint]]
   name = "github.com/google/go-cloud"
