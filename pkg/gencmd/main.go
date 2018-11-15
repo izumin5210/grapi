@@ -19,13 +19,13 @@ func New(
 		Use: "grapi-gen-" + name,
 	}
 
-	setGenerateCommand(rootCmd, generateCmd, ctx)
-	setDestroyCommand(rootCmd, destroyCmd, ctx)
+	setGenerateCommand(name, rootCmd, generateCmd, ctx)
+	setDestroyCommand(name, rootCmd, destroyCmd, ctx)
 
 	return newExecutor(ctx, rootCmd)
 }
 
-func setGenerateCommand(rootCmd *cobra.Command, cmd *Command, ctx *Ctx) {
+func setGenerateCommand(name string, rootCmd *cobra.Command, cmd *Command, ctx *Ctx) {
 	if cmd == nil {
 		return
 	}
@@ -38,6 +38,7 @@ func setGenerateCommand(rootCmd *cobra.Command, cmd *Command, ctx *Ctx) {
 			return errors.WithStack(err)
 		}
 
+		app.UI.Section("Generate " + name)
 		params, err := cmd.BuildParams(cmd, args)
 		if err != nil {
 			return errors.WithStack(err)
@@ -59,7 +60,7 @@ func setGenerateCommand(rootCmd *cobra.Command, cmd *Command, ctx *Ctx) {
 	rootCmd.AddCommand(ccmd)
 }
 
-func setDestroyCommand(rootCmd *cobra.Command, cmd *Command, ctx *Ctx) {
+func setDestroyCommand(name string, rootCmd *cobra.Command, cmd *Command, ctx *Ctx) {
 	if cmd == nil {
 		return
 	}
@@ -72,6 +73,7 @@ func setDestroyCommand(rootCmd *cobra.Command, cmd *Command, ctx *Ctx) {
 			return errors.WithStack(err)
 		}
 
+		app.UI.Section("Destroy " + name)
 		params, err := cmd.BuildParams(cmd, args)
 		if err != nil {
 			return errors.WithStack(err)
