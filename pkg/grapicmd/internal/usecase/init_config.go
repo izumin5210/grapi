@@ -18,10 +18,10 @@ func (c *InitConfig) BuildSpec() string {
 		constraint = c.Revision
 	case c.Branch != "":
 		constraint = c.Branch
-	case c.Version != "":
-		constraint = c.Version
 	case c.HEAD:
 		constraint = "master"
+	case c.Version != "":
+		constraint = c.Version
 	}
 	if constraint != "" {
 		buf.WriteString("@" + constraint)
