@@ -8,6 +8,7 @@ import (
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
+	"go.uber.org/zap"
 	"k8s.io/utils/exec"
 
 	"github.com/izumin5210/grapi/pkg/cli"
@@ -37,8 +38,8 @@ func ProvideGexConfig(
 			FS:         fs,
 			Execer:     execer,
 			WorkingDir: rootDir.String(),
-			// TODO: set verbose flag
-			// TODO: set logger
+			Verbose:    cli.IsVerbose() || cli.IsDebug(),
+			Logger:     zap.NewStdLog(zap.L()),
 		}
 	}
 	return gexCfg
