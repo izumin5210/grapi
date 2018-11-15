@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"github.com/izumin5210/clicontrib/pkg/ccmd"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
+	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 )
 
@@ -21,9 +21,12 @@ func NewGrapiCommand(ctx *grapicmd.Ctx) *cobra.Command {
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			return errors.WithStack(initErr)
 		},
+		PersistentPostRun: func(cmd *cobra.Command, args []string) {
+			cli.Close()
+		},
 	}
 
-	ccmd.HandleLogFlags(cmd)
+	cli.AddLoggingFlags(cmd)
 
 	cmd.AddCommand(
 		newInitCommand(ctx),
