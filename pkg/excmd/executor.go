@@ -9,8 +9,8 @@ import (
 	"os/signal"
 	"sync"
 
-	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 
 	"github.com/izumin5210/grapi/pkg/cli"
 )
@@ -28,7 +28,7 @@ func (e *executor) Exec(ctx context.Context, name string, opts ...Option) (out [
 	var wg sync.WaitGroup
 
 	c := BuildCommand(name, opts)
-	clog.Debug("execute", "command", c)
+	zap.L().Debug("execute", zap.Any("command", c))
 
 	cmd := exec.CommandContext(ctx, c.Name, c.Args...)
 	cmd.Dir = c.Dir
@@ -42,7 +42,7 @@ func (e *executor) Exec(ctx context.Context, name string, opts ...Option) (out [
 		defer wg.Done()
 		defer recover()
 		for sig := range sigCh {
-			clog.Debug("signal received", "signal", sig)
+			zap.L().Debug("signal received", zap.Stringer("signal", sig))
 			if cmd.ProcessState == nil || cmd.ProcessState.Exited() {
 				break
 			}
