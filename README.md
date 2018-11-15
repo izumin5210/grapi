@@ -22,6 +22,18 @@
 ## :warning: Migrate 0.2.x -> 0.3.x :warning:
 grapi v0.3.0 has some breaking changes. If you have a grapi project <=v0.2.x, you should migrate it.
 
+<details>
+<summary>:memo: How to migrate</summary>
+
+0. Bump grapi version
+    - If you use [dep](https://golang.github.io/dep/), update `Gopkg.toml`
+      ```diff
+       [[constraint]]
+         name = "github.com/izumin5210/grapi"
+      -  version = "0.2.2"
+      +  version = "0.3.0"
+      ```
+    - and run `dep ensure`
 1. Introduce [gex](https://github.com/izumin5210/gex)
     - ```
       go get github.com/izumin5210/gex/cmd/gex
@@ -42,11 +54,16 @@ grapi v0.3.0 has some breaking changes. If you have a grapi project <=v0.2.x, yo
         --add github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
         --add github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
       ```
-1. Update `grapi.toml`
-    - <details>
-      <summary>diff</summary>
-
+    - Remove protoc plugins from `Gopkg.toml`
       ```diff
+      -required = [
+      -  "github.com/golang/protobuf/protoc-gen-go",
+      -  "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway",
+      -  "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger",
+      -]
+      ```
+1. Update `grapi.toml`
+    - ```diff
       +package = "yourcompany.yourappname"
       +
        [grapi]
@@ -78,7 +95,7 @@ grapi v0.3.0 has some breaking changes. If you have a grapi project <=v0.2.x, yo
          args = { logtostderr = true }
       ```
 
-      </details>
+</details>
 
 
 ## Getting Started
