@@ -18,22 +18,87 @@
 
 [![asciicast](https://asciinema.org/a/176280.png)](https://asciinema.org/a/176280)
 
+
+## :warning: Migrate 0.2.x -> 0.3.x :warning:
+grapi v0.3.0 has some breaking changes. If you have a grapi project <=v0.2.x, you should migrate it.
+
+<details>
+<summary>:memo: How to migrate</summary>
+
+0. Bump grapi version
+    - If you use [dep](https://golang.github.io/dep/), update `Gopkg.toml`
+      ```diff
+       [[constraint]]
+         name = "github.com/izumin5210/grapi"
+      -  version = "0.2.2"
+      +  version = "0.3.0"
+      ```
+    - and run `dep ensure`
+1. Introduce [gex](https://github.com/izumin5210/gex)
+    - ```
+      go get github.com/izumin5210/gex/cmd/gex
+      ```
+1. Add defualt generator plugins:
+    - ```
+      gex \
+        --add github.com/izumin5210/grapi/cmd/grapi \
+        --add github.com/izumin5210/grapi/cmd/grapi-gen-command \
+        --add github.com/izumin5210/grapi/cmd/grapi-gen-service \
+        --add github.com/izumin5210/grapi/cmd/grapi-gen-scaffold-service \
+        --add github.com/izumin5210/grapi/cmd/grapi-gen-type
+      ```
+1. Add protoc plugins via gex
+    - ```
+      gex \
+        --add github.com/golang/protobuf/protoc-gen-go \
+        --add github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
+        --add github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+      ```
+    - Remove protoc plugins from `Gopkg.toml`
+      ```diff
+      -required = [
+      -  "github.com/golang/protobuf/protoc-gen-go",
+      -  "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway",
+      -  "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger",
+      -]
+      ```
+1. Update `grapi.toml`
+    - ```diff
+      +package = "yourcompany.yourappname"
+      +
+       [grapi]
+       server_dir = "./app/server"
+
+       [protoc]
+       protos_dir = "./api/protos"
+       out_dir = "./api"
+       import_dirs = [
+      +  "./api/protos",
+         "./vendor/github.com/grpc-ecosystem/grpc-gateway",
+         "./vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis",
+       ]
+
+         [[protoc.plugins]]
+      -  path = "./vendor/github.com/golang/protobuf/protoc-gen-go"
+         name = "go"
+         args = { plugins = "grpc", paths = "source_relative" }
+
+         [[protoc.plugins]]
+      -  path = "./vendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway"
+         name = "grpc-gateway"
+      -  args = { logtostderr = true }
+      +  args = { logtostderr = true, paths = "source_relative" }
+
+         [[protoc.plugins]]
+      -  path = "./vendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger"
+         name = "swagger"
+         args = { logtostderr = true }
+      ```
+
+</details>
+
+
 ## Getting Started
-### Installation
-#### For Homebrew users
-
-```
-$ brew install protobuf
-$ brew install izumin5210/tools/grapi
-```
-
-#### Download built binary
-You should install `protoc` command from [google/protobuf](https://github.com/google/protobuf).
-
-- Linux:
-  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.2/grapi_linux_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
-- macOS:
-  - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.2/grapi_darwin_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
 
 ### Create a new application
 ```
@@ -95,3 +160,26 @@ $ grapi import-books  # run the command
 $ grapi build
 ```
 
+## Installation
+
+1. **grapi**
+    - Linux
+        - `curl -Lo grapi https://github.com/izumin5210/grapi/releases/download/v0.2.2/grapi_linux_amd64 && chmod +x grapi && sudo mv grapi /usr/local/bin`
+    - macOS
+        - `brew install izumin5210/tools/grapi`
+    - others
+        - `go get github.com/izumin5210/grapi/cmd/grapi`
+1. **dep** or **Modules**
+    - [dep](https://golang.github.io/dep/)
+        - macOS
+            - `brew install dep`
+        - others
+            - See [Installation · dep](https://golang.github.io/dep/docs/installation.html)
+            - `curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh`
+    - [Modules](https://github.com/golang/go/wiki/Modules) (experimental)
+        - Use Go 1.11 and set `GO111MODULE=on` your env vars
+1. **protoc**
+    - macOS
+        - `brew install protobuf`
+    - others
+        - Download and install from [google/protobuf](https://github.com/google/protobuf)
