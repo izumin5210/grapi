@@ -179,18 +179,6 @@
   version = "v1.0"
 
 [[projects]]
-  digest = "1:e627c39de5c0fed755b325238dc6ae5818fd686a4c3ab2b99389b9f2e0bab493"
-  name = "github.com/izumin5210/clicontrib"
-  packages = [
-    "pkg/cbuild",
-    "pkg/ccmd",
-    "pkg/clog",
-  ]
-  pruneopts = "UT"
-  revision = "fdfd45e15564e04a472c90a37fb1a5d8035fe050"
-  version = "v0.1.0"
-
-[[projects]]
   digest = "1:ef7d23c4e98281efa84f13a4dee21e650622afc9877d5af964ffe3c0a89837e4"
   name = "github.com/izumin5210/gex"
   packages = [
@@ -466,7 +454,7 @@
   version = "v1.1.0"
 
 [[projects]]
-  digest = "1:0d59cfb5fb7d699ef8442a0d049935f6d0034aa001ca8328d048a814e1661035"
+  digest = "1:c52caf7bd44f92e54627a31b85baf06a68333a196b3d8d241480a774733dcf8b"
   name = "go.uber.org/zap"
   packages = [
     ".",
@@ -477,8 +465,8 @@
     "zapcore",
   ]
   pruneopts = "UT"
-  revision = "35aad584952c3e7020db7b839f6b102de6271f89"
-  version = "v1.7.1"
+  revision = "ff33455a0e382e8a81d14dd7c922020b6b5e7982"
+  version = "v1.9.1"
 
 [[projects]]
   branch = "master"
@@ -734,8 +722,6 @@
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
     "github.com/grpc-ecosystem/grpc-gateway/utilities",
     "github.com/haya14busa/reviewdog/cmd/reviewdog",
-    "github.com/izumin5210/clicontrib/pkg/ccmd",
-    "github.com/izumin5210/clicontrib/pkg/clog",
     "github.com/izumin5210/gex",
     "github.com/izumin5210/gex/cmd/gex",
     "github.com/izumin5210/gex/pkg/tool",
@@ -756,6 +742,8 @@
     "github.com/spf13/viper",
     "github.com/srvc/wraperr/cmd/wraperr",
     "github.com/tcnksm/go-input",
+    "go.uber.org/zap",
+    "go.uber.org/zap/zapcore",
     "golang.org/x/lint/golint",
     "golang.org/x/net/context",
     "golang.org/x/sync/errgroup",

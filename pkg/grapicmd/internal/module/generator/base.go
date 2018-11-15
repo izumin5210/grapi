@@ -5,10 +5,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/izumin5210/clicontrib/pkg/clog"
 	assets "github.com/jessevdk/go-assets"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
+	"go.uber.org/zap"
 
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
@@ -78,7 +78,7 @@ func (g *baseGeneratorImpl) Generate(dir string, data interface{}, genCfg genera
 				st = statusSkipped
 				g.ui.ItemFailure(path[1:] + " is conflicted.")
 				if ok, err := g.ui.Confirm("Overwite it?"); err != nil {
-					clog.Error("failed to confirm to apply", "error", err)
+					zap.L().Error("failed to confirm to apply", zap.Error(err))
 					return errors.WithStack(err)
 				} else if ok {
 					st = statusCreate

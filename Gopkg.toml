@@ -53,10 +53,6 @@
   version = "^1.7.0"
 
 [[constraint]]
-  name = "github.com/izumin5210/clicontrib"
-  version = "^0.1.0"
-
-[[constraint]]
   branch = "master"
   name = "golang.org/x/sync"
 
@@ -103,3 +99,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/shurcooL/httpfs"
+
+[[constraint]]
+  name = "go.uber.org/zap"
+  version = "^1.8"

@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
+	"go.uber.org/zap"
 	"k8s.io/utils/exec"
 
 	"github.com/izumin5210/grapi/pkg/cli"
@@ -79,7 +79,7 @@ func (e *wrapperImpl) execProtocAll(ctx context.Context) error {
 	}
 
 	if len(errs) > 0 {
-		clog.Error("failed to execute protoc", "errors", errs)
+		zap.L().Error("failed to execute protoc", zap.Errors("errors", errs))
 		return errors.New("failed to execute protoc")
 	}
 

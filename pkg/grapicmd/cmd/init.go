@@ -3,9 +3,9 @@ package cmd
 import (
 	"path/filepath"
 
-	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/di"
@@ -26,7 +26,7 @@ func newInitCommand(ctx *grapicmd.Ctx) *cobra.Command {
 			if err != nil {
 				return errors.WithStack(err)
 			}
-			clog.Debug("parseInitArgs", "root", root)
+			zap.L().Debug("parseInitArgs", zap.String("root", root))
 
 			return errors.WithStack(di.NewInitializeProjectUsecase(ctx).Perform(root, cfg))
 		},

@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
 	"github.com/shurcooL/httpfs/vfsutil"
 	"github.com/spf13/afero"
+	"go.uber.org/zap"
 
 	"github.com/izumin5210/grapi/pkg/cli"
 )
@@ -176,7 +176,7 @@ func (g *generatorImpl) shouldRun(e *Entry) (bool, error) {
 
 	g.ui.ItemFailure(e.Path[1:] + " is conflicted.")
 	if ok, err := g.ui.Confirm("Overwite it?"); err != nil {
-		clog.Error("failed to confirm to apply", "error", err)
+		zap.L().Error("failed to confirm to apply", zap.Error(err))
 		return false, errors.WithStack(err)
 	} else if ok {
 		return true, nil

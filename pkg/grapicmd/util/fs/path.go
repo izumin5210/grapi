@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
+	"go.uber.org/zap"
 )
 
 type getOSUserFunc func() (*user.User, error)
@@ -88,12 +88,12 @@ func FindMainPackagesAndSources(fs afero.Fs, dir string) (map[string][]string, e
 		}
 		data, err := afero.ReadFile(fs, path)
 		if err != nil {
-			clog.Warn("failed to read a file", "error", err, "path", path)
+			zap.L().Warn("failed to read a file", zap.Error(err), zap.String("path", path))
 			return nil
 		}
 		f, err := parser.ParseFile(fset, "", data, parser.PackageClauseOnly)
 		if err != nil {
-			clog.Warn("failed to parse a file", "error", err, "path", path, "body", string(data))
+			zap.L().Warn("failed to parse a file", zap.Error(err), zap.String("path", path), zap.String("body", string(data)))
 			return nil
 		}
 		if f.Package.IsValid() && f.Name.Name == "main" {

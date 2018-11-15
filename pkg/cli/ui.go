@@ -7,9 +7,9 @@ import (
 	"sync"
 
 	"github.com/fatih/color"
-	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
 	"github.com/tcnksm/go-input"
+	"go.uber.org/zap"
 )
 
 // UI is an interface for intaracting with the terminal.
@@ -90,7 +90,7 @@ func (u *uiImpl) Confirm(msg string) (bool, error) {
 		HideOrder: true,
 		Loop:      true,
 		ValidateFunc: func(ans string) error {
-			clog.Debug("receive user input", "query", msg, "input", ans)
+			zap.L().Debug("receive user input", zap.String("query", msg), zap.String("input", ans))
 			if ans != "Y" && ans != "n" {
 				return fmt.Errorf("input must be Y or n")
 			}

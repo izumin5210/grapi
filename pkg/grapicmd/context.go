@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 
 	"github.com/google/go-cloud/wire"
-	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 	"k8s.io/utils/exec"
 
 	"github.com/izumin5210/grapi/pkg/cli"
@@ -87,7 +87,7 @@ func (c *Ctx) loadConfig() error {
 
 	err := c.Viper.ReadInConfig()
 	if err != nil {
-		clog.Info("failed to find config file", "error", err)
+		zap.L().Info("failed to find config file", zap.Error(err))
 		return nil
 	}
 
@@ -96,13 +96,13 @@ func (c *Ctx) loadConfig() error {
 
 	err = c.Viper.Unmarshal(&c.Config)
 	if err != nil {
-		clog.Warn("failed to parse config", "error", err)
+		zap.L().Warn("failed to parse config", zap.Error(err))
 		return errors.WithStack(err)
 	}
 
 	err = c.Viper.UnmarshalKey("protoc", &c.ProtocConfig)
 	if err != nil {
-		clog.Warn("failed to parse protoc config", "error", err)
+		zap.L().Warn("failed to parse protoc config", zap.Error(err))
 		return errors.WithStack(err)
 	}
 

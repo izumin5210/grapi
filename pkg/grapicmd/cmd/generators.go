@@ -6,8 +6,8 @@ import (
 	"sync"
 
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
 
-	"github.com/izumin5210/clicontrib/pkg/clog"
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
@@ -45,13 +45,13 @@ func newGenerateCommands(ctx *grapicmd.Ctx) (cmds []*cobra.Command) {
 
 		toolRepo, err := di.NewToolRepository(ctx)
 		if err != nil {
-			clog.Debug("failed to initialize tools repository", "error", err)
+			zap.L().Debug("failed to initialize tools repository", zap.Error(err))
 			return
 		}
 
 		tools, err := toolRepo.List(context.TODO())
 		if err != nil {
-			clog.Debug("failed to retrieve tools", "error", err)
+			zap.L().Debug("failed to retrieve tools", zap.Error(err))
 			return
 		}
 
