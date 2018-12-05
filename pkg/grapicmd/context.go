@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/google/go-cloud/wire"
+	"github.com/google/wire"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"

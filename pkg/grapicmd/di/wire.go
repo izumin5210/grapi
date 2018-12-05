@@ -3,7 +3,7 @@
 package di
 
 import (
-	"github.com/google/go-cloud/wire"
+	"github.com/google/wire"
 	"github.com/izumin5210/gex/pkg/tool"
 
 	"github.com/izumin5210/grapi/pkg/cli"
