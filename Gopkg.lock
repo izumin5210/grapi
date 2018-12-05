@@ -677,14 +677,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:80a359dc3146cb9edf602d0a672b2f06a3506659301bbd132d4dd181b05bceba"
+  digest = "1:cd0855ac6b2ca65ed473699b7cacc68539b4b9994dbc21c6d4124b89a46c66de"
   name = "k8s.io/utils"
   packages = [
     "exec",
     "exec/testing",
   ]
   pruneopts = "UT"
-  revision = "cd6a8f44fe799a6b69c6dbbb1a930994738a367c"
+  revision = "0d26856f57b32ec3398579285e5c8a2bfe8c5243"
 
 [[projects]]
   branch = "master"
