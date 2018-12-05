@@ -3,7 +3,7 @@ package gencmd
 import (
 	"net/http"
 
-	"github.com/google/go-cloud/wire"
+	"github.com/google/wire"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 )

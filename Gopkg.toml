@@ -85,10 +85,6 @@
   version = "^0.4.4"
 
 [[constraint]]
-  name = "github.com/google/go-cloud"
-  version = "^0.5.0"
-
-[[constraint]]
   branch = "master"
   name = "k8s.io/utils"
 
@@ -103,3 +99,7 @@
 [[constraint]]
   name = "go.uber.org/zap"
   version = "^1.8"
+
+[[constraint]]
+  name = "github.com/google/wire"
+  version = "0.2.0"
