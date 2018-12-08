@@ -113,7 +113,7 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:ee73ed01fc93b8aa38a7f25543afed400df661992eeb7d3b250100b8b8f989b9"
+  digest = "1:3cbc83a159e161c6cf3e64590ae19da29069ecd8d92f9400ab6fda15e93cbc5f"
   name = "github.com/grpc-ecosystem/grpc-gateway"
   packages = [
     "runtime",
@@ -121,8 +121,8 @@
     "utilities",
   ]
   pruneopts = "UT"
-  revision = "8558711daa6c2853489043207b563dceacbc19cf"
-  version = "v1.5.0"
+  revision = "aeab1d96e0f1368d243e2e5f526aa29d495517bb"
+  version = "v1.5.1"
 
 [[projects]]
   branch = "master"
