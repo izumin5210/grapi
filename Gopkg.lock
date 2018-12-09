@@ -423,11 +423,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:29fa5c9ff973700f1bc2090037b905a06d90547b0223c7d1a5e7bea190b18ca8"
+  digest = "1:1e52cd770971c1f625650971d6c6f1f34669aa314e8dfd246fe3349b70a5304f"
   name = "github.com/tcnksm/go-input"
   packages = ["."]
   pruneopts = "UT"
-  revision = "bbe13e92fa7dda71a4e012e3f427df11866c7651"
+  revision = "548a7d7a8ee8fcb3d013fae6acf857da56165975"
 
 [[projects]]
   digest = "1:1e57328b5e7f644282160b0cc1d25dfaf0f0382195ade7c885f6fb917278a663"
