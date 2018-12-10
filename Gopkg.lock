@@ -34,7 +34,7 @@
   version = "v1.4.7"
 
 [[projects]]
-  digest = "1:7ded16107bddae6f7ad4bf105887304d35b13db44882bf516cb2d1854adb3fe2"
+  digest = "1:552a143cfb2692a4a8cbae568a9b4633ec4e7ce9269cfe74c07ea08ce50d866f"
   name = "github.com/golang/mock"
   packages = [
     "gomock",
@@ -42,8 +42,8 @@
     "mockgen/model",
   ]
   pruneopts = "UT"
-  revision = "c34cdb4725f4c3844d095133c6e40e448b86589b"
-  version = "v1.1.1"
+  revision = "51421b967af1f557f93a59e0057aaf15ca02e29c"
+  version = "v1.2.0"
 
 [[projects]]
   digest = "1:6b3f47fc2d485d7669dc9e7bea056d721b3fa417d83fd295d45de1376738568e"
