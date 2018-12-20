@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
+	"go.uber.org/zap"
 
 	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
@@ -35,6 +36,7 @@ type scriptLoader struct {
 
 func (f *scriptLoader) Load(dir string) error {
 	srcsByDir, err := fs.FindMainPackagesAndSources(f.fs, dir)
+	zap.L().Debug("found main packages", zap.Any("srcs_by_dir", srcsByDir))
 	if err != nil {
 		return errors.Wrap(err, "failed to find commands")
 	}
