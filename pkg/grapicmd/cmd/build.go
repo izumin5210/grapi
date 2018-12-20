@@ -14,7 +14,7 @@ func newBuildCommand(ctx *grapicmd.Ctx) *cobra.Command {
 		Short:         "Build commands",
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		RunE: func(c *cobra.Command, args []string) (err error) {
+		RunE: func(c *cobra.Command, args []string) error {
 			if !ctx.IsInsideApp() {
 				return errors.New("protoc command should be execute inside a grapi application directory")
 			}
@@ -27,6 +27,11 @@ func newBuildCommand(ctx *grapicmd.Ctx) *cobra.Command {
 
 			scriptLoader := di.NewScriptLoader(ctx)
 			ui := di.NewUI(ctx)
+
+			err := scriptLoader.Load(ctx.RootDir.Join("cmd"))
+			if err != nil {
+				return errors.WithStack(err)
+			}
 
 			for _, name := range scriptLoader.Names() {
 				script, ok := scriptLoader.Get(name)

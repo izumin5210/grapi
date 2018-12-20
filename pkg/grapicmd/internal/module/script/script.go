@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
+	"go.uber.org/zap"
 
 	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
@@ -24,6 +25,7 @@ func (s *script) Name() string {
 }
 
 func (s *script) Build(args ...string) error {
+	zap.L().Debug("build script", zap.String("name", s.name), zap.String("bin", s.binPath), zap.Strings("srcs", s.srcPaths))
 	err := fs.CreateDirIfNotExists(s.fs, filepath.Dir(s.binPath))
 	if err != nil {
 		return errors.WithStack(err)
