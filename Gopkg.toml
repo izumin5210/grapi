@@ -105,5 +105,5 @@
   version = "0.2.0"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/izumin5210/clig"
+  version = "0.2.0"

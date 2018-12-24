@@ -179,7 +179,6 @@
   version = "v1.0"
 
 [[projects]]
-  branch = "master"
   digest = "1:d0abe490afe0c1d856c5ddc38250555e41542fc49c12378397241b9a11fcc924"
   name = "github.com/izumin5210/clig"
   packages = [
@@ -187,7 +186,8 @@
     "pkg/clib/testing",
   ]
   pruneopts = "UT"
-  revision = "b777cf277554130971953a3eaba0b0274381c465"
+  revision = "2e6c66ccd558d58f233f56f674a13642f9b55e2c"
+  version = "v0.2.0"
 
 [[projects]]
   digest = "1:ef7d23c4e98281efa84f13a4dee21e650622afc9877d5af964ffe3c0a89837e4"
