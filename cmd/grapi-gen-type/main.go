@@ -83,7 +83,7 @@ func buildParams(path string, ctx *grapicmd.Ctx) (*params, error) {
 	if protoOutDir == "" {
 		protoOutDir = filepath.Join("api")
 	}
-	protoOutDir = filepath.Join(protoOutDir, "type")
+	path = filepath.Join("type", path)
 
 	protoParams, err := gencmdutil.BuildProtoParams(path, ctx.RootDir, protoOutDir, ctx.Config.Package)
 	if err != nil {

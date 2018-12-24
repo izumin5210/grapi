@@ -18,9 +18,10 @@ import (
 
 func TestType(t *testing.T) {
 	cases := []struct {
-		test  string
-		args  []string
-		files []string
+		test   string
+		args   []string
+		files  []string
+		config string
 	}{
 		{
 			test:  "simple",
@@ -46,6 +47,18 @@ func TestType(t *testing.T) {
 			test:  "kebab",
 			args:  []string{"foo/bar-user"},
 			files: []string{"api/protos/type/foo/bar_user.proto"},
+		},
+		{
+			test:   "simple with specified package",
+			args:   []string{"book"},
+			files:  []string{"api/protos/type/book.proto"},
+			config: `package = "yourcompany.yourapp"`,
+		},
+		{
+			test:   "nested with specified package",
+			args:   []string{"foo/user"},
+			files:  []string{"api/protos/type/foo/user.proto"},
+			config: `package = "yourcompany.yourapp"`,
 		},
 	}
 
