@@ -39,7 +39,7 @@ func Run(t *testing.T, ctx *Ctx) {
 	for _, tc := range ctx.Cases {
 		t.Run(tc.Test, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			afero.WriteFile(fs, ctx.RootDir.Join("grapi.toml"), []byte{}, 0755)
+			afero.WriteFile(fs, ctx.RootDir.Join("grapi.toml").String(), []byte{}, 0755)
 
 			t.Run("generate", func(t *testing.T) {
 				cmd := ctx.CreateCmd(t, fs, tc)
@@ -63,7 +63,7 @@ func Run(t *testing.T, ctx *Ctx) {
 								t.Error("should not exist")
 							}
 						} else {
-							data, err := afero.ReadFile(fs, ctx.RootDir.Join(file))
+							data, err := afero.ReadFile(fs, ctx.RootDir.Join(file).String())
 
 							if err != nil {
 								t.Errorf("returned an error: %v", err)
@@ -86,7 +86,7 @@ func Run(t *testing.T, ctx *Ctx) {
 
 				for _, file := range tc.Files {
 					t.Run(file, func(t *testing.T) {
-						ok, err := afero.Exists(fs, ctx.RootDir.Join(file))
+						ok, err := afero.Exists(fs, ctx.RootDir.Join(file).String())
 
 						if err != nil {
 							t.Errorf("Exists(fs, %q) returned an error: %v", file, err)

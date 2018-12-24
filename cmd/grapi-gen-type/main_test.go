@@ -8,6 +8,7 @@ import (
 	"github.com/bradleyjkemp/cupaloy"
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/grapi/cmd/grapi-gen-type/di"
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/gencmd"
@@ -64,7 +65,7 @@ func TestType(t *testing.T) {
 
 	defer func(c build.Context) { fs.BuildContext = c }(fs.BuildContext)
 	fs.BuildContext = build.Context{GOPATH: "/go"}
-	rootDir := cli.RootDir("/go/src/testapp")
+	rootDir := cli.RootDir{clib.Path("/go/src/testapp")}
 
 	createApp := func(cmd *gencmd.Command) (*di.App, error) {
 		return &di.App{Protoc: &fakeProtocWrapper{}}, nil
@@ -83,7 +84,7 @@ func TestType(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.test, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			afero.WriteFile(fs, rootDir.Join("grapi.toml"), []byte{}, 0755)
+			afero.WriteFile(fs, rootDir.Join("grapi.toml").String(), []byte{}, 0755)
 
 			t.Run("generate", func(t *testing.T) {
 				cmd := createCmd(t, fs)
@@ -96,7 +97,7 @@ func TestType(t *testing.T) {
 
 				for _, file := range tc.files {
 					t.Run(file, func(t *testing.T) {
-						data, err := afero.ReadFile(fs, rootDir.Join(file))
+						data, err := afero.ReadFile(fs, rootDir.Join(file).String())
 
 						if err != nil {
 							t.Errorf("returned an error: %v", err)
@@ -118,7 +119,7 @@ func TestType(t *testing.T) {
 
 				for _, file := range tc.files {
 					t.Run(file, func(t *testing.T) {
-						ok, err := afero.Exists(fs, rootDir.Join(file))
+						ok, err := afero.Exists(fs, rootDir.Join(file).String())
 
 						if err != nil {
 							t.Errorf("Exists(fs, %q) returned an error: %v", file, err)

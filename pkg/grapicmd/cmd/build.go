@@ -28,7 +28,7 @@ func newBuildCommand(ctx *grapicmd.Ctx) *cobra.Command {
 			scriptLoader := di.NewScriptLoader(ctx)
 			ui := di.NewUI(ctx)
 
-			err := scriptLoader.Load(ctx.RootDir.Join("cmd"))
+			err := scriptLoader.Load(ctx.RootDir.Join("cmd").String())
 			if err != nil {
 				return errors.WithStack(err)
 			}

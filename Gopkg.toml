@@ -103,3 +103,7 @@
 [[constraint]]
   name = "github.com/google/wire"
   version = "0.2.0"
+
+[[constraint]]
+  name = "github.com/izumin5210/clig"
+  version = "0.2.0"

@@ -4,7 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/izumin5210/grapi/pkg/cli"
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 )
 
@@ -22,17 +22,17 @@ func NewGrapiCommand(ctx *grapicmd.Ctx) *cobra.Command {
 			return errors.WithStack(initErr)
 		},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {
-			cli.Close()
+			clib.Close()
 		},
 	}
 
-	cli.AddLoggingFlags(cmd)
+	clib.AddLoggingFlags(cmd)
 
 	cmd.AddCommand(
 		newInitCommand(ctx),
 		newProtocCommand(ctx),
 		newBuildCommand(ctx),
-		newVersionCommand(ctx),
+		clib.NewVersionCommand(ctx.IO, ctx.Build),
 	)
 	cmd.AddCommand(newGenerateCommands(ctx)...)
 	cmd.AddCommand(newUserDefinedCommands(ctx)...)

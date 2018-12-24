@@ -6,13 +6,7 @@ const (
 )
 
 var (
-	prebuilt bool
-
 	// set via ldflags
 	revision  string
 	buildDate string
 )
-
-func init() {
-	prebuilt = revision != ""
-}

@@ -179,6 +179,17 @@
   version = "v1.0"
 
 [[projects]]
+  digest = "1:d0abe490afe0c1d856c5ddc38250555e41542fc49c12378397241b9a11fcc924"
+  name = "github.com/izumin5210/clig"
+  packages = [
+    "pkg/clib",
+    "pkg/clib/testing",
+  ]
+  pruneopts = "UT"
+  revision = "2e6c66ccd558d58f233f56f674a13642f9b55e2c"
+  version = "v0.2.0"
+
+[[projects]]
   digest = "1:ef7d23c4e98281efa84f13a4dee21e650622afc9877d5af964ffe3c0a89837e4"
   name = "github.com/izumin5210/gex"
   packages = [
@@ -411,15 +422,15 @@
   version = "v1.2.1"
 
 [[projects]]
-  digest = "1:ba6b1a61040f11451864ea00fbc29fc3f9a29211c630ce94f6141a1d4346f8d7"
+  digest = "1:d4093bdfb1d5d808bd9c61e42121711a077b5094de160ef4d68303604a8c659d"
   name = "github.com/srvc/wraperr"
   packages = [
     ".",
     "cmd/wraperr",
   ]
   pruneopts = "UT"
-  revision = "d96e660b51e4f1520597bdd720fa3649d08cf2d0"
-  version = "v0.1.1"
+  revision = "f6aeb1dc7dbd5421be3f411578f512eb6f6d3e07"
+  version = "v0.2.0"
 
 [[projects]]
   branch = "master"
@@ -559,7 +570,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c1a931e3040acea0a970f1bb40fb7e6b993f1810f1a5f8ae9a74ba436a830f95"
+  digest = "1:17bd32dfb269c96f3d5c4ebc831d307d760a039bfd0a00aabfd48efcad381b97"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -570,14 +581,18 @@
     "go/gcexportdata",
     "go/internal/cgo",
     "go/internal/gcimporter",
+    "go/internal/packagesdriver",
     "go/loader",
     "go/packages",
     "go/ssa",
     "go/ssa/ssautil",
     "go/types/typeutil",
+    "internal/fastwalk",
+    "internal/gopathwalk",
+    "internal/semver",
   ]
   pruneopts = "UT"
-  revision = "b71db7f417f13fa74a2565bc57b2387fdbf2c611"
+  revision = "d00ac6d27372a4273825635281f2dc360d4be563"
 
 [[projects]]
   digest = "1:6247f76e55a1e1a5c19a81e2d4b4dff6730461eeb5bbb0a16dd4a8ec8637ee93"
@@ -727,6 +742,8 @@
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
     "github.com/grpc-ecosystem/grpc-gateway/utilities",
     "github.com/haya14busa/reviewdog/cmd/reviewdog",
+    "github.com/izumin5210/clig/pkg/clib",
+    "github.com/izumin5210/clig/pkg/clib/testing",
     "github.com/izumin5210/gex",
     "github.com/izumin5210/gex/cmd/gex",
     "github.com/izumin5210/gex/pkg/tool",
@@ -734,7 +751,6 @@
     "github.com/jessevdk/go-assets-builder",
     "github.com/jinzhu/inflection",
     "github.com/kisielk/errcheck",
-    "github.com/mattn/go-colorable",
     "github.com/mitchellh/gox",
     "github.com/pkg/errors",
     "github.com/serenize/snaker",
@@ -748,7 +764,6 @@
     "github.com/srvc/wraperr/cmd/wraperr",
     "github.com/tcnksm/go-input",
     "go.uber.org/zap",
-    "go.uber.org/zap/zapcore",
     "golang.org/x/lint/golint",
     "golang.org/x/net/context",
     "golang.org/x/sync/errgroup",

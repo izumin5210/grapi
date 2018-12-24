@@ -101,7 +101,7 @@ func (e *wrapperImpl) execProtoc(ctx context.Context, protoPath string) error {
 		return errors.WithStack(err)
 	}
 
-	path := e.rootDir.BinDir() + string(filepath.ListSeparator) + os.Getenv("PATH")
+	path := e.rootDir.BinDir().String() + string(filepath.ListSeparator) + os.Getenv("PATH")
 	env := append(os.Environ(), "PATH="+path)
 
 	for _, args := range cmds {

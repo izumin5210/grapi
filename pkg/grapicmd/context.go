@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap"
 	"k8s.io/utils/exec"
 
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/protoc"
 )
@@ -20,13 +21,13 @@ type Ctx struct {
 	FS     afero.Fs
 	Viper  *viper.Viper
 	Execer exec.Interface
-	IO     *cli.IO
+	IO     clib.IO
 
 	RootDir   cli.RootDir
 	insideApp bool
 
 	Config       Config
-	Build        BuildConfig
+	Build        clib.Build
 	ProtocConfig protoc.Config
 }
 
@@ -38,24 +39,15 @@ type Config struct {
 	}
 }
 
-// BuildConfig contains the build metadata.
-type BuildConfig struct {
-	AppName   string
-	Version   string
-	Revision  string
-	BuildDate string
-	Prebuilt  bool
-}
-
 // Init initializes the runtime context.
 func (c *Ctx) Init() error {
-	if c.RootDir == "" {
+	if c.RootDir.String() == "" {
 		dir, _ := os.Getwd()
-		c.RootDir = cli.RootDir(dir)
+		c.RootDir = cli.RootDir{clib.Path(dir)}
 	}
 
 	if c.IO == nil {
-		c.IO = cli.DefaultIO()
+		c.IO = clib.Stdio()
 	}
 
 	if c.FS == nil {
@@ -92,7 +84,7 @@ func (c *Ctx) loadConfig() error {
 	}
 
 	c.insideApp = true
-	c.RootDir = cli.RootDir(filepath.Dir(c.Viper.ConfigFileUsed()))
+	c.RootDir = cli.RootDir{clib.Path(filepath.Dir(c.Viper.ConfigFileUsed()))}
 
 	err = c.Viper.Unmarshal(&c.Config)
 	if err != nil {
@@ -129,8 +121,8 @@ var CtxSet = wire.NewSet(
 func ProvideFS(c *Ctx) afero.Fs                 { return c.FS }
 func ProvideViper(c *Ctx) *viper.Viper          { return c.Viper }
 func ProvideExecer(c *Ctx) exec.Interface       { return c.Execer }
-func ProvideIO(c *Ctx) *cli.IO                  { return c.IO }
+func ProvideIO(c *Ctx) clib.IO                  { return c.IO }
 func ProvideRootDir(c *Ctx) cli.RootDir         { return c.RootDir }
 func ProvideConfig(c *Ctx) *Config              { return &c.Config }
-func ProvideBuildConfig(c *Ctx) *BuildConfig    { return &c.Build }
+func ProvideBuildConfig(c *Ctx) *clib.Build     { return &c.Build }
 func ProvideProtocConfig(c *Ctx) *protoc.Config { return &c.ProtocConfig }
