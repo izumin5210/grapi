@@ -5,13 +5,14 @@ import (
 
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 )
 
 func TestCtx(t *testing.T) {
-	root := cli.RootDir("/go/src/awesomeapp")
-	cwd := root.Join("api")
+	root := cli.RootDir{clib.Path("/go/src/awesomeapp")}
+	cwd := root.Join("api").String()
 
 	orDie := func(t *testing.T, err error) {
 		t.Helper()
@@ -22,7 +23,7 @@ func TestCtx(t *testing.T) {
 
 	fs := afero.NewMemMapFs()
 	orDie(t, fs.MkdirAll(cwd, 0755))
-	orDie(t, afero.WriteFile(fs, root.Join("grapi.toml"), []byte(`
+	orDie(t, afero.WriteFile(fs, root.Join("grapi.toml").String(), []byte(`
 package = "awesomeapp"
 
 [grapi]
@@ -50,7 +51,7 @@ import_dirs = [
   args = { logtostderr = true }
 `), 0644))
 
-	ctx := &grapicmd.Ctx{FS: fs, RootDir: cli.RootDir(cwd)}
+	ctx := &grapicmd.Ctx{FS: fs, RootDir: cli.RootDir{clib.Path(cwd)}}
 
 	err := ctx.Init()
 
@@ -80,8 +81,8 @@ import_dirs = [
 }
 
 func TestCtx_outsideApp(t *testing.T) {
-	root := cli.RootDir("/go/src/awesomeapp")
-	cwd := root.Join("api")
+	root := cli.RootDir{clib.Path("/go/src/awesomeapp")}
+	cwd := root.Join("api").String()
 
 	orDie := func(t *testing.T, err error) {
 		t.Helper()
@@ -93,7 +94,7 @@ func TestCtx_outsideApp(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	orDie(t, fs.MkdirAll(cwd, 0755))
 
-	ctx := &grapicmd.Ctx{FS: fs, RootDir: cli.RootDir(cwd)}
+	ctx := &grapicmd.Ctx{FS: fs, RootDir: cli.RootDir{clib.Path(cwd)}}
 
 	err := ctx.Init()
 

@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/google/wire"
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/gex"
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/pkg/errors"
@@ -25,20 +26,20 @@ var (
 func ProvideGexConfig(
 	fs afero.Fs,
 	execer exec.Interface,
-	io *cli.IO,
+	io clib.IO,
 	rootDir cli.RootDir,
 ) *gex.Config {
 	gexCfgMu.Lock()
 	defer gexCfgMu.Unlock()
 	if gexCfg == nil {
 		gexCfg = &gex.Config{
-			OutWriter:  io.Out,
-			ErrWriter:  io.Err,
-			InReader:   io.In,
+			OutWriter:  io.Out(),
+			ErrWriter:  io.Err(),
+			InReader:   io.In(),
 			FS:         fs,
 			Execer:     execer,
 			WorkingDir: rootDir.String(),
-			Verbose:    cli.IsVerbose() || cli.IsDebug(),
+			Verbose:    clib.IsVerbose() || clib.IsDebug(),
 			Logger:     zap.NewStdLog(zap.L()),
 		}
 	}

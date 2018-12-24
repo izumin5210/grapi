@@ -1,11 +1,11 @@
 package excmd_test
 
 import (
-	"bytes"
 	"context"
 	"testing"
 
-	"github.com/izumin5210/grapi/pkg/cli"
+	clibtesting "github.com/izumin5210/clig/pkg/clib/testing"
+
 	"github.com/izumin5210/grapi/pkg/excmd"
 )
 
@@ -34,11 +34,10 @@ func TestExecutor_WithConnectedIO(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.test, func(t *testing.T) {
-			stdout := new(bytes.Buffer)
-			stderr := new(bytes.Buffer)
-			stdin := bytes.NewBufferString("foo\n")
+			io := clibtesting.NewFakeIO()
+			io.InBuf.WriteString("foo\n")
 
-			execer := excmd.NewExecutor(&cli.IO{Out: stdout, Err: stderr, In: stdin})
+			execer := excmd.NewExecutor(io)
 
 			out, err := execer.Exec(context.TODO(), tc.cmd, tc.opts...)
 			if err != nil {
@@ -49,7 +48,7 @@ func TestExecutor_WithConnectedIO(t *testing.T) {
 				t.Errorf("returned %q, want %q", got, want)
 			}
 
-			if got, want := stdout.String(), tc.stdout; got != want {
+			if got, want := io.OutBuf.String(), tc.stdout; got != want {
 				t.Errorf("printed %q, want %q", got, want)
 			}
 		})

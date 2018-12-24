@@ -7,6 +7,9 @@ import (
 	"testing"
 
 	"github.com/fatih/color"
+	"github.com/izumin5210/clig/pkg/clib"
+	clibtesting "github.com/izumin5210/clig/pkg/clib/testing"
+
 	"github.com/izumin5210/grapi/pkg/cli"
 )
 
@@ -27,8 +30,8 @@ func TestUI(t *testing.T) {
      ✗  fail!!!
 `
 
-	out := new(bytes.Buffer)
-	ui := cli.NewUI(&cli.IO{Out: out, In: new(bytes.Buffer)})
+	io := clibtesting.NewFakeIO()
+	ui := cli.NewUI(io)
 
 	ui.Section("section 1")
 	ui.Subsection("subsection 1.1")
@@ -40,7 +43,7 @@ func TestUI(t *testing.T) {
 	ui.Section("section 2")
 	ui.ItemFailure("fail!!!")
 
-	if got := out.String(); got != want {
+	if got := io.OutBuf.String(); got != want {
 		t.Errorf("got:\n%s\nwant:\n%s", got, want)
 	}
 }
@@ -54,17 +57,15 @@ func (r *errReader) Read(p []byte) (n int, err error) {
 
 func TestUI_Confirm(t *testing.T) {
 	type TestContext struct {
-		in, out, err *bytes.Buffer
-		ui           cli.UI
+		io *clibtesting.FakeIO
+		ui cli.UI
 	}
 
 	createTestContext := func() *TestContext {
-		in := new(bytes.Buffer)
-		out := new(bytes.Buffer)
+		io := clibtesting.NewFakeIO()
 		return &TestContext{
-			in:  in,
-			out: out,
-			ui:  cli.NewUI(&cli.IO{Out: out, In: in}),
+			io: io,
+			ui: cli.NewUI(io),
 		}
 	}
 
@@ -103,16 +104,16 @@ func TestUI_Confirm(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.test, func(t *testing.T) {
 			ctx := createTestContext()
-			ctx.in.WriteString(c.input)
+			ctx.io.InBuf.WriteString(c.input)
 
 			ok, err := ctx.ui.Confirm(c.test)
 
-			if got, want := ctx.out.String(), c.test; !strings.HasPrefix(got, want) {
+			if got, want := ctx.io.OutBuf.String(), c.test; !strings.HasPrefix(got, want) {
 				t.Errorf("Confirm() wrote %q, want %q", got, want)
 			}
 
 			wantErrMsg := "input must be Y or n\n"
-			if got, want := strings.Count(ctx.out.String(), wantErrMsg), c.errMsgCnt; got != want {
+			if got, want := strings.Count(ctx.io.OutBuf.String(), wantErrMsg), c.errMsgCnt; got != want {
 				t.Errorf("Confirm() wrote %q as error %d times, want %d times", wantErrMsg, got, want)
 			}
 
@@ -127,7 +128,7 @@ func TestUI_Confirm(t *testing.T) {
 	}
 
 	t.Run("when failed to read", func(t *testing.T) {
-		ui := cli.NewUI(&cli.IO{Out: new(bytes.Buffer), In: &errReader{}})
+		ui := cli.NewUI(&clib.IOContainer{OutW: new(bytes.Buffer), InR: &errReader{}})
 
 		ok, err := ui.Confirm("test")
 

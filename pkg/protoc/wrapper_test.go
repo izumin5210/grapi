@@ -2,10 +2,10 @@ package protoc_test
 
 import (
 	"context"
-	"path/filepath"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy"
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/spf13/afero"
 	"k8s.io/utils/exec"
@@ -37,22 +37,21 @@ func TestWrapper_Exec(t *testing.T) {
 		}
 	}
 
-	rootDir := cli.RootDir("/go/src/awesomeapp")
-	binDir := rootDir.BinDir()
+	rootDir := cli.RootDir{Path: clib.Path("/go/src/awesomeapp")}
 	protosDir := rootDir.Join("api", "protos")
 
 	fs := afero.NewMemMapFs()
-	dieIf(t, fs.MkdirAll(binDir, 0755))
-	dieIf(t, fs.MkdirAll(protosDir, 0755))
-	dieIf(t, afero.WriteFile(fs, rootDir.Join("api", "should_be_ignored.proto"), []byte{}, 0644))
-	dieIf(t, afero.WriteFile(fs, rootDir.Join("api", "should_be_ignored_proto"), []byte{}, 0644))
-	dieIf(t, afero.WriteFile(fs, filepath.Join(protosDir, "book.proto"), []byte{}, 0644))
-	dieIf(t, afero.WriteFile(fs, filepath.Join(protosDir, "types", "users.proto"), []byte{}, 0644))
+	dieIf(t, fs.MkdirAll(rootDir.BinDir().String(), 0755))
+	dieIf(t, fs.MkdirAll(protosDir.String(), 0755))
+	dieIf(t, afero.WriteFile(fs, rootDir.Join("api", "should_be_ignored.proto").String(), []byte{}, 0644))
+	dieIf(t, afero.WriteFile(fs, rootDir.Join("api", "should_be_ignored_proto").String(), []byte{}, 0644))
+	dieIf(t, afero.WriteFile(fs, protosDir.Join("book.proto").String(), []byte{}, 0644))
+	dieIf(t, afero.WriteFile(fs, protosDir.Join("types", "users.proto").String(), []byte{}, 0644))
 
 	cfg := &protoc.Config{
 		ImportDirs: []string{
-			rootDir.Join("vendor", "github.com", "grpc-ecosystem", "grpc-gateway"),
-			protosDir,
+			rootDir.Join("vendor", "github.com", "grpc-ecosystem", "grpc-gateway").String(),
+			protosDir.String(),
 		},
 		ProtosDir: "./api/protos",
 		OutDir:    "./api",

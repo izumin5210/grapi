@@ -55,7 +55,7 @@ func parseInitArgs(ctx *grapicmd.Ctx, args []string) (root string, err error) {
 	}
 	root = arg
 	if !filepath.IsAbs(arg) {
-		root = ctx.RootDir.Join(arg)
+		root = ctx.RootDir.Join(arg).String()
 	}
 	return
 }

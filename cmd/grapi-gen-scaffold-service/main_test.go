@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/afero"
 
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/gencmd"
 	gencmdtesting "github.com/izumin5210/grapi/pkg/gencmd/testing"
@@ -41,7 +42,7 @@ func TestRun(t *testing.T) {
 		},
 	}
 
-	rootDir := cli.RootDir("/home/src/testapp")
+	rootDir := cli.RootDir{clib.Path("/home/src/testapp")}
 
 	createSvcApp := func(cmd *gencmd.Command) (*svcgen.App, error) {
 		return svcgentesting.NewTestApp(cmd, &fakeProtocWrapper{}, cli.NopUI)

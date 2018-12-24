@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/fatih/color"
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/pkg/errors"
 	"github.com/tcnksm/go-input"
 	"go.uber.org/zap"
@@ -28,7 +29,7 @@ var (
 )
 
 // UIInstance retuens a singleton UI instance.
-func UIInstance(io *IO) UI {
+func UIInstance(io clib.IO) UI {
 	uiMu.Lock()
 	defer uiMu.Unlock()
 	if ui == nil {
@@ -38,12 +39,12 @@ func UIInstance(io *IO) UI {
 }
 
 // NewUI creates a new UI instance.
-func NewUI(io *IO) UI {
+func NewUI(io clib.IO) UI {
 	return &uiImpl{
-		out: io.Out,
+		out: io.Out(),
 		inputUI: &input.UI{
-			Reader: io.In,
-			Writer: io.Out,
+			Reader: io.In(),
+			Writer: io.Out(),
 		},
 	}
 }

@@ -83,7 +83,7 @@ func (g *generatorImpl) Destroy(params interface{}) error {
 			return errors.Wrapf(err, "failed to parse path: %s", tmplPath)
 		}
 
-		absPath := g.rootDir.Join(path)
+		absPath := g.rootDir.Join(path).String()
 		if ok, err := afero.Exists(g.fs, absPath); err != nil {
 			g.ui.ItemFailure(path)
 			return errors.WithStack(err)
@@ -157,7 +157,7 @@ func (g *generatorImpl) shouldRun(e *Entry) (bool, error) {
 		return false, nil
 	}
 
-	absPath := g.rootDir.Join(e.Path)
+	absPath := g.rootDir.Join(e.Path).String()
 
 	if ok, err := afero.Exists(g.fs, absPath); err != nil {
 		return false, errors.WithStack(err)
@@ -186,7 +186,7 @@ func (g *generatorImpl) shouldRun(e *Entry) (bool, error) {
 }
 
 func (g *generatorImpl) writeFile(e *Entry) error {
-	path := g.rootDir.Join(e.Path)
+	path := g.rootDir.Join(e.Path).String()
 	dir := filepath.Dir(path)
 
 	if ok, err := afero.DirExists(g.fs, dir); err != nil {

@@ -17,7 +17,7 @@ func newUserDefinedCommands(ctx *grapicmd.Ctx) (cmds []*cobra.Command) {
 
 	scriptLoader := di.NewScriptLoader(ctx)
 
-	err := scriptLoader.Load(ctx.RootDir.Join("cmd"))
+	err := scriptLoader.Load(ctx.RootDir.Join("cmd").String())
 	if err != nil {
 		// TODO: log
 		return
