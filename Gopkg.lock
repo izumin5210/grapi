@@ -348,11 +348,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7ca2584fa7da0520cd2d1136a10194fe5a5b220bdb215074ab6f7b5ad91115f4"
+  digest = "1:68cecd4c1137f77dfa2db1f13a0ceef2b5606d6b69d66fa69f7df1b2f2fe9afc"
   name = "github.com/shurcooL/httpfs"
   packages = ["vfsutil"]
   pruneopts = "UT"
-  revision = "809beceb23714880abc4a382a00c05f89d13b1cc"
+  revision = "74dc9339e414ad069a8d04bba7e7aafd08043a25"
 
 [[projects]]
   branch = "master"
