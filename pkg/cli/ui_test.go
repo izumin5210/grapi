@@ -25,6 +25,8 @@ func TestUI(t *testing.T) {
 
   ▸  subsection 1.2
      ✗  failure
+        foobar
+        baz
 
   ➜  section 2
      ✗  fail!!!
@@ -39,7 +41,7 @@ func TestUI(t *testing.T) {
 	ui.ItemSkipped("skipped")
 	ui.ItemSuccess("ok")
 	ui.Subsection("subsection 1.2")
-	ui.ItemFailure("failure")
+	ui.ItemFailure("failure", errors.New("foobar"), errors.New("baz"))
 	ui.Section("section 2")
 	ui.ItemFailure("fail!!!")
 
