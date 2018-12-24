@@ -73,13 +73,13 @@ func (e *wrapperImpl) execProtocAll(ctx context.Context) error {
 		if err == nil {
 			e.ui.ItemSuccess(relPath)
 		} else {
+			zap.L().Error("failed to execute protoc", zap.Error(err))
 			errs = append(errs, err)
-			e.ui.ItemFailure(relPath)
+			e.ui.ItemFailure(relPath, err)
 		}
 	}
 
 	if len(errs) > 0 {
-		zap.L().Error("failed to execute protoc", zap.Errors("errors", errs))
 		return errors.New("failed to execute protoc")
 	}
 

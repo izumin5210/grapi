@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/fatih/color"
@@ -19,7 +20,7 @@ type UI interface {
 	Subsection(msg string)
 	ItemSuccess(msg string)
 	ItemSkipped(msg string)
-	ItemFailure(msg string)
+	ItemFailure(msg string, errs ...error)
 	Confirm(msg string) (bool, error)
 }
 
@@ -81,9 +82,17 @@ func (u *uiImpl) ItemSkipped(msg string) {
 	printTypeItemSkipped.Fprintln(u.out, msg)
 }
 
-func (u *uiImpl) ItemFailure(msg string) {
+func (u *uiImpl) ItemFailure(msg string, errs ...error) {
 	u.inSection = true
 	printTypeItemFailure.Fprintln(u.out, msg)
+	cfg := configByPrintType[printTypeItemFailure]
+	pad := strings.Repeat(" ", cfg.indent+4)
+	fprintln := color.New(color.FgRed).FprintlnFunc()
+	for _, err := range errs {
+		for _, s := range strings.Split(err.Error(), "\n") {
+			fprintln(u.out, pad+s)
+		}
+	}
 }
 
 func (u *uiImpl) Confirm(msg string) (bool, error) {
