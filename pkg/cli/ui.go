@@ -84,12 +84,15 @@ func (u *uiImpl) ItemSkipped(msg string) {
 
 func (u *uiImpl) ItemFailure(msg string, errs ...error) {
 	u.inSection = true
-	msgs := make([]string, 1+len(errs))
-	msgs[0] = msg
-	for i, err := range errs {
-		msgs[i+1] = err.Error()
+	printTypeItemFailure.Fprintln(u.out, msg)
+	cfg := configByPrintType[printTypeItemFailure]
+	pad := strings.Repeat(" ", cfg.indent+4)
+	fprintln := color.New(color.FgRed).FprintlnFunc()
+	for _, err := range errs {
+		for _, s := range strings.Split(err.Error(), "\n") {
+			fprintln(u.out, pad+s)
+		}
 	}
-	printTypeItemFailure.Fprintln(u.out, msgs...)
 }
 
 func (u *uiImpl) Confirm(msg string) (bool, error) {
@@ -186,11 +189,6 @@ func init() {
 	}
 }
 
-func (pt printType) Fprintln(w io.Writer, msgs ...string) {
-	fprintlnFuncByPrintType[pt](w, msgs[0])
-	cfg := configByPrintType[pt]
-	pad := strings.Repeat(" ", cfg.indent+4)
-	for _, msg := range msgs[1:] {
-		fmt.Fprintln(w, pad+msg)
-	}
+func (pt printType) Fprintln(w io.Writer, msg string) {
+	fprintlnFuncByPrintType[pt](w, msg)
 }
