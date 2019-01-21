@@ -2,12 +2,12 @@
 
 
 [[projects]]
-  digest = "1:5d7ed16e3359fcc983d93b17126d26ffbc4056ff509d34ef030fc3345ecc5616"
+  digest = "1:f1b14e9f7661ae2cd8b30fc0cde69b1f7c30db85fc43f346b315ef0e434ddbff"
   name = "github.com/bradleyjkemp/cupaloy"
   packages = ["."]
   pruneopts = "UT"
-  revision = "29f58f1e4393a0062f60596ee97bfec34a25cd5f"
-  version = "v2.3.0"
+  revision = "4ebc4e863ab6bedcc009ccfb5f209939090ceadd"
+  version = "v2.4.0"
 
 [[projects]]
   digest = "1:a2c1d0e43bd3baaa071d1b9ed72c27d78169b2b269f71c105ac4ba34b1be4a39"
