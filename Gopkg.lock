@@ -708,7 +708,7 @@
     "exec/testing",
   ]
   pruneopts = "UT"
-  revision = "8a16e7dd8fb6d97d1331b0c79a16722f934b00b1"
+  revision = "4ae6e769426ee1a06523eb30fcb69c0a01f03772"
 
 [[projects]]
   branch = "master"
