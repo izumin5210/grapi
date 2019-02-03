@@ -80,7 +80,6 @@ func (b *builderImpl) Build(path string, resName string, methodNames []string) (
 		"google.golang.org/grpc/codes",
 		"google.golang.org/grpc/status",
 	}
-	goTestImports := []string{}
 
 	resNames := names
 	if resName != "" {
@@ -92,8 +91,6 @@ func (b *builderImpl) Build(path string, resName string, methodNames []string) (
 	sort.Strings(protoImports)
 	goImports = append(goImports, methods.GoImports...)
 	sort.Strings(goImports)
-	goTestImports = append(goTestImports, methods.GoImports...)
-	sort.Strings(goTestImports)
 
 	params := &Params{
 		ProtoDir:    b.protoDir,
@@ -112,11 +109,10 @@ func (b *builderImpl) Build(path string, resName string, methodNames []string) (
 			PackageName: protoParams.PbGo.ImportName,
 		},
 		Go: GoParams{
-			Package:     packageName,
-			Imports:     goImports,
-			TestImports: goTestImports,
-			ServerName:  serviceName + "Service" + "Server",
-			StructName:  localServiceName + "Service" + "Server" + "Impl",
+			Package:    packageName,
+			Imports:    goImports,
+			ServerName: serviceName + "Service" + "Server",
+			StructName: localServiceName + "Service" + "Server" + "Impl",
 		},
 	}
 
