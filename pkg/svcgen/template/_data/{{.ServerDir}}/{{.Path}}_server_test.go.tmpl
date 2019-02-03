@@ -3,7 +3,8 @@ package {{.Go.Package }}
 import (
 	"context"
 	"testing"
-{{range .Go.TestImports}}
+
+{{- range .Go.TestImports}}
 	"{{.}}"
 {{- end}}
 
