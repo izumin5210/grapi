@@ -3,7 +3,8 @@ package {{.Go.Package }}
 import (
 	"context"
 	"testing"
-{{range .Go.TestImports}}
+
+{{- range .Go.TestImports}}
 	"{{.}}"
 {{- end}}
 
@@ -19,6 +20,8 @@ func Test_{{$go.ServerName}}_{{.Method}}(t *testing.T) {
 	req := &{{.RequestGo $pbGo.PackageName}}{}
 
 	resp, err := svr.{{.Method}}(ctx, req)
+
+	t.SkipNow()
 
 	if err != nil {
 		t.Errorf("returned an error %v", err)
