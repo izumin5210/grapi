@@ -97,7 +97,7 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:95ce41f5f1d4fba49840c6e12e2a00eda2868177f5880cdf67a5a65ab66492de"
+  digest = "1:4ce3bcf509ecb1d50fef89280d4239608809e2d3485dc9d78573c51e25bdf9cb"
   name = "github.com/google/wire"
   packages = [
     ".",
@@ -105,8 +105,8 @@
     "internal/wire",
   ]
   pruneopts = "UT"
-  revision = "28f5930663cd2ab724e2735cc5713b490f207616"
-  version = "v0.2.0"
+  revision = "9a7ae3ba6b734d831e88c75966fd5e9c0abdeace"
+  version = "v0.2.1"
 
 [[projects]]
   digest = "1:1168584a5881d371e96cb0e66ef6db71d7cef0856cc7f311490bc856627f8328"
