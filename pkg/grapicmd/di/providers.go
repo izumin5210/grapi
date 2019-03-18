@@ -25,10 +25,11 @@ func ProvideScriptLoader(ctx *grapicmd.Ctx, executor excmd.Executor) module.Scri
 	return script.NewLoader(ctx.FS, executor, ctx.RootDir.String())
 }
 
-func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui cli.UI, generator module.Generator) usecase.InitializeProjectUsecase {
+func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui cli.UI, generator module.Generator, excmd excmd.Executor) usecase.InitializeProjectUsecase {
 	return usecase.NewInitializeProjectUsecase(
 		ui,
 		generator,
+		excmd,
 		gexCfg,
 	)
 }
