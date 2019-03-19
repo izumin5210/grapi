@@ -57,7 +57,7 @@ func (s *GatewayServer) Shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	err := s.server.Shutdown(ctx)
-	grpclog.Info("All http(s) requets finished")
+	grpclog.Info("All http(s) requests finished")
 	if err != nil {
 		grpclog.Errorf("failed to shutdown grpc-gateway server: %v", err)
 	}
