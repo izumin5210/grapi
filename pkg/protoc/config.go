@@ -46,27 +46,3 @@ func (c *Config) OutDirOf(rootDir string, protoPath string) (string, error) {
 
 	return filepath.Join(c.OutDir, relProtoDir), nil
 }
-
-// Commands returns protoc command and arguments for given proto file.
-func (c *Config) Commands(rootDir, protoPath string) ([][]string, error) {
-	cmds := make([][]string, 0, len(c.Plugins))
-	relProtoPath, _ := filepath.Rel(rootDir, protoPath)
-
-	outDir, err := c.OutDirOf(rootDir, protoPath)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	for _, p := range c.Plugins {
-		args := []string{}
-		args = append(args, "-I", filepath.Dir(relProtoPath))
-		for _, dir := range c.ImportDirs {
-			args = append(args, "-I", dir)
-		}
-		args = append(args, p.toProtocArg(outDir))
-		args = append(args, relProtoPath)
-		cmds = append(cmds, append([]string{"protoc"}, args...))
-	}
-
-	return cmds, nil
-}
