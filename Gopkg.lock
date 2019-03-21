@@ -34,6 +34,20 @@
   version = "v1.4.7"
 
 [[projects]]
+  digest = "1:2cd7915ab26ede7d95b8749e6b1f933f1c6d5398030684e6505940a10f31cfda"
+  name = "github.com/ghodss/yaml"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0ca9ea5df5451ffdf184b4428c902747c2c11cd7"
+
+[[projects]]
+  digest = "1:1ba1d79f2810270045c328ae5d674321db34e3aae468eb4233883b473c5c0467"
+  name = "github.com/golang/glog"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "23def4e6c14b4da8ac2ed8007337bc5eb5007998"
+
+[[projects]]
   digest = "1:552a143cfb2692a4a8cbae568a9b4633ec4e7ce9269cfe74c07ea08ce50d866f"
   name = "github.com/golang/mock"
   packages = [
@@ -46,14 +60,17 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:e3180bea674449a3d8c40341b39423e44e79d68ddb200f94f5c0020a42685ee8"
+  digest = "1:329b943e12961fb0c0db5bc18858433e569183178edfd0a8d99033ce032c62cc"
   name = "github.com/golang/protobuf"
   packages = [
+    "descriptor",
     "jsonpb",
     "proto",
+    "protoc-gen-go",
     "protoc-gen-go/descriptor",
     "protoc-gen-go/generator",
     "protoc-gen-go/generator/internal/remap",
+    "protoc-gen-go/grpc",
     "protoc-gen-go/plugin",
     "ptypes",
     "ptypes/any",
@@ -116,10 +133,19 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:ec9b294ee624e9b87e31a8fa39a2a7724f90ce7af2055a9248100883d9956922"
+  digest = "1:e4f2416beca662090d5cfc9489208e9d7e3c17dee87e4fe2c5f2c8fe3cb71aa8"
   name = "github.com/grpc-ecosystem/grpc-gateway"
   packages = [
+    "codegenerator",
     "internal",
+    "protoc-gen-grpc-gateway",
+    "protoc-gen-grpc-gateway/descriptor",
+    "protoc-gen-grpc-gateway/generator",
+    "protoc-gen-grpc-gateway/gengateway",
+    "protoc-gen-grpc-gateway/httprule",
+    "protoc-gen-swagger",
+    "protoc-gen-swagger/genswagger",
+    "protoc-gen-swagger/options",
     "runtime",
     "utilities",
   ]
@@ -737,11 +763,14 @@
     "github.com/golang/mock/gomock",
     "github.com/golang/mock/mockgen",
     "github.com/golang/protobuf/proto",
+    "github.com/golang/protobuf/protoc-gen-go",
     "github.com/golang/protobuf/ptypes/empty",
     "github.com/google/go-cmp/cmp",
     "github.com/google/wire",
     "github.com/google/wire/cmd/wire",
     "github.com/grpc-ecosystem/go-grpc-middleware",
+    "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway",
+    "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger",
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
     "github.com/grpc-ecosystem/grpc-gateway/utilities",
     "github.com/haya14busa/reviewdog/cmd/reviewdog",
@@ -753,7 +782,6 @@
     "github.com/jessevdk/go-assets",
     "github.com/jessevdk/go-assets-builder",
     "github.com/jinzhu/inflection",
-    "github.com/kisielk/errcheck",
     "github.com/mitchellh/gox",
     "github.com/pkg/errors",
     "github.com/serenize/snaker",
@@ -767,7 +795,6 @@
     "github.com/srvc/wraperr/cmd/wraperr",
     "github.com/tcnksm/go-input",
     "go.uber.org/zap",
-    "golang.org/x/lint/golint",
     "golang.org/x/net/context",
     "golang.org/x/sync/errgroup",
     "google.golang.org/genproto/googleapis/api/annotations",
@@ -776,10 +803,8 @@
     "google.golang.org/grpc/grpclog",
     "google.golang.org/grpc/reflection",
     "google.golang.org/grpc/status",
-    "honnef.co/go/tools/cmd/megacheck",
     "k8s.io/utils/exec",
     "k8s.io/utils/exec/testing",
-    "mvdan.cc/unparam",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
