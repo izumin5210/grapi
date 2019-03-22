@@ -30,7 +30,7 @@ jobs:
     if: type != 'pull_request'
 
   - &test-e2e
-    name: "E2E test (go 1.11.2)"
+    name: "E2E test (mod)"
     language: bash
     sudo: required
     services:
@@ -48,14 +48,11 @@ jobs:
   - <<: *test
     go: master
 
-  - <<: *test
-    go: '1.10'
-
   # TODO: Skip this because --HEAD option does not work with --use-dep option
   # - <<: *test-e2e
-  #   name: "E2E test (go 1.10.5)"
+  #   name: "E2E test (dep)"
   #   env:
-  #   - GO_VERSION=1.10.5
+  #   - GO_VERSION=1.11.2
   #   - USE_DEP=1
 
   - stage: deploy
