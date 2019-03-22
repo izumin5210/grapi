@@ -1,11 +1,11 @@
 language: go
 
-go: '1.11'
+go: '1.12'
 
 env:
   global:
-  - DEP_RELEASE_TAG=v0.5.0
   - FILE_TO_DEPLOY="dist/*"
+  - GO111MODULE=on
 
   # GITHUB_TOKEN
   - secure: "MhmvXAAzOA5HY7koCfagX1wJi2mBVQsVF5cCMaNx73l+7uDgNzGYfTn4OGKmckduiGB/mp5bTJ1DeMbPq+TDX1n/RE6kndu/Q/1vw4pbxm9BsmO9b3DizIFoWlnG+EABdAZa9igbCAfv+Jj57a0WjKGaiLazylj1mb7AYj6Vao+1zvm2ufoZvpKJcnKPqcWTsx/enJD3wx0LbqTpN5a/EdynJF9kj9Z97cGk9lS/hQHqmYVUYLYG5ZIvPjkuc6ho6pYaerupZ8aQgwraupRrNAzh70C3QgxnrCK+6RRmBMchhBsHOZq1MGhbN48ttlSMKow2NyVp8mK8+wLUnQgxEvYjVNJBXf5iKMmCTBiTO8IqgAKkkMgLaB3H0UpkeOoUQNTACPxR42+FJcwObmxYRSekTGFPwAAwnZV/1BuPrpxpT7JHa9ELlShz2OVEDz9aK/WC28/oEmtYKN8s9koKr1sx4OT5c0F/XG+er2idgCWwvfK5A0Om7Fudur+bbp1a38QWb00cAu8dPTIONe01vGXQ04d+NyohS2bcvK3iehVpa+WZ4CHkjRRuv6vQGvFMNCtwwQjXopBM99+yAykLm7yqOewbzbxFI7nCHNBc1zHvI13j7yniEoI/vdWk43e2H3Az0OOtdVASNmmp5Avwo/UWzjVACvlyNK1CST4pqYQ="
@@ -14,7 +14,6 @@ env:
 
 cache:
   directories:
-  - $GOPATH/pkg/dep
   - $GOPATH/pkg/mod
   - $HOME/.cache/go-build
 
@@ -31,32 +30,29 @@ jobs:
     if: type != 'pull_request'
 
   - &test-e2e
-    name: "E2E test (go 1.11.2)"
+    name: "E2E test (mod)"
     language: bash
     sudo: required
     services:
     - docker
     env:
-    - GO_VERSION=1.11.2
+    - GO_VERSION=1.11.6
     script: make test-e2e
     if: type != 'pull_request'
 
   - <<: *test
-    name: "coverage (go 1.11)"
+    name: "coverage (go 1.12)"
     script: make cover
     after_success: bash <(curl -s https://codecov.io/bash)
 
   - <<: *test
     go: master
 
-  - <<: *test
-    go: '1.10'
-
   # TODO: Skip this because --HEAD option does not work with --use-dep option
   # - <<: *test-e2e
-  #   name: "E2E test (go 1.10.5)"
+  #   name: "E2E test (dep)"
   #   env:
-  #   - GO_VERSION=1.10.5
+  #   - GO_VERSION=1.11.6
   #   - USE_DEP=1
 
   - stage: deploy
