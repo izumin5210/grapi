@@ -15,6 +15,5 @@ docker run \
   -v $(pwd)/$DIR:/go/src/e2e \
   --env TARGET_REVISION=$TARGET_REVISION \
   --env USE_DEP=${USE_DEP:-0} \
-  --env GO111MODULE=${GO111MODULE:-auto} \
   $IMAGE_NAME \
   sh -c 'go test -v -timeout 2m'

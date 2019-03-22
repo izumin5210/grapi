@@ -38,7 +38,6 @@ jobs:
     - docker
     env:
     - GO_VERSION=1.11.2
-    - GO111MODULE=on
     script: make test-e2e
     if: type != 'pull_request'
 
