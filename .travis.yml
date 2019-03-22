@@ -1,6 +1,6 @@
 language: go
 
-go: '1.11'
+go: '1.12'
 
 env:
   global:
@@ -36,12 +36,12 @@ jobs:
     services:
     - docker
     env:
-    - GO_VERSION=1.11.2
+    - GO_VERSION=1.11.6
     script: make test-e2e
     if: type != 'pull_request'
 
   - <<: *test
-    name: "coverage (go 1.11)"
+    name: "coverage (go 1.12)"
     script: make cover
     after_success: bash <(curl -s https://codecov.io/bash)
 
@@ -52,7 +52,7 @@ jobs:
   # - <<: *test-e2e
   #   name: "E2E test (dep)"
   #   env:
-  #   - GO_VERSION=1.11.2
+  #   - GO_VERSION=1.11.6
   #   - USE_DEP=1
 
   - stage: deploy
