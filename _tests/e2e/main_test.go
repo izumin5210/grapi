@@ -24,6 +24,8 @@ func Test_Integration(t *testing.T) {
 
 	srcDir := filepath.Dir(wd)
 
+	os.Setenv("GO111MODULE", "on")
+
 	name := "sample"
 	rootPath := filepath.Join(srcDir, name)
 
@@ -34,6 +36,9 @@ func Test_Integration(t *testing.T) {
 		args = append(args, "--revision="+commit)
 	} else {
 		args = append(args, "--HEAD")
+	}
+	if os.Getenv("USE_DEP") == "1" {
+		args = append(args, "--use-dep")
 	}
 	args = append(args, name)
 
@@ -269,6 +274,7 @@ func run(t *testing.T, dir string, cmd *exec.Cmd) {
 	cmd.Dir = dir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	cmd.Env = append(os.Environ(), "GO111MODULE=on")
 	err := cmd.Run()
 	if err != nil {
 		t.Fatalf("failed to execute command %v: %v", cmd, err)

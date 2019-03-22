@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/izumin5210/grapi/pkg/cli"
+	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
@@ -18,10 +19,11 @@ type InitializeProjectUsecase interface {
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui cli.UI, generator module.ProjectGenerator, gexCfg *gex.Config) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui cli.UI, generator module.ProjectGenerator, excmd excmd.Executor, gexCfg *gex.Config) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
 		ui:        ui,
 		generator: generator,
+		excmd:     excmd,
 		gexCfg:    gexCfg,
 	}
 }
@@ -29,6 +31,7 @@ func NewInitializeProjectUsecase(ui cli.UI, generator module.ProjectGenerator, g
 type initializeProjectUsecase struct {
 	ui        cli.UI
 	generator module.ProjectGenerator
+	excmd     excmd.Executor
 	gexCfg    *gex.Config
 }
 
@@ -55,22 +58,46 @@ func (u *initializeProjectUsecase) GenerateProject(rootDir, pkgName string) erro
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) error {
-	u.gexCfg.WorkingDir = rootDir
-	repo, err := u.gexCfg.Create()
-	if err == nil {
-		spec := cfg.BuildSpec()
-		err = repo.Add(
-			context.TODO(),
-			"github.com/izumin5210/grapi/cmd/grapi"+spec,
-			"github.com/izumin5210/grapi/cmd/grapi-gen-command",
-			"github.com/izumin5210/grapi/cmd/grapi-gen-service",
-			"github.com/izumin5210/grapi/cmd/grapi-gen-scaffold-service",
-			"github.com/izumin5210/grapi/cmd/grapi-gen-type",
-			// TODO: make configurable
-			"github.com/golang/protobuf/protoc-gen-go",
-			"github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway",
-			"github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger",
-		)
+	var (
+		name string
+		args []string
+		opts = []excmd.Option{
+			excmd.WithDir(rootDir),
+			excmd.WithIOConnected(),
+		}
+	)
+	if cfg.Dep {
+		name = "dep"
+		args = []string{"init"}
+	} else {
+		name = "go"
+		args = []string{"mod", "init"}
+		opts = append(opts, excmd.WithEnv("GO111MODULE", "on"))
 	}
-	return errors.WithStack(err)
+	_, err := u.excmd.Exec(context.Background(), name, append([]excmd.Option{excmd.WithArgs(args...)}, opts...)...)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	if !cfg.Dep {
+		_, err := u.excmd.Exec(context.Background(), "go", append([]excmd.Option{excmd.WithArgs("get", "./...")}, opts...)...)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
+	if spec := cfg.BuildSpec(); spec != "" {
+		if cfg.Dep {
+			u.ui.ItemFailure("--version, --revision, --branch and --HEAD are not supported in dep mode")
+		} else {
+			pkg := "github.com/izumin5210/grapi"
+			args = []string{"get", pkg + "/..." + spec}
+			_, err := u.excmd.Exec(context.Background(), name, append([]excmd.Option{excmd.WithArgs(args...)}, opts...)...)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+		}
+	}
+
+	return nil
 }

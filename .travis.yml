@@ -52,10 +52,12 @@ jobs:
   - <<: *test
     go: '1.10'
 
-  - <<: *test-e2e
-    name: "E2E test (go 1.10.5)"
-    env:
-    - GO_VERSION=1.10.5
+  # TODO: Skip this because --HEAD option does not work with --use-dep option
+  # - <<: *test-e2e
+  #   name: "E2E test (go 1.10.5)"
+  #   env:
+  #   - GO_VERSION=1.10.5
+  #   - USE_DEP=1
 
   - stage: deploy
     install: make setup

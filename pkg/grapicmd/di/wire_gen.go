@@ -80,6 +80,7 @@ func NewInitializeProjectUsecase(ctx *grapicmd.Ctx) usecase.InitializeProjectUse
 	config := protoc.ProvideGexConfig(fs, execInterface, io, rootDir)
 	ui := cli.UIInstance(io)
 	generator := ProvideGenerator(ctx, ui)
-	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, generator)
+	executor := excmd.NewExecutor(io)
+	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, generator, executor)
 	return initializeProjectUsecase
 }

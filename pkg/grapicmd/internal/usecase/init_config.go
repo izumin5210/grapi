@@ -8,6 +8,7 @@ type InitConfig struct {
 	Version  string
 	HEAD     bool
 	Package  string
+	Dep      bool
 }
 
 func (c *InitConfig) BuildSpec() string {

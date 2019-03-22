@@ -2,7 +2,6 @@ package protoc
 
 import (
 	"path/filepath"
-	"reflect"
 	"testing"
 )
 
@@ -58,31 +57,4 @@ func Test_Config_OutDirOf(t *testing.T) {
 			t.Errorf("OutDirOf returned %q, want %q", got, want)
 		}
 	})
-}
-
-func Test_Config_Commands(t *testing.T) {
-	cfg := createDefaultConfig()
-	rootDir := "/home/example/app"
-	protoPath := "api/protos/foo/bar.proto"
-
-	cmds, err := cfg.Commands(rootDir, filepath.Join(rootDir, protoPath))
-
-	if err != nil {
-		t.Errorf("Commands() returned an error %v", err)
-	}
-
-	wantCmd := []string{
-		"protoc",
-		"-I", "api/protos/foo",
-		"-I", "./vendor/github.com/grpc-ecosystem/grpc-gateway",
-		"-I", "./vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis",
-		"--go_out=plugins=grpc:api/foo",
-		"api/protos/foo/bar.proto",
-	}
-
-	if got, want := len(cmds), len(cfg.Plugins); got != want {
-		t.Errorf("Commands() returned %d commands, want %d commands", got, want)
-	} else if got, want := cmds[0], wantCmd; !reflect.DeepEqual(got, want) {
-		t.Errorf("Commands()[0] returned %v, want %v", got, want)
-	}
 }
