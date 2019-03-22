@@ -1,0 +1,12 @@
+output:
+  format: colored-line-number
+
+linters-settings:
+  lll:
+    line-length: 140
+
+linters:
+  enable-all: true
+  disable:
+    - gochecknoglobals
+    - gochecknoinits
