@@ -4,8 +4,8 @@ go: '1.11'
 
 env:
   global:
-  - DEP_RELEASE_TAG=v0.5.0
   - FILE_TO_DEPLOY="dist/*"
+  - GO111MODULE=on
 
   # GITHUB_TOKEN
   - secure: "MhmvXAAzOA5HY7koCfagX1wJi2mBVQsVF5cCMaNx73l+7uDgNzGYfTn4OGKmckduiGB/mp5bTJ1DeMbPq+TDX1n/RE6kndu/Q/1vw4pbxm9BsmO9b3DizIFoWlnG+EABdAZa9igbCAfv+Jj57a0WjKGaiLazylj1mb7AYj6Vao+1zvm2ufoZvpKJcnKPqcWTsx/enJD3wx0LbqTpN5a/EdynJF9kj9Z97cGk9lS/hQHqmYVUYLYG5ZIvPjkuc6ho6pYaerupZ8aQgwraupRrNAzh70C3QgxnrCK+6RRmBMchhBsHOZq1MGhbN48ttlSMKow2NyVp8mK8+wLUnQgxEvYjVNJBXf5iKMmCTBiTO8IqgAKkkMgLaB3H0UpkeOoUQNTACPxR42+FJcwObmxYRSekTGFPwAAwnZV/1BuPrpxpT7JHa9ELlShz2OVEDz9aK/WC28/oEmtYKN8s9koKr1sx4OT5c0F/XG+er2idgCWwvfK5A0Om7Fudur+bbp1a38QWb00cAu8dPTIONe01vGXQ04d+NyohS2bcvK3iehVpa+WZ4CHkjRRuv6vQGvFMNCtwwQjXopBM99+yAykLm7yqOewbzbxFI7nCHNBc1zHvI13j7yniEoI/vdWk43e2H3Az0OOtdVASNmmp5Avwo/UWzjVACvlyNK1CST4pqYQ="
@@ -14,7 +14,6 @@ env:
 
 cache:
   directories:
-  - $GOPATH/pkg/dep
   - $GOPATH/pkg/mod
   - $HOME/.cache/go-build
 
