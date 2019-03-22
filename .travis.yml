@@ -38,6 +38,7 @@ jobs:
     - docker
     env:
     - GO_VERSION=1.11.2
+    - GO111MODULE=on
     script: make test-e2e
     if: type != 'pull_request'
 
@@ -56,6 +57,7 @@ jobs:
     name: "E2E test (go 1.10.5)"
     env:
     - GO_VERSION=1.10.5
+    - USE_DEP=1
 
   - stage: deploy
     install: make setup

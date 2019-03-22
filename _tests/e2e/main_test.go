@@ -35,6 +35,9 @@ func Test_Integration(t *testing.T) {
 	} else {
 		args = append(args, "--HEAD")
 	}
+	if os.Getenv("USE_DEP") == "1" {
+		args = append(args, "--use-dep")
+	}
 	args = append(args, name)
 
 	run(t, srcDir, exec.Command("grapi", args...))
