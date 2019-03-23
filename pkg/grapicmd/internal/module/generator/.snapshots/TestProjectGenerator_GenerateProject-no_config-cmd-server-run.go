@@ -1,23 +1,16 @@
 package main
 
 import (
-	"os"
-
-	"google.golang.org/grpc/grpclog"
-
-	"testcompany/testapp/app"
+	"github.com/izumin5210/grapi/pkg/grapiserver"
 )
 
-func main() {
-	os.Exit(run())
-}
-
-func run() int {
-	err := app.Run()
-	if err != nil {
-		grpclog.Errorf("server was shutdown with errors: %v", err)
-		return 1
-	}
-	return 0
+func run() error {
+	s := grapiserver.New(
+		grapiserver.WithDefaultLogger(),
+		grapiserver.WithServers(
+		// TODO
+		),
+	)
+	return s.Serve()
 }
 
