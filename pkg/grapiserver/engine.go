@@ -6,11 +6,11 @@ import (
 	"os"
 	"os/signal"
 	"reflect"
+	"sync"
 	"syscall"
 
 	"github.com/izumin5210/grapi/pkg/grapiserver/internal"
 	"github.com/pkg/errors"
-	"github.com/soheilhy/cmux"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/grpclog"
 )
@@ -18,7 +18,6 @@ import (
 // Engine is the framework instance.
 type Engine struct {
 	*Config
-	cancelFunc func()
 }
 
 // New creates a server intstance.
@@ -30,10 +29,16 @@ func New(opts ...Option) *Engine {
 
 // Serve starts gRPC and Gateway servers.
 func (e *Engine) Serve() error {
+	return errors.WithStack(e.ServeContext(context.Background()))
+}
+
+// ServeContext starts gRPC and Gateway servers.
+func (e *Engine) ServeContext(ctx context.Context) error {
 	var (
-		grpcServer, gatewayServer, muxServer internal.Server
-		grpcLis, gatewayLis, internalLis     net.Listener
-		err                                  error
+		grpcServer, gatewayServer        internal.Server
+		grpcLis, gatewayLis, internalLis net.Listener
+		cmuxServer                       *cmuxServer
+		err                              error
 	)
 
 	if e.GrpcAddr != nil && e.GatewayAddr != nil && reflect.DeepEqual(e.GrpcAddr, e.GatewayAddr) {
@@ -41,14 +46,14 @@ func (e *Engine) Serve() error {
 		if err != nil {
 			return errors.Wrap(err, "failed to listen network for servers")
 		}
-		mux := cmux.New(lis)
-		muxServer = NewMuxServer(mux, lis)
-		grpcLis = mux.Match(cmux.HTTP2HeaderField("content-type", "application/grpc"))
-		gatewayLis = mux.Match(cmux.HTTP2(), cmux.HTTP1Fast())
+		defer lis.Close()
+		cmuxServer = newCmuxServer(lis)
+		grpcLis = cmuxServer.GRPCListener()
+		gatewayLis = cmuxServer.HTTPListener()
 	}
 
 	// Setup servers
-	grpcServer = NewGrpcServer(e.Config)
+	grpcServer = newGRPCServer(e.Config)
 
 	// Setup listeners
 	if grpcLis == nil && e.GrpcAddr != nil {
@@ -60,7 +65,7 @@ func (e *Engine) Serve() error {
 	}
 
 	if e.GatewayAddr != nil {
-		gatewayServer = NewGatewayServer(e.Config)
+		gatewayServer = newGatewayServer(e.Config)
 		internalLis, err = e.GrpcInternalAddr.createListener()
 		if err != nil {
 			return errors.Wrap(err, "failed to listen network for gRPC server internal")
@@ -77,57 +82,56 @@ func (e *Engine) Serve() error {
 	}
 
 	// Start servers
-	eg, ctx := errgroup.WithContext(context.Background())
-	ctx, e.cancelFunc = context.WithCancel(ctx)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	eg, ctx := errgroup.WithContext(ctx)
 
 	if internalLis != nil {
-		eg.Go(func() error { return grpcServer.Serve(internalLis) })
+		eg.Go(func() error { return grpcServer.Serve(ctx, internalLis) })
 	}
 	if grpcLis != nil {
-		eg.Go(func() error { return grpcServer.Serve(grpcLis) })
+		eg.Go(func() error { return grpcServer.Serve(ctx, grpcLis) })
 	}
 	if gatewayLis != nil {
-		eg.Go(func() error { return gatewayServer.Serve(gatewayLis) })
-	}
-	if muxServer != nil {
-		eg.Go(func() error { return muxServer.Serve(nil) })
+		eg.Go(func() error { return gatewayServer.Serve(ctx, gatewayLis) })
 	}
 
-	eg.Go(func() error { return e.watchShutdownSignal(ctx) })
+	var wg sync.WaitGroup
 
-	select {
-	case <-ctx.Done():
-		for _, s := range []internal.Server{gatewayServer, grpcServer, muxServer} {
-			if s != nil {
-				s.Shutdown()
-			}
+	if cmuxServer != nil {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			cmuxServer.Serve()
+		}()
+	}
+
+	doneCh := make(chan struct{}, 1)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		e.watchShutdownSignal(cancel, doneCh)
+	}()
+
+	err = errors.WithStack(eg.Wait())
+	close(doneCh)
+	wg.Wait()
+
+	return err
+}
+
+func (e *Engine) watchShutdownSignal(cancel context.CancelFunc, doneCh <-chan struct{}) {
+	sigCh := make(chan os.Signal, 1)
+	defer close(sigCh)
+	defer signal.Stop(sigCh)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	for {
+		select {
+		case sig := <-sigCh:
+			grpclog.Info("received signal: %v", sig)
+			cancel()
+		case <-doneCh:
+			return
 		}
 	}
-
-	err = eg.Wait()
-
-	return errors.WithStack(err)
-}
-
-// Shutdown closes servers.
-func (e *Engine) Shutdown() {
-	if e.cancelFunc != nil {
-		e.cancelFunc()
-	} else {
-		grpclog.Warning("the server has been started yet")
-	}
-}
-
-func (e *Engine) watchShutdownSignal(ctx context.Context) error {
-	sdCh := make(chan os.Signal, 1)
-	defer close(sdCh)
-	defer signal.Stop(sdCh)
-	signal.Notify(sdCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	select {
-	case <-sdCh:
-		e.Shutdown()
-	case <-ctx.Done():
-		// no-op
-	}
-	return nil
 }
