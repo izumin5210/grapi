@@ -43,7 +43,7 @@ func TestProjectGenerator_GenerateProject(t *testing.T) {
 				".gitignore",
 				"grapi.toml",
 				"tools.go",
-				"app/run.go",
+				"cmd/server/main.go",
 				"cmd/server/run.go",
 			}
 

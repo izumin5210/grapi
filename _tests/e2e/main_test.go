@@ -126,7 +126,7 @@ func (v *visitor) Visit(node ast.Node) ast.Visitor {
 }
 
 func updateRun(t *testing.T, rootPath string, port int) {
-	data, err := ioutil.ReadFile(filepath.Join(rootPath, "app", "run.go"))
+	data, err := ioutil.ReadFile(filepath.Join(rootPath, "cmd", "server", "run.go"))
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -189,7 +189,7 @@ func updateRun(t *testing.T, rootPath string, port int) {
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	err = ioutil.WriteFile(filepath.Join(rootPath, "app", "run.go"), buf.Bytes(), 0755)
+	err = ioutil.WriteFile(filepath.Join(rootPath, "cmd", "server", "run.go"), buf.Bytes(), 0755)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
