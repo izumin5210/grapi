@@ -12,27 +12,26 @@ import (
 	"github.com/pkg/errors"
 )
 
-// GrpcServer wraps grpc.Server setup process.
-type GrpcServer struct {
+// grpcServer wraps grpc.Server setup process.
+type grpcServer struct {
 	server *grpc.Server
 	*Config
 }
 
-// NewGrpcServer creates GrpcServer instance.
-func NewGrpcServer(c *Config) internal.Server {
+func newGRPCServer(c *Config) internal.Server {
 	s := grpc.NewServer(c.serverOptions()...)
 	reflection.Register(s)
 	for _, svr := range c.Servers {
 		svr.RegisterWithServer(s)
 	}
-	return &GrpcServer{
+	return &grpcServer{
 		server: s,
 		Config: c,
 	}
 }
 
-// Serve implements Server.Shutdown
-func (s *GrpcServer) Serve(ctx context.Context, l net.Listener) error {
+// Serve implements Server.Server
+func (s *grpcServer) Serve(ctx context.Context, l net.Listener) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 

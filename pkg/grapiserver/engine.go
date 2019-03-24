@@ -37,7 +37,7 @@ func (e *Engine) ServeContext(ctx context.Context) error {
 	var (
 		grpcServer, gatewayServer        internal.Server
 		grpcLis, gatewayLis, internalLis net.Listener
-		cmuxServer                       *MuxServer
+		cmuxServer                       *cmuxServer
 		err                              error
 	)
 
@@ -47,13 +47,13 @@ func (e *Engine) ServeContext(ctx context.Context) error {
 			return errors.Wrap(err, "failed to listen network for servers")
 		}
 		defer lis.Close()
-		cmuxServer = NewMuxServer(lis)
+		cmuxServer = newCmuxServer(lis)
 		grpcLis = cmuxServer.GRPCListener()
 		gatewayLis = cmuxServer.HTTPListener()
 	}
 
 	// Setup servers
-	grpcServer = NewGrpcServer(e.Config)
+	grpcServer = newGRPCServer(e.Config)
 
 	// Setup listeners
 	if grpcLis == nil && e.GrpcAddr != nil {
@@ -65,7 +65,7 @@ func (e *Engine) ServeContext(ctx context.Context) error {
 	}
 
 	if e.GatewayAddr != nil {
-		gatewayServer = NewGatewayServer(e.Config)
+		gatewayServer = newGatewayServer(e.Config)
 		internalLis, err = e.GrpcInternalAddr.createListener()
 		if err != nil {
 			return errors.Wrap(err, "failed to listen network for gRPC server internal")

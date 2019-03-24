@@ -13,21 +13,20 @@ import (
 	"google.golang.org/grpc/grpclog"
 )
 
-// NewGatewayServer creates GrpcServer instance.
-func NewGatewayServer(c *Config) internal.Server {
-	return &GatewayServer{
+func newGatewayServer(c *Config) internal.Server {
+	return &gatewayServer{
 		Config: c,
 	}
 }
 
-// GatewayServer wraps gRPC gateway server setup process.
-type GatewayServer struct {
+// gatewayServer wraps gRPC gateway server setup process.
+type gatewayServer struct {
 	server *http.Server
 	*Config
 }
 
-// Serve implements Server.Shutdown
-func (s *GatewayServer) Serve(ctx context.Context, l net.Listener) error {
+// Serve implements Server.Server
+func (s *gatewayServer) Serve(ctx context.Context, l net.Listener) error {
 	conn, err := s.createConn()
 	if err != nil {
 		return errors.Wrap(err, "failed to create connection with grpc-gateway server")
@@ -60,7 +59,7 @@ func (s *GatewayServer) Serve(ctx context.Context, l net.Listener) error {
 	return nil
 }
 
-func (s *GatewayServer) shutdown() {
+func (s *gatewayServer) shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	err := s.server.Shutdown(ctx)
@@ -70,7 +69,7 @@ func (s *GatewayServer) shutdown() {
 	}
 }
 
-func (s *GatewayServer) createConn() (conn *grpc.ClientConn, err error) {
+func (s *gatewayServer) createConn() (conn *grpc.ClientConn, err error) {
 	conn, err = grpc.Dial(s.GrpcInternalAddr.Addr, s.clientOptions()...)
 	if err != nil {
 		err = errors.Wrap(err, "failed to connect to gRPC server")
@@ -78,7 +77,7 @@ func (s *GatewayServer) createConn() (conn *grpc.ClientConn, err error) {
 	return
 }
 
-func (s *GatewayServer) createServer(conn *grpc.ClientConn) (*http.Server, error) {
+func (s *gatewayServer) createServer(conn *grpc.ClientConn) (*http.Server, error) {
 	mux := runtime.NewServeMux(
 		append(
 			[]runtime.ServeMuxOption{runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler)},
