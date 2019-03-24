@@ -4,7 +4,7 @@ package testapp.api.type;
 
 option go_package = "testapp/api/type;type_pb";
 
-messagge Book {
+message Book {
   string id = 1;
 }
 

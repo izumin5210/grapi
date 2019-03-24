@@ -34,6 +34,7 @@ func (m *MockGenerator) EXPECT() *MockGeneratorMockRecorder {
 
 // GenerateProject mocks base method
 func (m *MockGenerator) GenerateProject(rootDir, pkgName string) error {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GenerateProject", rootDir, pkgName)
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -41,6 +42,7 @@ func (m *MockGenerator) GenerateProject(rootDir, pkgName string) error {
 
 // GenerateProject indicates an expected call of GenerateProject
 func (mr *MockGeneratorMockRecorder) GenerateProject(rootDir, pkgName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateProject", reflect.TypeOf((*MockGenerator)(nil).GenerateProject), rootDir, pkgName)
 }
 
@@ -69,6 +71,7 @@ func (m *MockProjectGenerator) EXPECT() *MockProjectGeneratorMockRecorder {
 
 // GenerateProject mocks base method
 func (m *MockProjectGenerator) GenerateProject(rootDir, pkgName string) error {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GenerateProject", rootDir, pkgName)
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -76,5 +79,6 @@ func (m *MockProjectGenerator) GenerateProject(rootDir, pkgName string) error {
 
 // GenerateProject indicates an expected call of GenerateProject
 func (mr *MockProjectGeneratorMockRecorder) GenerateProject(rootDir, pkgName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateProject", reflect.TypeOf((*MockProjectGenerator)(nil).GenerateProject), rootDir, pkgName)
 }
