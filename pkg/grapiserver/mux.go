@@ -3,8 +3,6 @@ package grapiserver
 import (
 	"net"
 
-	"github.com/izumin5210/grapi/pkg/grapiserver/internal"
-	"github.com/pkg/errors"
 	"github.com/soheilhy/cmux"
 	"google.golang.org/grpc/grpclog"
 )
@@ -16,28 +14,26 @@ type MuxServer struct {
 }
 
 // NewMuxServer creates MuxServer instance.
-func NewMuxServer(mux cmux.CMux, lis net.Listener) internal.Server {
+func NewMuxServer(lis net.Listener) *MuxServer {
 	return &MuxServer{
-		mux: mux,
+		mux: cmux.New(lis),
 		lis: lis,
 	}
 }
 
 // Serve implements Server.Serve
-func (s *MuxServer) Serve(net.Listener) error {
+func (s *MuxServer) Serve() {
 	grpclog.Info("mux is starting %s", s.lis.Addr())
 
 	err := s.mux.Serve()
 
 	grpclog.Infof("mux is closed: %v", err)
-
-	return errors.Wrap(err, "failed to serve cmux server")
 }
 
-// Shutdown implements Server.Shutdown
-func (s *MuxServer) Shutdown() {
-	err := s.lis.Close()
-	if err != nil {
-		grpclog.Errorf("failed to close cmux's listener: %v", err)
-	}
+func (s *MuxServer) GRPCListener() net.Listener {
+	return s.mux.Match(cmux.HTTP2HeaderField("content-type", "application/grpc"))
+}
+
+func (s *MuxServer) HTTPListener() net.Listener {
+	return s.mux.Match(cmux.HTTP2(), cmux.HTTP1Fast())
 }

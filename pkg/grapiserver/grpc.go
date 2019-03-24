@@ -1,6 +1,7 @@
 package grapiserver
 
 import (
+	"context"
 	"net"
 
 	"google.golang.org/grpc"
@@ -31,7 +32,15 @@ func NewGrpcServer(c *Config) internal.Server {
 }
 
 // Serve implements Server.Shutdown
-func (s *GrpcServer) Serve(l net.Listener) error {
+func (s *GrpcServer) Serve(ctx context.Context, l net.Listener) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	go func() {
+		<-ctx.Done()
+		s.server.GracefulStop()
+	}()
+
 	grpclog.Infof("gRPC server is starting %s", l.Addr())
 
 	err := s.server.Serve(l)
@@ -39,9 +48,4 @@ func (s *GrpcServer) Serve(l net.Listener) error {
 	grpclog.Infof("gRPC server stopped: %v", err)
 
 	return errors.Wrap(err, "failed to serve gRPC server")
-}
-
-// Shutdown implements Server.Shutdown
-func (s *GrpcServer) Shutdown() {
-	s.server.GracefulStop()
 }

@@ -27,7 +27,7 @@ type GatewayServer struct {
 }
 
 // Serve implements Server.Shutdown
-func (s *GatewayServer) Serve(l net.Listener) error {
+func (s *GatewayServer) Serve(ctx context.Context, l net.Listener) error {
 	conn, err := s.createConn()
 	if err != nil {
 		return errors.Wrap(err, "failed to create connection with grpc-gateway server")
@@ -38,6 +38,14 @@ func (s *GatewayServer) Serve(l net.Listener) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to create gRPC Gateway server: %v")
 	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	go func() {
+		<-ctx.Done()
+		s.shutdown()
+	}()
 
 	grpclog.Infof("grpc-gateway server is starting %s", l.Addr())
 
@@ -52,8 +60,7 @@ func (s *GatewayServer) Serve(l net.Listener) error {
 	return nil
 }
 
-// Shutdown implements Server.Shutdown
-func (s *GatewayServer) Shutdown() {
+func (s *GatewayServer) shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	err := s.server.Shutdown(ctx)

@@ -34,15 +34,16 @@ func orDie(t *testing.T, err error) {
 func startServer(t *testing.T, s *grapiserver.Engine) func() {
 	var wg sync.WaitGroup
 	wg.Add(1)
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		defer wg.Done()
-		if err := s.Serve(); err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
+		if err := s.ServeContext(ctx); err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
 			t.Errorf("Engine.Serve returned an error: %v", err)
 		}
 	}()
 	waitForServer()
 	return func() {
-		s.Shutdown()
+		cancel()
 		wg.Wait()
 	}
 }
