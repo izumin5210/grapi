@@ -98,5 +98,16 @@ func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) e
 		}
 	}
 
+	u.gexCfg.WorkingDir = rootDir
+	u.gexCfg.RootDir = rootDir
+	toolRepo, err := u.gexCfg.Create()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	err = toolRepo.BuildAll(context.Background())
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
 	return nil
 }
