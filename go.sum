@@ -130,6 +130,8 @@ github.com/izumin5210/clig v0.2.0 h1:msbqSd7m4z1FF+0V+31T4/St3evxDaxnq+1TYro9gXs
 github.com/izumin5210/clig v0.2.0/go.mod h1:ThTkzDLziQQrsaeAuzhhV+EzDbzUBlNbxrDs8HTJ9qM=
 github.com/izumin5210/gex v0.4.4 h1:0k/sBw4XvcaSEb8JyCxIM8xmQQBdK7buKTxFZCsPuMQ=
 github.com/izumin5210/gex v0.4.4/go.mod h1:a3mEUh4AHD05YgcgPnLqyScKTqG39Ap5wHLQZlbM1WI=
+github.com/izumin5210/gex v0.4.5 h1:qa9MWsGgRislHyNM98786YxolDgEbPP595Ajz/p7VXQ=
+github.com/izumin5210/gex v0.4.5/go.mod h1:a3mEUh4AHD05YgcgPnLqyScKTqG39Ap5wHLQZlbM1WI=
 github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15 h1:cW/amwGEJK5MSKntPXRjX4dxs/nGxGT8gXKIsKFmHGc=
 github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15/go.mod h1:Fdm/oWRW+CH8PRbLntksCNtmcCBximKPkVQYvmMl80k=
 github.com/jessevdk/go-assets-builder v0.0.0-20130903091706-b8483521738f h1:K2zqtTU3T3ZX/vVeFtJ1OoxEm+gsLhu3zQ34tKgOAyk=
