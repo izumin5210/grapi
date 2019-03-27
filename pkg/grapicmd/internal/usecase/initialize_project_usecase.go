@@ -109,5 +109,12 @@ func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) e
 		return errors.WithStack(err)
 	}
 
+	if !cfg.Dep {
+		_, err := u.excmd.Exec(context.Background(), "go", append([]excmd.Option{excmd.WithArgs("mod", "tidy")}, opts...)...)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
 	return nil
 }
