@@ -79,23 +79,22 @@ func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) e
 		return errors.WithStack(err)
 	}
 
-	if !cfg.Dep {
-		_, err := u.excmd.Exec(context.Background(), "go", append([]excmd.Option{excmd.WithArgs("get", "./...")}, opts...)...)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-	}
-
-	if spec := cfg.BuildSpec(); spec != "" {
-		if cfg.Dep {
+	if cfg.Dep {
+		if spec := cfg.BuildSpec(); spec != "" {
 			u.ui.ItemFailure("--version, --revision, --branch and --HEAD are not supported in dep mode")
-		} else {
-			pkg := "github.com/izumin5210/grapi"
-			args = []string{"get", pkg + "/..." + spec}
+		}
+	} else {
+		if spec := cfg.BuildSpec(); spec != "" {
+			pkg := "github.com/izumin5210/grapi/pkg/grapiserver"
+			args = []string{"get", pkg + spec}
 			_, err := u.excmd.Exec(context.Background(), name, append([]excmd.Option{excmd.WithArgs(args...)}, opts...)...)
 			if err != nil {
 				return errors.WithStack(err)
 			}
+		}
+		_, err := u.excmd.Exec(context.Background(), "go", append([]excmd.Option{excmd.WithArgs("get", "./...")}, opts...)...)
+		if err != nil {
+			return errors.WithStack(err)
 		}
 	}
 
