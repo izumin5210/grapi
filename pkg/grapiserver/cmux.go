@@ -29,7 +29,7 @@ func (s *cmuxServer) Serve() {
 }
 
 func (s *cmuxServer) GRPCListener() net.Listener {
-	return s.mux.Match(cmux.HTTP2HeaderField("content-type", "application/grpc"))
+	return s.mux.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
 }
 
 func (s *cmuxServer) HTTPListener() net.Listener {
