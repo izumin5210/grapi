@@ -172,7 +172,7 @@ func (e *wrapperImpl) getModulePath(ctx context.Context, pkg string) (string, er
 	}
 	buf := new(bytes.Buffer)
 	cmd := e.execer.CommandContext(ctx, "go", "list", "-f", "{{.Dir}}", "-m", pkg)
-	cmd.SetEnv(append(os.Environ(), "GO111MODULE", "on"))
+	cmd.SetEnv(append(os.Environ(), "GO111MODULE=on"))
 	cmd.SetDir(e.rootDir.String())
 	cmd.SetStdout(buf)
 	err := cmd.Run()
