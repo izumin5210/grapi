@@ -57,7 +57,7 @@ jobs:
 
   - stage: deploy
     install: make setup
-    script: make packages -j4
+    script: make grapi-package -j4
     deploy:
     - provider: releases
       skip_cleanup: true
