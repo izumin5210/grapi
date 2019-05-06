@@ -69,6 +69,17 @@ workflows:
 
       - test:
           <<: *go-1-12
+          name: 'lint'
+          context: reviewdog
+          commands:
+            - run: go get github.com/izumin5210/gex/cmd/gex
+            - run: gex --build
+            - run: gex reviewdog -reporter=github-pr-review
+          requires:
+            - setup-1.12
+
+      - test:
+          <<: *go-1-12
           name: 'test-1.12'
           commands:
             - run: make cover
