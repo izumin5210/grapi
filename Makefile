@@ -84,8 +84,8 @@ cover:
 	go test $(GO_TEST_FLAGS) $(GO_COVER_FLAGS) ./...
 
 .PHONY: test-e2e
-test-e2e:
-	@./_tests/e2e/run_test.sh
+test-e2e: bin/grapi
+	go test $(GO_TEST_FLAGS) ./_tests/e2e --grapi=$$PWD/bin/grapi --revision="$(TARGET_REVISION)"
 
 .PHONY: all
 all: $(GENERATED_BINS)
