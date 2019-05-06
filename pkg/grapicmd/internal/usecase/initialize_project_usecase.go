@@ -51,7 +51,7 @@ func (u *initializeProjectUsecase) Perform(rootDir string, cfg InitConfig) error
 	u.ui.Subsection("Install dependencies")
 	err = u.InstallDeps(rootDir, cfg)
 	if err != nil {
-		return errors.Wrap(err, "failed to execute `dep ensure`")
+		return errors.Wrap(err, "failed to install dependencies")
 	}
 
 	return nil
