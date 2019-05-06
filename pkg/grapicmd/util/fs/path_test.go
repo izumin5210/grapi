@@ -30,9 +30,9 @@ func Test_GetImportPath(t *testing.T) {
 			out:  "testapp",
 		},
 		{
-			test:  "outside of GOPATH",
-			in:    "/home/go/testapp",
-			isErr: true,
+			test: "outside of GOPATH",
+			in:   "/home/go/testapp",
+			out:  "testapp",
 		},
 	}
 
@@ -84,9 +84,9 @@ func Test_GetPackageName(t *testing.T) {
 			out:  "com.example.go.test_app",
 		},
 		{
-			test:  "outside of GOPATH",
-			in:    "/home/go/testapp",
-			isErr: true,
+			test: "outside of GOPATH",
+			in:   "/home/go/testapp",
+			out:  "testuser.testapp",
 		},
 	}
 

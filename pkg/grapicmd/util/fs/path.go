@@ -43,7 +43,7 @@ func GetImportPath(rootPath string) (importPath string, err error) {
 		}
 	}
 	if importPath == "" {
-		err = errors.New("failed to get the import path")
+		importPath = filepath.Base(rootPath)
 	}
 	return
 }

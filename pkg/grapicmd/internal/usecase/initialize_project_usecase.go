@@ -2,9 +2,11 @@ package usecase
 
 import (
 	"context"
+	"path/filepath"
 
 	"github.com/izumin5210/gex"
 	"github.com/pkg/errors"
+	"github.com/spf13/afero"
 
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/excmd"
@@ -19,9 +21,10 @@ type InitializeProjectUsecase interface {
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui cli.UI, generator module.ProjectGenerator, excmd excmd.Executor, gexCfg *gex.Config) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui cli.UI, fs afero.Fs, generator module.ProjectGenerator, excmd excmd.Executor, gexCfg *gex.Config) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
 		ui:        ui,
+		fs:        fs,
 		generator: generator,
 		excmd:     excmd,
 		gexCfg:    gexCfg,
@@ -30,6 +33,7 @@ func NewInitializeProjectUsecase(ui cli.UI, generator module.ProjectGenerator, e
 
 type initializeProjectUsecase struct {
 	ui        cli.UI
+	fs        afero.Fs
 	generator module.ProjectGenerator
 	excmd     excmd.Executor
 	gexCfg    *gex.Config
@@ -47,7 +51,7 @@ func (u *initializeProjectUsecase) Perform(rootDir string, cfg InitConfig) error
 	u.ui.Subsection("Install dependencies")
 	err = u.InstallDeps(rootDir, cfg)
 	if err != nil {
-		return errors.Wrap(err, "failed to execute `dep ensure`")
+		return errors.Wrap(err, "failed to install dependencies")
 	}
 
 	return nil
@@ -58,25 +62,34 @@ func (u *initializeProjectUsecase) GenerateProject(rootDir, pkgName string) erro
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) error {
-	var (
-		name string
-		args []string
-		opts = []excmd.Option{
-			excmd.WithDir(rootDir),
-			excmd.WithIOConnected(),
-		}
-	)
-	if cfg.Dep {
-		name = "dep"
-		args = []string{"init"}
-	} else {
-		name = "go"
-		args = []string{"mod", "init"}
+	opts := []excmd.Option{
+		excmd.WithDir(rootDir),
+		excmd.WithIOConnected(),
+	}
+	if !cfg.Dep {
 		opts = append(opts, excmd.WithEnv("GO111MODULE", "on"))
 	}
-	_, err := u.excmd.Exec(context.Background(), name, append([]excmd.Option{excmd.WithArgs(args...)}, opts...)...)
-	if err != nil {
+
+	invoke := func(name string, args ...string) error {
+		_, err := u.excmd.Exec(context.Background(), name, append([]excmd.Option{excmd.WithArgs(args...)}, opts...)...)
 		return errors.WithStack(err)
+	}
+
+	if cfg.Dep {
+		err := invoke("dep", "init")
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	} else if ok, _ := afero.Exists(u.fs, filepath.Join(rootDir, "go.mod")); ok {
+		err := invoke("go", "mod", "tidy")
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	} else {
+		err := invoke("go", "mod", "init", filepath.Base(rootDir))
+		if err != nil {
+			return errors.WithStack(err)
+		}
 	}
 
 	if cfg.Dep {
@@ -86,13 +99,12 @@ func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) e
 	} else {
 		if spec := cfg.BuildSpec(); spec != "" {
 			pkg := "github.com/izumin5210/grapi/pkg/grapiserver"
-			args = []string{"get", pkg + spec}
-			_, err := u.excmd.Exec(context.Background(), name, append([]excmd.Option{excmd.WithArgs(args...)}, opts...)...)
+			err := invoke("go", "get", pkg+spec)
 			if err != nil {
 				return errors.WithStack(err)
 			}
 		}
-		_, err := u.excmd.Exec(context.Background(), "go", append([]excmd.Option{excmd.WithArgs("get", "./...")}, opts...)...)
+		err := invoke("go", "get", "./...")
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -110,7 +122,7 @@ func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) e
 	}
 
 	if !cfg.Dep {
-		_, err := u.excmd.Exec(context.Background(), "go", append([]excmd.Option{excmd.WithArgs("mod", "tidy")}, opts...)...)
+		err := invoke("go", "mod", "tidy")
 		if err != nil {
 			return errors.WithStack(err)
 		}
