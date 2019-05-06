@@ -125,6 +125,7 @@ workflows:
           <<: *go-1-12
           packages: ./cmd/grapi
           workspace-root: /go/src/github.com/izumin5210/grapi
+          ldflags: "-X main.revision=$(git describe --always) -X main.buildDate=$(date +'%Y-%m-%dT%H:%M:%SZ')"
           requires:
             - setup-1.12
 
