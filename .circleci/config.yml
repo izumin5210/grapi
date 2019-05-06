@@ -1,0 +1,134 @@
+version: 2.1
+
+orbs:
+  go-module: timakin/go-module@0.3.0
+  go-crossbuild: izumin5210/go-crossbuild@0.1.0
+  github-release: izumin5210/github-release@0.1.1
+  homebrew: izumin5210/homebrew@0.1.1
+
+executors:
+  golang:
+    parameters:
+      version:
+        type: string
+        default: '1.12'
+    working_directory: /go/src/github.com/izumin5210/grapi
+    docker:
+      - image: circleci/golang:<< parameters.version >>
+    environment:
+      - GO111MODULE: "on"
+
+jobs:
+  test:
+    parameters:
+      executor:
+        type: executor
+      commands:
+        type: steps
+    executor: << parameters.executor >>
+    steps:
+      - attach_workspace:
+          at: /go/src/github.com/izumin5210/grapi
+      - steps: << parameters.commands >>
+
+aliases:
+  go1.11: &go-1-11
+    executor:
+      name: golang
+      version: '1.11'
+  go1.12: &go-1-12
+    executor:
+      name: golang
+      version: '1.12'
+  filter-all: &filter-all
+    filters:
+      tags:
+        only: /.*/
+  filter-release: &filter-release
+    filters:
+      branches:
+        ignore: /.*/
+      tags:
+        only: /^v\d+\.\d+\.\d+$/
+
+workflows:
+  build_and_release:
+    jobs:
+      - go-module/download: &setup-base
+          <<: *filter-all
+          <<: *go-1-12
+          name: 'setup-1.12'
+          persist-to-workspace: true
+          vendoring: true
+          workspace-root: /go/src/github.com/izumin5210/grapi
+
+      - go-module/download:
+          <<: *setup-base
+          <<: *go-1-11
+          name: 'setup-1.11'
+
+      - test:
+          <<: *go-1-12
+          name: 'test-1.12'
+          commands:
+            - run: make cover
+            - run: bash <(curl -s https://codecov.io/bash)
+          requires:
+            - setup-1.12
+
+      - test:
+          <<: *go-1-11
+          name: 'test-1.11'
+          commands:
+            - run: make test
+          requires:
+            - setup-1.11
+
+      - test: &test-e2e-base
+          <<: *go-1-12
+          name: 'test-e2e-1.12'
+          commands:
+            - run:
+                name: Install protoc
+                command: |
+                  PROTOC_VERSION=3.7.1
+                  archive=protoc-$PROTOC_VERSION-linux-x86_64
+                  curl -O -L https://github.com/protocolbuffers/protobuf/releases/download/v$PROTOC_VERSION/$archive.zip
+                  unzip -d $archive $archive.zip
+                  sudo cp -rv $archive/bin/* /usr/local/bin/
+                  sudo cp -rv $archive/include/* /usr/local/include/
+                  rm -rf $archive*
+            - run: make test-e2e TARGET_REVISION=$CIRCLE_SHA1
+          requires:
+            - setup-1.12
+
+      - test:
+          <<: *test-e2e-base
+          <<: *go-1-11
+          name: 'test-e2e-1.11'
+          requires:
+            - setup-1.11
+
+      - go-crossbuild/build:
+          <<: *filter-all
+          <<: *go-1-12
+          packages: ./cmd/grapi
+          workspace-root: /go/src/github.com/izumin5210/grapi
+          requires:
+            - setup-1.12
+
+      - github-release/create:
+          <<: *filter-release
+          context: tool-releasing
+          requires:
+            - test-1.12
+            - test-1.11
+            - test-e2e-1.12
+            - test-e2e-1.11
+            - go-crossbuild/build
+
+      - homebrew/update:
+          <<: *filter-release
+          context: tool-releasing
+          requires:
+            - github-release/create
