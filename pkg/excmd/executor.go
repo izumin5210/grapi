@@ -34,19 +34,37 @@ func (e *executor) Exec(ctx context.Context, name string, opts ...Option) (out [
 	cmd.Dir = c.Dir
 	cmd.Env = c.Env
 
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh)
+	cCtx, cancel := context.WithCancel(context.Background())
+
 	wg.Add(1)
 
 	go func() {
 		defer wg.Done()
-		defer recover()
-		for sig := range sigCh {
-			zap.L().Debug("signal received", zap.Stringer("signal", sig))
-			if cmd.ProcessState == nil || cmd.ProcessState.Exited() {
-				break
+		select {
+		case <-ctx.Done():
+			cmd.Process.Signal(os.Interrupt)
+		case <-cCtx.Done():
+			// no-op
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh)
+
+		for {
+			select {
+			case sig := <-sigCh:
+				zap.L().Debug("signal received", zap.Stringer("signal", sig))
+				cmd.Process.Signal(sig)
+			case <-cCtx.Done():
+				signal.Stop(sigCh)
+				close(sigCh)
+				return
 			}
-			cmd.Process.Signal(sig)
 		}
 	}()
 
@@ -55,10 +73,9 @@ func (e *executor) Exec(ctx context.Context, name string, opts ...Option) (out [
 		err = errors.WithStack(err)
 	}
 
-	signal.Reset()
-	close(sigCh)
-
+	cancel()
 	wg.Wait()
+
 	return
 }
 
