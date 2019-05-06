@@ -37,8 +37,6 @@ require (
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/mitchellh/gox v0.4.0
-	github.com/mitchellh/iochan v0.0.0-20150529224432-87b45ffd0e95 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/serenize/snaker v0.0.0-20171204205717-a683aaf2d516
 	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414
