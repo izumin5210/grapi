@@ -7,7 +7,7 @@ REVISION ?= $(shell git describe --always)
 BUILD_DATE ?= $(shell date +'%Y-%m-%dT%H:%M:%SZ')
 
 GO_BUILD_FLAGS := -v
-GO_TEST_FLAGS := -v -timeout 2m
+GO_TEST_FLAGS := -v
 GO_COVER_FLAGS := -coverprofile coverage.txt -covermode atomic
 SRC_FILES := $(shell go list -f '{{range .GoFiles}}{{printf "%s/%s\n" $$.Dir .}}{{end}}' ./...)
 
@@ -85,7 +85,7 @@ cover:
 
 .PHONY: test-e2e
 test-e2e: bin/grapi
-	go test $(GO_TEST_FLAGS) ./_tests/e2e --grapi=$$PWD/bin/grapi --revision="$(TARGET_REVISION)"
+	go test $(GO_TEST_FLAGS) -timeout 4m ./_tests/e2e --grapi=$$PWD/bin/grapi --revision="$(TARGET_REVISION)"
 
 .PHONY: all
 all: $(GENERATED_BINS)
