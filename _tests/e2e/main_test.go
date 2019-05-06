@@ -206,7 +206,7 @@ func updateRun(t *testing.T, rootPath string, port int) {
 					n.Specs = append(n.Specs, &ast.ImportSpec{
 						Path: &ast.BasicLit{
 							Kind:  token.STRING,
-							Value: strconv.Quote("sample/app/server"),
+							Value: strconv.Quote("sampleapp/app/server"),
 						},
 					})
 				}
@@ -282,7 +282,7 @@ func updateServerImpl(t *testing.T, rootPath string) {
 							Name: &ast.Ident{Name: "api_pb"},
 							Path: &ast.BasicLit{
 								Kind:  token.STRING,
-								Value: strconv.Quote("sample/api"),
+								Value: strconv.Quote("sampleapp/api"),
 							},
 						},
 					}
