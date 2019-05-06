@@ -81,6 +81,6 @@ func NewInitializeProjectUsecase(ctx *grapicmd.Ctx) usecase.InitializeProjectUse
 	ui := cli.UIInstance(io)
 	generator := ProvideGenerator(ctx, ui)
 	executor := excmd.NewExecutor(io)
-	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, generator, executor)
+	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, fs, generator, executor)
 	return initializeProjectUsecase
 }

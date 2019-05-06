@@ -3,6 +3,7 @@ package di
 import (
 	"github.com/google/wire"
 	"github.com/izumin5210/gex"
+	"github.com/spf13/afero"
 
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/excmd"
@@ -25,9 +26,10 @@ func ProvideScriptLoader(ctx *grapicmd.Ctx, executor excmd.Executor) module.Scri
 	return script.NewLoader(ctx.FS, executor, ctx.RootDir.String())
 }
 
-func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui cli.UI, generator module.Generator, excmd excmd.Executor) usecase.InitializeProjectUsecase {
+func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui cli.UI, fs afero.Fs, generator module.Generator, excmd excmd.Executor) usecase.InitializeProjectUsecase {
 	return usecase.NewInitializeProjectUsecase(
 		ui,
+		fs,
 		generator,
 		excmd,
 		gexCfg,
