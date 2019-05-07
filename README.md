@@ -1,5 +1,5 @@
 # ![grapi](./grapi.png)
-[![Build Status](https://travis-ci.org/izumin5210/grapi.svg?branch=master)](https://travis-ci.org/izumin5210/grapi)
+[![CircleCI](https://circleci.com/gh/izumin5210/grapi/tree/master.svg?style=svg)](https://circleci.com/gh/izumin5210/grapi/tree/master)
 [![GoDoc](https://godoc.org/github.com/izumin5210/grapi/pkg/grapiserver?status.svg)](https://godoc.org/github.com/izumin5210/grapi/pkg/grapiserver)
 [![Go Report Card](https://goreportcard.com/badge/github.com/izumin5210/grapi)](https://goreportcard.com/report/github.com/izumin5210/grapi)
 [![Go project version](https://badge.fury.io/go/github.com%2Fizumin5210%2Fgrapi.svg)](https://badge.fury.io/go/github.com%2Fizumin5210%2Fgrapi)

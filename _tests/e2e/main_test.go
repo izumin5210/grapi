@@ -3,118 +3,183 @@ package main
 import (
 	"bytes"
 	"context"
+	"flag"
 	"fmt"
 	"go/ast"
 	"go/format"
 	"go/parser"
 	"go/token"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
+
+	"golang.org/x/tools/go/packages/packagestest"
 )
 
-func Test_Integration(t *testing.T) {
-	wd, err := os.Getwd()
-	orDie(t, err)
+var (
+	grapiCmd = flag.String("grapi", "grapi", "path of grapi command")
+	revision = flag.String("revision", "", "target revision")
+)
 
-	srcDir := filepath.Dir(wd)
+func TestE2E_withModules(t *testing.T) {
+	invokeE2ETest(t, packagestest.Modules)
+}
 
-	os.Setenv("GO111MODULE", "on")
+func TestE2E_withDep(t *testing.T) {
+	t.SkipNow()
+	invokeE2ETest(t, packagestest.GOPATH)
+}
 
-	name := "sample"
-	rootPath := filepath.Join(srcDir, name)
+func invokeE2ETest(t *testing.T, exporter packagestest.Exporter) {
+	t.Helper()
 
-	// defer os.RemoveAll(rootPath)
+	exported := packagestest.Export(t, exporter, []packagestest.Module{
+		{Name: "sampleapp", Files: map[string]interface{}{".keep": ""}},
+	})
+	defer exported.Cleanup()
 
-	args := []string{"--debug", "init"}
-	if commit, ok := os.LookupEnv("TARGET_REVISION"); ok {
-		args = append(args, "--revision="+commit)
-	} else {
-		args = append(args, "--HEAD")
+	rootPath := exported.Config.Dir
+	exported.Config.Dir = filepath.Dir(rootPath)
+	checkNoErr(t, os.RemoveAll(rootPath))
+
+	// init
+	{
+		args := []string{"--debug", "init"}
+		if *revision != "" {
+			args = append(args, "--revision="+*revision)
+		} else {
+			args = append(args, "--HEAD")
+		}
+		if exporter.Name() == "GOPATH" {
+			args = append(args, "--use-dep")
+		}
+		args = append(args, filepath.Base(rootPath))
+		invoke(t, exported, exec.Command(*grapiCmd, args...))
+		checkExistence(t, rootPath)
+		t.Log("Initialize a project successfully")
 	}
-	if os.Getenv("USE_DEP") == "1" {
-		args = append(args, "--use-dep")
+
+	exported.Config.Dir = rootPath
+
+	// generate service
+	{
+		invoke(t, exported, exec.Command(*grapiCmd, "--debug", "g", "service", "book", "list"))
+		checkExistence(t, filepath.Join(rootPath, "app", "server", "book_server.go"))
+		t.Log("Generate a service successfully")
 	}
-	args = append(args, name)
 
-	run(t, srcDir, exec.Command("grapi", args...))
-
-	if !exists(t, rootPath) {
-		t.Fatalf("%s does not exist: %v", rootPath, err)
-	}
-	t.Log("Initialize a project successfully")
-
-	run(t, rootPath, exec.Command("grapi", "--debug", "g", "service", "book", "list"))
-
-	svrPath := filepath.Join(rootPath, "app", "server", "book_server.go")
-	if !exists(t, svrPath) {
-		t.Fatalf("%s does not exist: %v", svrPath, err)
-	}
-	t.Log("Generate a service successfully")
-
-	port := 15261
-
+	port := getFreePort(t)
 	updateRun(t, rootPath, port)
 	updateServerImpl(t, rootPath)
 
-	t.Log("Start the server")
-	svrCtx, cancel := context.WithCancel(context.Background())
-	cmd := exec.CommandContext(svrCtx, "grapi", "--debug", "server")
-	cmd.Dir = rootPath
+	// run server
+	{
+		t.Log("Start the server")
+		cmd := exec.Command(*grapiCmd, "--debug", "server")
+		sdCh := make(chan struct{}, 1)
+		go func() {
+			defer close(sdCh)
+			invoke(t, exported, cmd)
+		}()
+
+		startedAt := time.Now()
+		var (
+			resp     *http.Response
+			retryCnt int
+			err      error
+		)
+
+		for {
+			func() {
+				defer recover()
+				resp, err = http.Get(fmt.Sprintf("http://localhost:%d/books", port))
+			}()
+			if err != nil && time.Since(startedAt) < 120*time.Second {
+				time.Sleep(5 * time.Second)
+				retryCnt++
+			} else {
+				break
+			}
+		}
+
+		if err != nil {
+			t.Fatalf("Unexpected error (retry count: %d): %v", retryCnt, err)
+		}
+
+		if got, want := resp.StatusCode, 200; got != want {
+			t.Errorf("Response status is %d, want %d", got, want)
+		}
+
+		t.Log("HTTP Request successfully")
+
+		sendSignal(t, cmd, os.Interrupt)
+		toCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		select {
+		case <-sdCh:
+			t.Log("Shutdown server successfully")
+		case <-toCtx.Done():
+			t.Log("Deadline exceeded stopping server")
+			sendSignal(t, cmd, os.Kill)
+			<-sdCh
+		}
+	}
+}
+
+func invoke(t *testing.T, exported *packagestest.Exported, cmd *exec.Cmd) {
+	t.Helper()
+	cmd.Dir = exported.Config.Dir
+	for _, kv := range exported.Config.Env {
+		if strings.HasPrefix(kv, "GOPROXY=") {
+			continue
+		}
+		cmd.Env = append(cmd.Env, kv)
+	}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err = cmd.Start()
+	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
+		t.Fatalf("failed to execute command %v: %v", cmd, err)
 	}
-	defer func() {
-		if cmd.Process != nil && cmd.ProcessState != nil && !cmd.ProcessState.Exited() {
-			cmd.Process.Kill()
-		}
-	}()
+}
 
-	startedAt := time.Now()
-	var resp *http.Response
-	var retryCnt int
-
-	for {
-		func() {
-			defer recover()
-			resp, err = http.Get(fmt.Sprintf("http://localhost:%d/books", port))
-		}()
-		if err != nil && time.Since(startedAt) < 120*time.Second {
-			time.Sleep(5 * time.Second)
-			retryCnt++
-		} else {
-			break
-		}
-	}
-
+func checkNoErr(t *testing.T, err error) {
+	t.Helper()
 	if err != nil {
-		t.Fatalf("Unexpected error (retry count: %d): %v", retryCnt, err)
+		t.Fatalf("unexpected error: %v", err)
 	}
+}
 
-	if got, want := resp.StatusCode, 200; got != want {
-		t.Errorf("Response status is %d, want %d", got, want)
+func checkExistence(t *testing.T, path string) {
+	t.Helper()
+	_, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			t.Fatalf("%s does not exist: %v", path, err)
+		}
+		t.Fatalf("failed to check file existence: %v", err)
 	}
+}
 
-	t.Log("HTTP Request successfully")
+func getFreePort(t *testing.T) int {
+	t.Helper()
+	lis, err := net.Listen("tcp", ":0")
+	checkNoErr(t, err)
+	defer lis.Close()
 
-	cancel()
-	toCtx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	select {
-	case <-svrCtx.Done():
-		t.Log("Shutdown server successfully")
-	case <-toCtx.Done():
-		t.Log("Deadline exceeded stopping server")
-		cmd.Process.Signal(os.Kill)
-	}
-	err = cmd.Wait()
+	return lis.Addr().(*net.TCPAddr).Port
+}
+
+func sendSignal(t *testing.T, cmd *exec.Cmd, sig os.Signal) {
+	t.Helper()
+	checkNoErr(t, cmd.Process.Signal(sig))
 }
 
 type visitor struct {
@@ -127,15 +192,11 @@ func (v *visitor) Visit(node ast.Node) ast.Visitor {
 
 func updateRun(t *testing.T, rootPath string, port int) {
 	data, err := ioutil.ReadFile(filepath.Join(rootPath, "cmd", "server", "run.go"))
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
+	checkNoErr(t, err)
 
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, "", data, parser.DeclarationErrors)
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
+	checkNoErr(t, err)
 
 	ast.Walk(&visitor{
 		VisitFunc: func(v ast.Visitor, n ast.Node) ast.Visitor {
@@ -145,7 +206,7 @@ func updateRun(t *testing.T, rootPath string, port int) {
 					n.Specs = append(n.Specs, &ast.ImportSpec{
 						Path: &ast.BasicLit{
 							Kind:  token.STRING,
-							Value: strconv.Quote("sample/app/server"),
+							Value: strconv.Quote("sampleapp/app/server"),
 						},
 					})
 				}
@@ -186,26 +247,18 @@ func updateRun(t *testing.T, rootPath string, port int) {
 
 	buf := new(bytes.Buffer)
 	err = format.Node(buf, token.NewFileSet(), f)
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
+	checkNoErr(t, err)
 	err = ioutil.WriteFile(filepath.Join(rootPath, "cmd", "server", "run.go"), buf.Bytes(), 0755)
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
+	checkNoErr(t, err)
 }
 
 func updateServerImpl(t *testing.T, rootPath string) {
 	data, err := ioutil.ReadFile(filepath.Join(rootPath, "app", "server", "book_server.go"))
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
+	checkNoErr(t, err)
 
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, "", data, parser.DeclarationErrors)
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
+	checkNoErr(t, err)
 
 	ast.Walk(&visitor{
 		VisitFunc: func(v ast.Visitor, n ast.Node) ast.Visitor {
@@ -229,7 +282,7 @@ func updateServerImpl(t *testing.T, rootPath string) {
 							Name: &ast.Ident{Name: "api_pb"},
 							Path: &ast.BasicLit{
 								Kind:  token.STRING,
-								Value: strconv.Quote("sample/api"),
+								Value: strconv.Quote("sampleapp/api"),
 							},
 						},
 					}
@@ -260,42 +313,7 @@ func updateServerImpl(t *testing.T, rootPath string) {
 
 	buf := new(bytes.Buffer)
 	err = format.Node(buf, token.NewFileSet(), f)
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
+	checkNoErr(t, err)
 	err = ioutil.WriteFile(filepath.Join(rootPath, "app", "server", "book_server.go"), buf.Bytes(), 0755)
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
-}
-
-func run(t *testing.T, dir string, cmd *exec.Cmd) {
-	t.Helper()
-	cmd.Dir = dir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Env = append(os.Environ(), "GO111MODULE=on")
-	err := cmd.Run()
-	if err != nil {
-		t.Fatalf("failed to execute command %v: %v", cmd, err)
-	}
-}
-
-func orDie(t *testing.T, err error) {
-	t.Helper()
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
-}
-
-func exists(t *testing.T, path string) bool {
-	t.Helper()
-	_, err := os.Stat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-		t.Fatalf("failed to check file existence: %v", err)
-	}
-	return true
+	checkNoErr(t, err)
 }
