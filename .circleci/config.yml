@@ -14,22 +14,17 @@ executors:
       version:
         type: string
         default: '1.12'
-    working_directory: /go/src/github.com/izumin5210/grapi
     docker:
       - image: circleci/golang:<< parameters.version >>
     environment:
       - GO111MODULE: "on"
 
 aliases:
-  workspace: &workspace
-    workspace-root: /go/src/github.com/izumin5210/grapi
   go1.11: &go-1-11
-    <<: *workspace
     executor:
       name: golang
       version: '1.11'
   go1.12: &go-1-12
-    <<: *workspace
     executor:
       name: golang
       version: '1.12'
@@ -108,6 +103,7 @@ workflows:
       - go-crossbuild/build:
           <<: *filter-all
           <<: *go-1-12
+          app-name: grapi
           packages: ./cmd/grapi
           ldflags: "-X main.revision=$(git describe --always) -X main.buildDate=$(date +'%Y-%m-%dT%H:%M:%SZ')"
           requires:
