@@ -95,43 +95,44 @@ func (e *Engine) ServeContext(ctx context.Context) error {
 	if gatewayLis != nil {
 		eg.Go(func() error { return gatewayServer.Serve(ctx, gatewayLis) })
 	}
-
-	var wg sync.WaitGroup
-
 	if cmuxServer != nil {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			cmuxServer.Serve()
-		}()
+		eg.Go(func() error { cmuxServer.Serve(); return nil })
 	}
 
+	if e.SignalHanding {
+		defer watchShutdownSignal(cancel)()
+	}
+
+	return errors.WithStack(eg.Wait())
+}
+
+func watchShutdownSignal(cancel context.CancelFunc) func() {
+	var wg sync.WaitGroup
 	doneCh := make(chan struct{}, 1)
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		e.watchShutdownSignal(cancel, doneCh)
+
+		sigCh := make(chan os.Signal, 1)
+
+		signal.Notify(sigCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+		defer signal.Stop(sigCh)
+		defer close(sigCh)
+
+		for {
+			select {
+			case sig := <-sigCh:
+				grpclog.Info("received signal: %v", sig)
+				cancel()
+			case <-doneCh:
+				return
+			}
+		}
 	}()
 
-	err = errors.WithStack(eg.Wait())
-	close(doneCh)
-	wg.Wait()
-
-	return err
-}
-
-func (e *Engine) watchShutdownSignal(cancel context.CancelFunc, doneCh <-chan struct{}) {
-	sigCh := make(chan os.Signal, 1)
-	defer close(sigCh)
-	defer signal.Stop(sigCh)
-	signal.Notify(sigCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	for {
-		select {
-		case sig := <-sigCh:
-			grpclog.Info("received signal: %v", sig)
-			cancel()
-		case <-doneCh:
-			return
-		}
+	return func() {
+		close(doneCh)
+		wg.Wait()
 	}
 }
