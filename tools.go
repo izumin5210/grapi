@@ -14,3 +14,14 @@ import (
 	_ "github.com/jessevdk/go-assets-builder"
 	_ "github.com/srvc/wraperr/cmd/wraperr"
 )
+
+// If you want to use tools, please run the following command:
+//  go generate ./tools.go
+//
+//go:generate go build -v -o=./bin/mockgen github.com/golang/mock/mockgen
+//go:generate go build -v -o=./bin/golangci-lint github.com/golangci/golangci-lint/cmd/golangci-lint
+//go:generate go build -v -o=./bin/wire github.com/google/wire/cmd/wire
+//go:generate go build -v -o=./bin/reviewdog github.com/haya14busa/reviewdog/cmd/reviewdog
+//go:generate go build -v -o=./bin/gex github.com/izumin5210/gex/cmd/gex
+//go:generate go build -v -o=./bin/go-assets-builder github.com/jessevdk/go-assets-builder
+//go:generate go build -v -o=./bin/wraperr github.com/srvc/wraperr/cmd/wraperr
