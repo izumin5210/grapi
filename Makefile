@@ -3,18 +3,16 @@ export PATH
 
 .DEFAULT_GOAL := build
 
-.PHONY: setup
-setup:
-	go mod download
-	@go get github.com/izumin5210/gex/cmd/gex
-	gex --build --verbose
+.PHONY: tools
+tools:
+	go genereate ./tools.go
 
 .PHONY: clean
 clean:
 	rm -rf ./bin/*
 
 .PHONY: gen
-gen:
+gen: tools
 	go generate ./...
 
 .PHONY: grapi
@@ -22,8 +20,8 @@ build:
 	go build -v -o ./bin/grapi ./cmd/grapi
 
 .PHONY: lint
-lint:
-	gex reviewdog -diff="git diff master"
+lint: tools
+	reviewdog -diff="git diff master"
 
 .PHONY: test
 test:
