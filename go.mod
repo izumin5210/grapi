@@ -3,9 +3,7 @@ module github.com/izumin5210/grapi
 go 1.12
 
 require (
-	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/bradleyjkemp/cupaloy v2.2.0+incompatible
-	github.com/containerd/continuity v0.0.0-20190827140505-75bee3e2ccb6 // indirect
 	github.com/fatih/color v1.7.0
 	github.com/golang/mock v1.2.0
 	github.com/golang/protobuf v1.2.0
@@ -20,11 +18,9 @@ require (
 	github.com/jessevdk/go-assets-builder v0.0.0-20130903091706-b8483521738f
 	github.com/jessevdk/go-flags v1.3.0 // indirect
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a
-	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/mattn/go-colorable v0.0.9 // indirect
 	github.com/mattn/go-isatty v0.0.3 // indirect
 	github.com/onsi/gomega v1.4.2 // indirect
-	github.com/ory/dockertest v3.3.5+incompatible // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/serenize/snaker v0.0.0-20171204205717-a683aaf2d516
 	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414
@@ -33,8 +29,6 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.2.1
-	github.com/srvc/wraperr v0.2.0 // indirect
-	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/tcnksm/go-input v0.0.0-20180404061846-548a7d7a8ee8
 	go.uber.org/atomic v1.3.1 // indirect
@@ -48,7 +42,5 @@ require (
 	golang.org/x/tools v0.0.0-20190828213141-aed303cbaa74 // indirect
 	google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8
 	google.golang.org/grpc v1.19.0
-	k8s.io/klog v0.4.0 // indirect
 	k8s.io/utils v0.0.0-20190809000727-6c36bc71fc4a
-	mvdan.cc/unparam v0.0.0-20190310220240-1b9ccfa71afe // indirect
 )
