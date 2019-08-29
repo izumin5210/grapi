@@ -59,8 +59,7 @@ workflows:
           name: 'lint'
           context: reviewdog
           steps:
-            - run: make tools
-            - run: reviewdog -reporter=github-pr-review
+            - run: make lint
           requires:
             - setup-1.12
 
