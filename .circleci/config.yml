@@ -59,9 +59,7 @@ workflows:
           name: 'lint'
           context: reviewdog
           steps:
-            - run: go get github.com/izumin5210/gex/cmd/gex
-            - run: gex --build
-            - run: gex reviewdog -reporter=github-pr-review
+            - run: make lint
           requires:
             - setup-1.12
 
