@@ -11,7 +11,7 @@ require (
 	github.com/google/wire v0.2.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/grpc-gateway v1.8.5
-	github.com/izumin5210/clig v0.3.0
+	github.com/izumin5210/clig v0.3.1
 	github.com/izumin5210/gex v0.5.1
 	github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15
 	github.com/jessevdk/go-assets-builder v0.0.0-20130903091706-b8483521738f
@@ -39,5 +39,5 @@ require (
 	golang.org/x/tools v0.0.0-20190828213141-aed303cbaa74 // indirect
 	google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8
 	google.golang.org/grpc v1.19.0
-	k8s.io/utils v0.0.0-20190809000727-6c36bc71fc4a
+	k8s.io/utils v0.0.0-20190920012459-5008bf6f8cd6
 )
