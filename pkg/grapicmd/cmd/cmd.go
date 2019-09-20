@@ -27,12 +27,13 @@ func NewGrapiCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	}
 
 	clib.AddLoggingFlags(cmd)
+	clib.SetIO(cmd, ctx.IO)
 
 	cmd.AddCommand(
 		newInitCommand(ctx),
 		newProtocCommand(ctx),
 		newBuildCommand(ctx),
-		clib.NewVersionCommand(ctx.IO, ctx.Build),
+		clib.NewVersionCommand(ctx.Build),
 	)
 	cmd.AddCommand(newGenerateCommands(ctx)...)
 	cmd.AddCommand(newUserDefinedCommands(ctx)...)
