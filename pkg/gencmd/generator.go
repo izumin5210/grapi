@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/shurcooL/httpfs/vfsutil"
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/afero"
 	"go.uber.org/zap"
 
@@ -117,7 +117,7 @@ func (g *generatorImpl) listEntries(params interface{}) ([]*Entry, error) {
 			return nil, errors.Wrapf(err, "failed to parse path: %s", tmplPath)
 		}
 
-		data, err := vfsutil.ReadFile(g.templateFS, tmplPath)
+		data, err := fs.ReadFile(g.templateFS, tmplPath)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to read template: %s", tmplPath)
 		}
@@ -133,7 +133,7 @@ func (g *generatorImpl) listEntries(params interface{}) ([]*Entry, error) {
 }
 
 func (g *generatorImpl) listPathTemplates() (tmplPaths []string, err error) {
-	err = vfsutil.Walk(g.templateFS, "/", func(path string, info os.FileInfo, err error) error {
+	err = fs.Walk(g.templateFS, "/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return errors.WithStack(err)
 		}

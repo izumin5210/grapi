@@ -8,6 +8,7 @@ package gencmd
 import (
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/rakyll/statik/fs"
 )
 
 // Injectors from wire.go:
@@ -15,13 +16,16 @@ import (
 func newApp(command *Command) (*App, error) {
 	ctx := ProvideCtx(command)
 	grapicmdCtx := ProvideGrapiCtx(ctx)
-	fs := grapicmd.ProvideFS(grapicmdCtx)
+	aferoFs := grapicmd.ProvideFS(grapicmdCtx)
 	io := grapicmd.ProvideIO(grapicmdCtx)
 	ui := cli.UIInstance(io)
 	rootDir := grapicmd.ProvideRootDir(grapicmdCtx)
-	fileSystem := ProvideTemplateFS(command)
+	fileSystem, err := fs.New()
+	if err != nil {
+		return nil, err
+	}
 	shouldRunFunc := ProvideShouldRun(command)
-	generator := NewGenerator(fs, ui, rootDir, fileSystem, shouldRunFunc)
+	generator := NewGenerator(aferoFs, ui, rootDir, fileSystem, shouldRunFunc)
 	app := &App{
 		Generator: generator,
 		UI:        ui,

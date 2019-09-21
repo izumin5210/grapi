@@ -9,6 +9,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/gencmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
+	"github.com/rakyll/statik/fs"
 )
 
 // Injectors from wire.go:
@@ -16,11 +17,14 @@ import (
 func NewTestApp(command *gencmd.Command, ui cli.UI) (*gencmd.App, error) {
 	ctx := gencmd.ProvideCtx(command)
 	grapicmdCtx := gencmd.ProvideGrapiCtx(ctx)
-	fs := grapicmd.ProvideFS(grapicmdCtx)
+	aferoFs := grapicmd.ProvideFS(grapicmdCtx)
 	rootDir := grapicmd.ProvideRootDir(grapicmdCtx)
-	fileSystem := gencmd.ProvideTemplateFS(command)
+	fileSystem, err := fs.New()
+	if err != nil {
+		return nil, err
+	}
 	shouldRunFunc := gencmd.ProvideShouldRun(command)
-	generator := gencmd.NewGenerator(fs, ui, rootDir, fileSystem, shouldRunFunc)
+	generator := gencmd.NewGenerator(aferoFs, ui, rootDir, fileSystem, shouldRunFunc)
 	app := &gencmd.App{
 		Generator: generator,
 		UI:        ui,

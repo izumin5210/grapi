@@ -12,6 +12,10 @@ import (
 	"github.com/izumin5210/grapi/pkg/protoc"
 )
 
+import (
+	_ "github.com/izumin5210/grapi/pkg/svcgen/template"
+)
+
 // Injectors from wire.go:
 
 func NewApp(command *gencmd.Command) (*App, error) {

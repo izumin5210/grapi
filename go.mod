@@ -21,8 +21,8 @@ require (
 	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/onsi/gomega v1.4.2 // indirect
 	github.com/pkg/errors v0.8.1
+	github.com/rakyll/statik v0.1.6
 	github.com/serenize/snaker v0.0.0-20171204205717-a683aaf2d516
-	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414
 	github.com/soheilhy/cmux v0.1.4
 	github.com/spf13/afero v1.2.2
 	github.com/spf13/cobra v0.0.5

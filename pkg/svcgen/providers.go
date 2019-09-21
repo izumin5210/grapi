@@ -7,6 +7,7 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/protoc"
 	"github.com/izumin5210/grapi/pkg/svcgen/params"
+	_ "github.com/izumin5210/grapi/pkg/svcgen/template"
 )
 
 func ProvideParamsBuilder(rootDir cli.RootDir, protocCfg *protoc.Config, grapiCfg *grapicmd.Config) params.Builder {

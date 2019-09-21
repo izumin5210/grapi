@@ -1,8 +1,6 @@
 package gencmd
 
 import (
-	"net/http"
-
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -31,9 +29,6 @@ type Command struct {
 
 	// ShouldInsideApp will disable the command when a current working directory is not inside of a grapi project.
 	ShouldInsideApp bool
-
-	// TemplateFS contains file templates(required).
-	TemplateFS http.FileSystem
 
 	flags *pflag.FlagSet
 	ctx   *Ctx
