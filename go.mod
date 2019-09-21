@@ -3,7 +3,7 @@ module github.com/izumin5210/grapi
 go 1.12
 
 require (
-	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
+	github.com/bradleyjkemp/cupaloy/v2 v2.5.0
 	github.com/fatih/color v1.7.0
 	github.com/golang/mock v1.2.0
 	github.com/golang/protobuf v1.2.0
