@@ -10,7 +10,9 @@ import (
 
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/excmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
+	"github.com/izumin5210/grapi/pkg/gencmd"
+	_ "github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase/template"
+	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 // InitializeProjectUsecase is an interface to create a new grapi project.
@@ -21,7 +23,7 @@ type InitializeProjectUsecase interface {
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui cli.UI, fs afero.Fs, generator module.ProjectGenerator, excmd excmd.Executor, gexCfg *gex.Config) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui cli.UI, fs afero.Fs, generator gencmd.Generator, excmd excmd.Executor, gexCfg *gex.Config) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
 		ui:        ui,
 		fs:        fs,
@@ -34,7 +36,7 @@ func NewInitializeProjectUsecase(ui cli.UI, fs afero.Fs, generator module.Projec
 type initializeProjectUsecase struct {
 	ui        cli.UI
 	fs        afero.Fs
-	generator module.ProjectGenerator
+	generator gencmd.Generator
 	excmd     excmd.Executor
 	gexCfg    *gex.Config
 }
@@ -58,7 +60,23 @@ func (u *initializeProjectUsecase) Perform(rootDir string, cfg InitConfig) error
 }
 
 func (u *initializeProjectUsecase) GenerateProject(rootDir, pkgName string) error {
-	return errors.WithStack(u.generator.GenerateProject(rootDir, pkgName))
+	importPath, err := fs.GetImportPath(rootDir)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	if pkgName == "" {
+		pkgName, err = fs.GetPackageName(rootDir)
+		if err != nil {
+			return errors.Wrap(err, "failed to decide a package name")
+		}
+	}
+
+	data := map[string]interface{}{
+		"packageName": pkgName,
+		"importPath":  importPath,
+	}
+	return errors.WithStack(u.generator.Generate(data))
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) error {

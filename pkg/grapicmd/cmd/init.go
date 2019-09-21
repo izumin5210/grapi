@@ -28,7 +28,12 @@ func newInitCommand(ctx *grapicmd.Ctx) *cobra.Command {
 			}
 			zap.L().Debug("parseInitArgs", zap.String("root", root))
 
-			return errors.WithStack(di.NewInitializeProjectUsecase(ctx).Perform(root, cfg))
+			u, err := di.NewInitializeProjectUsecase(ctx)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+
+			return errors.WithStack(u.Perform(root, cfg))
 		},
 	}
 

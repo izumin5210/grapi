@@ -9,10 +9,12 @@ import (
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/excmd"
+	"github.com/izumin5210/grapi/pkg/gencmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
 	"github.com/izumin5210/grapi/pkg/protoc"
+	"github.com/rakyll/statik/fs"
 )
 
 // Injectors from wire.go:
@@ -27,13 +29,6 @@ func NewCommandExecutor(ctx *grapicmd.Ctx) excmd.Executor {
 	io := grapicmd.ProvideIO(ctx)
 	executor := excmd.NewExecutor(io)
 	return executor
-}
-
-func NewGenerator(ctx *grapicmd.Ctx) module.Generator {
-	io := grapicmd.ProvideIO(ctx)
-	ui := cli.UIInstance(io)
-	generator := ProvideGenerator(ctx, ui)
-	return generator
 }
 
 func NewScriptLoader(ctx *grapicmd.Ctx) module.ScriptLoader {
@@ -72,15 +67,20 @@ func NewProtocWrapper(ctx *grapicmd.Ctx) (protoc.Wrapper, error) {
 	return wrapper, nil
 }
 
-func NewInitializeProjectUsecase(ctx *grapicmd.Ctx) usecase.InitializeProjectUsecase {
-	fs := grapicmd.ProvideFS(ctx)
+func NewInitializeProjectUsecase(ctx *grapicmd.Ctx) (usecase.InitializeProjectUsecase, error) {
+	aferoFs := grapicmd.ProvideFS(ctx)
 	execInterface := grapicmd.ProvideExecer(ctx)
 	io := grapicmd.ProvideIO(ctx)
 	rootDir := grapicmd.ProvideRootDir(ctx)
-	config := protoc.ProvideGexConfig(fs, execInterface, io, rootDir)
+	config := protoc.ProvideGexConfig(aferoFs, execInterface, io, rootDir)
 	ui := cli.UIInstance(io)
-	generator := ProvideGenerator(ctx, ui)
+	fileSystem, err := fs.New()
+	if err != nil {
+		return nil, err
+	}
+	shouldRunFunc := ProvideShouldRun()
+	generator := gencmd.NewGenerator(aferoFs, ui, rootDir, fileSystem, shouldRunFunc)
 	executor := excmd.NewExecutor(io)
-	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, fs, generator, executor)
-	return initializeProjectUsecase
+	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, aferoFs, generator, executor)
+	return initializeProjectUsecase, nil
 }

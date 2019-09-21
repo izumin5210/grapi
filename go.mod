@@ -13,9 +13,6 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.8.5
 	github.com/izumin5210/clig v0.3.1
 	github.com/izumin5210/gex v0.5.1
-	github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15
-	github.com/jessevdk/go-assets-builder v0.0.0-20130903091706-b8483521738f
-	github.com/jessevdk/go-flags v1.3.0 // indirect
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.9 // indirect

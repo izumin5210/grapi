@@ -9,7 +9,6 @@ import (
 	_ "github.com/golang/mock/mockgen"
 	_ "github.com/google/wire/cmd/wire"
 	_ "github.com/izumin5210/gex/cmd/gex"
-	_ "github.com/jessevdk/go-assets-builder"
 	_ "github.com/rakyll/statik"
 )
 
@@ -19,5 +18,4 @@ import (
 //go:generate go build -v -o=./bin/mockgen github.com/golang/mock/mockgen
 //go:generate go build -v -o=./bin/wire github.com/google/wire/cmd/wire
 //go:generate go build -v -o=./bin/gex github.com/izumin5210/gex/cmd/gex
-//go:generate go build -v -o=./bin/go-assets-builder github.com/jessevdk/go-assets-builder
 //go:generate go build -v -o=./bin/statik github.com/rakyll/statik
