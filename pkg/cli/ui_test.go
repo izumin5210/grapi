@@ -129,7 +129,7 @@ func TestUI_Confirm(t *testing.T) {
 	}
 
 	t.Run("when failed to read", func(t *testing.T) {
-		ui := cli.NewUI(clib.NewBufferedIO())
+		ui := cli.NewUI(clib.NewIO(&errReader{}, new(bytes.Buffer), new(bytes.Buffer)))
 
 		ok, err := ui.Confirm("test")
 
