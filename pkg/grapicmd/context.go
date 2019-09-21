@@ -21,7 +21,7 @@ type Ctx struct {
 	FS     afero.Fs
 	Viper  *viper.Viper
 	Execer exec.Interface
-	IO     clib.IO
+	IO     *clib.IO
 
 	RootDir   cli.RootDir
 	insideApp bool
@@ -121,7 +121,7 @@ var CtxSet = wire.NewSet(
 func ProvideFS(c *Ctx) afero.Fs                 { return c.FS }
 func ProvideViper(c *Ctx) *viper.Viper          { return c.Viper }
 func ProvideExecer(c *Ctx) exec.Interface       { return c.Execer }
-func ProvideIO(c *Ctx) clib.IO                  { return c.IO }
+func ProvideIO(c *Ctx) *clib.IO                 { return c.IO }
 func ProvideRootDir(c *Ctx) cli.RootDir         { return c.RootDir }
 func ProvideConfig(c *Ctx) *Config              { return &c.Config }
 func ProvideBuildConfig(c *Ctx) *clib.Build     { return &c.Build }

@@ -8,7 +8,6 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/izumin5210/clig/pkg/clib"
-	clibtesting "github.com/izumin5210/clig/pkg/clib/testing"
 
 	"github.com/izumin5210/grapi/pkg/cli"
 )
@@ -32,7 +31,7 @@ func TestUI(t *testing.T) {
      ✗  fail!!!
 `
 
-	io := clibtesting.NewFakeIO()
+	io := clib.NewBufferedIO()
 	ui := cli.NewUI(io)
 
 	ui.Section("section 1")
@@ -45,7 +44,7 @@ func TestUI(t *testing.T) {
 	ui.Section("section 2")
 	ui.ItemFailure("fail!!!")
 
-	if got := io.OutBuf.String(); got != want {
+	if got := io.Out.(*bytes.Buffer).String(); got != want {
 		t.Errorf("got:\n%s\nwant:\n%s", got, want)
 	}
 }
@@ -59,12 +58,12 @@ func (r *errReader) Read(p []byte) (n int, err error) {
 
 func TestUI_Confirm(t *testing.T) {
 	type TestContext struct {
-		io *clibtesting.FakeIO
+		io *clib.IO
 		ui cli.UI
 	}
 
 	createTestContext := func() *TestContext {
-		io := clibtesting.NewFakeIO()
+		io := clib.NewBufferedIO()
 		return &TestContext{
 			io: io,
 			ui: cli.NewUI(io),
@@ -106,16 +105,16 @@ func TestUI_Confirm(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.test, func(t *testing.T) {
 			ctx := createTestContext()
-			ctx.io.InBuf.WriteString(c.input)
+			ctx.io.In.(*bytes.Buffer).WriteString(c.input)
 
 			ok, err := ctx.ui.Confirm(c.test)
 
-			if got, want := ctx.io.OutBuf.String(), c.test; !strings.HasPrefix(got, want) {
+			if got, want := ctx.io.Out.(*bytes.Buffer).String(), c.test; !strings.HasPrefix(got, want) {
 				t.Errorf("Confirm() wrote %q, want %q", got, want)
 			}
 
 			wantErrMsg := "input must be Y or n\n"
-			if got, want := strings.Count(ctx.io.OutBuf.String(), wantErrMsg), c.errMsgCnt; got != want {
+			if got, want := strings.Count(ctx.io.Out.(*bytes.Buffer).String(), wantErrMsg), c.errMsgCnt; got != want {
 				t.Errorf("Confirm() wrote %q as error %d times, want %d times", wantErrMsg, got, want)
 			}
 
@@ -130,7 +129,7 @@ func TestUI_Confirm(t *testing.T) {
 	}
 
 	t.Run("when failed to read", func(t *testing.T) {
-		ui := cli.NewUI(&clib.IOContainer{OutW: new(bytes.Buffer), InR: &errReader{}})
+		ui := cli.NewUI(clib.NewIO(&errReader{}, new(bytes.Buffer), new(bytes.Buffer)))
 
 		ok, err := ui.Confirm("test")
 

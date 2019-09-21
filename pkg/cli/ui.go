@@ -30,7 +30,7 @@ var (
 )
 
 // UIInstance retuens a singleton UI instance.
-func UIInstance(io clib.IO) UI {
+func UIInstance(io *clib.IO) UI {
 	uiMu.Lock()
 	defer uiMu.Unlock()
 	if ui == nil {
@@ -40,12 +40,12 @@ func UIInstance(io clib.IO) UI {
 }
 
 // NewUI creates a new UI instance.
-func NewUI(io clib.IO) UI {
+func NewUI(io *clib.IO) UI {
 	return &uiImpl{
-		out: io.Out(),
+		out: io.Out,
 		inputUI: &input.UI{
-			Reader: io.In(),
-			Writer: io.Out(),
+			Reader: io.In,
+			Writer: io.Out,
 		},
 	}
 }

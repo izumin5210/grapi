@@ -26,16 +26,16 @@ var (
 func ProvideGexConfig(
 	fs afero.Fs,
 	execer exec.Interface,
-	io clib.IO,
+	io *clib.IO,
 	rootDir cli.RootDir,
 ) *gex.Config {
 	gexCfgMu.Lock()
 	defer gexCfgMu.Unlock()
 	if gexCfg == nil {
 		gexCfg = &gex.Config{
-			OutWriter:  io.Out(),
-			ErrWriter:  io.Err(),
-			InReader:   io.In(),
+			OutWriter:  io.Out,
+			ErrWriter:  io.Err,
+			InReader:   io.In,
 			FS:         fs,
 			Execer:     execer,
 			WorkingDir: rootDir.String(),

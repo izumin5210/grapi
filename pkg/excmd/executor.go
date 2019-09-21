@@ -16,12 +16,12 @@ import (
 )
 
 // NewExecutor creates a new Executor instance.
-func NewExecutor(io clib.IO) Executor {
+func NewExecutor(io *clib.IO) Executor {
 	return &executor{io: io}
 }
 
 type executor struct {
-	io clib.IO
+	io *clib.IO
 }
 
 func (e *executor) Exec(ctx context.Context, name string, opts ...Option) (out []byte, err error) {
@@ -102,16 +102,16 @@ func (e *executor) exec(c *Command, cmd *exec.Cmd) (out []byte, err error) {
 		wg.Add(2)
 		go func() {
 			defer wg.Done()
-			io.Copy(e.io.Out(), io.TeeReader(outReader, &buf))
+			io.Copy(e.io.Out, io.TeeReader(outReader, &buf))
 		}()
 		closers = append(closers, outReader.Close)
 		go func() {
 			defer wg.Done()
-			io.Copy(e.io.Err(), io.TeeReader(errReader, &buf))
+			io.Copy(e.io.Err, io.TeeReader(errReader, &buf))
 		}()
 		closers = append(closers, errReader.Close)
 
-		cmd.Stdin = e.io.In()
+		cmd.Stdin = e.io.In
 
 		err = cmd.Run()
 		for _, c := range closers {
