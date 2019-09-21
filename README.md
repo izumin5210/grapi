@@ -18,6 +18,68 @@
 
 [![asciicast](https://asciinema.org/a/176280.png)](https://asciinema.org/a/176280)
 
+## :warning: Migrate 0.3.x -> 0.4.x :warning:
+Some tools that are depended by grapi are updated. If you have a grapi project <=v0.3.x, you should migrate it.
+
+<details>
+<summary>:memo: How to migrate</summary>
+
+0. Bump grapi version
+    - If you use [dep](https://golang.github.io/dep/), update `Gopkg.toml`
+      ```diff
+       [[constraint]]
+         name = "github.com/izumin5210/grapi"
+      -  version = "0.3.0"
+      +  version = "0.4.0"
+      ```
+    - and run `dep ensure`
+1. Update [gex](https://github.com/izumin5210/gex) and `tools.go`
+    - ```
+      go get -u github.com/izumin5210/gex/cmd/gex
+      gex --regen
+      ```
+1. Initialize [Go Modules](https://github.com/golang/go/wiki/Modules)
+    - ```
+      go mod init
+      go mod tidy
+      ```
+1. Update `grapi.toml`
+    - ```diff
+      package = "yourcompany.yourappname"
+      
+      [grapi]
+      server_dir = "./app/server"
+   
+      [protoc]
+      protos_dir = "./api/protos"
+      out_dir = "./api"
+      import_dirs = [
+        "./api/protos",
+      -  "./vendor/github.com/grpc-ecosystem/grpc-gateway",
+      -  "./vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis",
+      +  '{{ module "github.com/grpc-ecosystem/grpc-gateway" }}',
+      +  '{{ module "github.com/grpc-ecosystem/grpc-gateway" }}/third_party/googleapis',
+      ]
+   
+        [[protoc.plugins]]
+        name = "go"
+        args = { plugins = "grpc", paths = "source_relative" }
+   
+        [[protoc.plugins]]
+        name = "grpc-gateway"
+        args = { logtostderr = true, paths = "source_relative" }
+   
+        [[protoc.plugins]]
+        name = "swagger"
+        args = { logtostderr = true }
+      ```
+1. Drop dep
+    - ```
+      rm Gopkg.*
+      ```
+
+	
+</details>
 
 ## :warning: Migrate 0.2.x -> 0.3.x :warning:
 grapi v0.3.0 has some breaking changes. If you have a grapi project <=v0.2.x, you should migrate it.
