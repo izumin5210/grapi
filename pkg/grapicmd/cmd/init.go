@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
@@ -28,7 +29,7 @@ func newInitCommand(ctx *grapicmd.Ctx) *cobra.Command {
 			}
 			zap.L().Debug("parseInitArgs", zap.String("root", root))
 
-			u, err := di.NewInitializeProjectUsecase(ctx)
+			u, err := di.NewInitializeProjectUsecase(ctx, clib.Path(root))
 			if err != nil {
 				return errors.WithStack(err)
 			}

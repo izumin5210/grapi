@@ -19,12 +19,13 @@ func NewTestApp(command *gencmd.Command, ui cli.UI) (*gencmd.App, error) {
 	grapicmdCtx := gencmd.ProvideGrapiCtx(ctx)
 	aferoFs := grapicmd.ProvideFS(grapicmdCtx)
 	rootDir := grapicmd.ProvideRootDir(grapicmdCtx)
+	path := gencmd.ProvidePath(rootDir)
 	fileSystem, err := fs.New()
 	if err != nil {
 		return nil, err
 	}
 	shouldRunFunc := gencmd.ProvideShouldRun(command)
-	generator := gencmd.NewGenerator(aferoFs, ui, rootDir, fileSystem, shouldRunFunc)
+	generator := gencmd.NewGenerator(aferoFs, ui, path, fileSystem, shouldRunFunc)
 	app := &gencmd.App{
 		Generator: generator,
 		UI:        ui,

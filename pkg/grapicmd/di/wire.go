@@ -4,6 +4,7 @@ package di
 
 import (
 	"github.com/google/wire"
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/gex/pkg/tool"
 
 	"github.com/izumin5210/grapi/pkg/cli"
@@ -39,7 +40,7 @@ func NewProtocWrapper(*grapicmd.Ctx) (protoc.Wrapper, error) {
 	return nil, nil
 }
 
-func NewInitializeProjectUsecase(*grapicmd.Ctx) (usecase.InitializeProjectUsecase, error) {
+func NewInitializeProjectUsecase(*grapicmd.Ctx, clib.Path) (usecase.InitializeProjectUsecase, error) {
 	wire.Build(Set)
 	return nil, nil
 }

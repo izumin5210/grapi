@@ -20,12 +20,13 @@ func newApp(command *Command) (*App, error) {
 	io := grapicmd.ProvideIO(grapicmdCtx)
 	ui := cli.UIInstance(io)
 	rootDir := grapicmd.ProvideRootDir(grapicmdCtx)
+	path := ProvidePath(rootDir)
 	fileSystem, err := fs.New()
 	if err != nil {
 		return nil, err
 	}
 	shouldRunFunc := ProvideShouldRun(command)
-	generator := NewGenerator(aferoFs, ui, rootDir, fileSystem, shouldRunFunc)
+	generator := NewGenerator(aferoFs, ui, path, fileSystem, shouldRunFunc)
 	app := &App{
 		Generator: generator,
 		UI:        ui,

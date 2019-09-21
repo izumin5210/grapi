@@ -6,10 +6,10 @@
 package di
 
 import (
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/excmd"
-	"github.com/izumin5210/grapi/pkg/gencmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
@@ -67,7 +67,7 @@ func NewProtocWrapper(ctx *grapicmd.Ctx) (protoc.Wrapper, error) {
 	return wrapper, nil
 }
 
-func NewInitializeProjectUsecase(ctx *grapicmd.Ctx) (usecase.InitializeProjectUsecase, error) {
+func NewInitializeProjectUsecase(ctx *grapicmd.Ctx, path clib.Path) (usecase.InitializeProjectUsecase, error) {
 	aferoFs := grapicmd.ProvideFS(ctx)
 	execInterface := grapicmd.ProvideExecer(ctx)
 	io := grapicmd.ProvideIO(ctx)
@@ -78,8 +78,7 @@ func NewInitializeProjectUsecase(ctx *grapicmd.Ctx) (usecase.InitializeProjectUs
 	if err != nil {
 		return nil, err
 	}
-	shouldRunFunc := ProvideShouldRun()
-	generator := gencmd.NewGenerator(aferoFs, ui, rootDir, fileSystem, shouldRunFunc)
+	generator := ProvideGenerator(ctx, ui, aferoFs, fileSystem, path)
 	executor := excmd.NewExecutor(io)
 	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, aferoFs, generator, executor)
 	return initializeProjectUsecase, nil

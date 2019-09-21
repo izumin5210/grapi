@@ -1,0 +1,26 @@
+package = "izumin.sampleapp"
+
+[grapi]
+server_dir = "./app/server"
+
+[protoc]
+protos_dir = "./api/protos"
+out_dir = "./api"
+import_dirs = [
+  "./api/protos",
+  '{{ module "github.com/grpc-ecosystem/grpc-gateway" }}',
+  '{{ module "github.com/grpc-ecosystem/grpc-gateway" }}/third_party/googleapis',
+]
+
+  [[protoc.plugins]]
+  name = "go"
+  args = { plugins = "grpc", paths = "source_relative" }
+
+  [[protoc.plugins]]
+  name = "grpc-gateway"
+  args = { logtostderr = true, paths = "source_relative" }
+
+  [[protoc.plugins]]
+  name = "swagger"
+  args = { logtostderr = true }
+

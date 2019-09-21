@@ -1,7 +1,10 @@
 package di
 
 import (
+	"net/http"
+
 	"github.com/google/wire"
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/gex"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/afero"
@@ -20,6 +23,16 @@ func ProvideScriptLoader(ctx *grapicmd.Ctx, executor excmd.Executor) module.Scri
 	return script.NewLoader(ctx.FS, executor, ctx.RootDir.String())
 }
 
+func ProvideGenerator(ctx *grapicmd.Ctx, ui cli.UI, fs afero.Fs, tmplFs http.FileSystem, outDir clib.Path) gencmd.Generator {
+	return gencmd.NewGenerator(
+		fs,
+		ui,
+		outDir,
+		tmplFs,
+		nil,
+	)
+}
+
 func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui cli.UI, fs afero.Fs, generator gencmd.Generator, excmd excmd.Executor) usecase.InitializeProjectUsecase {
 	return usecase.NewInitializeProjectUsecase(
 		ui,
@@ -30,16 +43,13 @@ func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui c
 	)
 }
 
-func ProvideShouldRun() gencmd.ShouldRunFunc { return nil }
-
 var Set = wire.NewSet(
 	grapicmd.CtxSet,
 	protoc.WrapperSet,
 	cli.UIInstance,
 	excmd.NewExecutor,
 	ProvideScriptLoader,
-	gencmd.NewGenerator,
+	ProvideGenerator,
 	fs.New,
-	ProvideShouldRun,
 	ProvideInitializeProjectUsecase,
 )
