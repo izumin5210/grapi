@@ -1,4 +1,4 @@
-package = "izumin.sampleapp"
+package = "testuser.sampleapp"
 
 [grapi]
 server_dir = "./app/server"

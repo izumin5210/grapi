@@ -52,7 +52,7 @@ func invokeE2ETest(t *testing.T, exporter packagestest.Exporter) {
 
 	// init
 	{
-		args := []string{"--debug", "init"}
+		args := []string{"--debug", "init", "--package", "testuser.sampleapp"}
 		if *revision != "" {
 			args = append(args, "--revision="+*revision)
 		} else {
