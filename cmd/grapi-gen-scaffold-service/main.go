@@ -8,7 +8,6 @@ import (
 
 	"github.com/izumin5210/grapi/pkg/gencmd"
 	"github.com/izumin5210/grapi/pkg/svcgen"
-	"github.com/izumin5210/grapi/pkg/svcgen/template"
 )
 
 func main() {
@@ -35,7 +34,6 @@ func newGenerateCommand(createApp svcgen.CreateAppFunc) *gencmd.Command {
 		Use:             "generate NAME [flags]",
 		Short:           "Generate a new service with standard methods",
 		Args:            cobra.ExactArgs(1),
-		TemplateFS:      template.FS,
 		ShouldInsideApp: true,
 		PreRun: func(c *gencmd.Command, args []string) error {
 			var err error
@@ -69,7 +67,6 @@ func newDestroyCommand(createApp svcgen.CreateAppFunc) *gencmd.Command {
 		Use:             "destroy NAME",
 		Short:           "Destroy an existing service",
 		Args:            cobra.ExactArgs(1),
-		TemplateFS:      template.FS,
 		ShouldInsideApp: true,
 		PreRun: func(c *gencmd.Command, args []string) error {
 			var err error

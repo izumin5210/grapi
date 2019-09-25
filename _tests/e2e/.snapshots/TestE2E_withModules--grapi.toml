@@ -1,4 +1,4 @@
-package = "testcompany.testapp"
+package = "testuser.sampleapp"
 
 [grapi]
 server_dir = "./app/server"

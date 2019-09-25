@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/izumin5210/grapi/cmd/grapi-gen-command/template"
-	"github.com/izumin5210/grapi/pkg/gencmd"
 	"github.com/spf13/cobra"
+
+	_ "github.com/izumin5210/grapi/cmd/grapi-gen-command/template"
+	"github.com/izumin5210/grapi/pkg/gencmd"
 )
 
 func main() {
@@ -24,7 +25,6 @@ func newGenerateCommand() *gencmd.Command {
 		Use:             "generate NAME",
 		Short:           "Generate a new command",
 		Args:            cobra.ExactArgs(1),
-		TemplateFS:      template.FS,
 		ShouldInsideApp: true,
 		BuildParams: func(c *gencmd.Command, args []string) (interface{}, error) {
 			return map[string]string{"name": args[0]}, nil
@@ -37,7 +37,6 @@ func newDestroyCommand() *gencmd.Command {
 		Use:             "destroy NAME",
 		Short:           "Destroy a existing command",
 		Args:            cobra.ExactArgs(1),
-		TemplateFS:      template.FS,
 		ShouldInsideApp: true,
 		BuildParams: func(c *gencmd.Command, args []string) (interface{}, error) {
 			return map[string]string{"name": args[0]}, nil

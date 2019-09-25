@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bradleyjkemp/cupaloy/v2"
 	"golang.org/x/tools/go/packages/packagestest"
 )
 
@@ -51,7 +52,7 @@ func invokeE2ETest(t *testing.T, exporter packagestest.Exporter) {
 
 	// init
 	{
-		args := []string{"--debug", "init"}
+		args := []string{"--debug", "init", "--package", "testuser.sampleapp"}
 		if *revision != "" {
 			args = append(args, "--revision="+*revision)
 		} else {
@@ -67,6 +68,41 @@ func invokeE2ETest(t *testing.T, exporter packagestest.Exporter) {
 	}
 
 	exported.Config.Dir = rootPath
+
+	ignoreFiles := map[string]struct{}{
+		"/go.mod": struct{}{},
+		"/go.sum": struct{}{},
+	}
+
+	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if info.IsDir() {
+			return nil
+		}
+		rel := strings.TrimPrefix(path, rootPath)
+		if _, ok := ignoreFiles[rel]; ok {
+			return nil
+		}
+		if strings.HasPrefix(rel, "/bin/") {
+			return nil
+		}
+
+		t.Run(rel, func(t *testing.T) {
+			data, err := ioutil.ReadFile(path)
+			if err != nil {
+				t.Errorf("failed to open %s: %v", path, err)
+			}
+
+			cupaloy.SnapshotT(t, string(data))
+		})
+
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// generate service
 	{

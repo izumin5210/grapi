@@ -7,10 +7,11 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/shurcooL/httpfs/vfsutil"
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/afero"
 	"go.uber.org/zap"
 
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/grapi/pkg/cli"
 )
 
@@ -22,14 +23,14 @@ type Generator interface {
 func NewGenerator(
 	fs afero.Fs,
 	ui cli.UI,
-	rootDir cli.RootDir,
+	outDir clib.Path,
 	templateFS http.FileSystem,
 	shouldRunFunc ShouldRunFunc,
 ) Generator {
 	return &generatorImpl{
 		fs:            fs,
 		ui:            ui,
-		rootDir:       rootDir,
+		outDir:        outDir,
 		templateFS:    templateFS,
 		shouldRunFunc: shouldRunFunc,
 	}
@@ -39,7 +40,7 @@ type generatorImpl struct {
 	fs afero.Fs
 	ui cli.UI
 
-	rootDir cli.RootDir
+	outDir clib.Path
 
 	templateFS    http.FileSystem
 	shouldRunFunc ShouldRunFunc
@@ -83,7 +84,7 @@ func (g *generatorImpl) Destroy(params interface{}) error {
 			return errors.Wrapf(err, "failed to parse path: %s", tmplPath)
 		}
 
-		absPath := g.rootDir.Join(path).String()
+		absPath := g.outDir.Join(path).String()
 		if ok, err := afero.Exists(g.fs, absPath); err != nil {
 			g.ui.ItemFailure(path)
 			return errors.WithStack(err)
@@ -117,7 +118,7 @@ func (g *generatorImpl) listEntries(params interface{}) ([]*Entry, error) {
 			return nil, errors.Wrapf(err, "failed to parse path: %s", tmplPath)
 		}
 
-		data, err := vfsutil.ReadFile(g.templateFS, tmplPath)
+		data, err := fs.ReadFile(g.templateFS, tmplPath)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to read template: %s", tmplPath)
 		}
@@ -133,7 +134,7 @@ func (g *generatorImpl) listEntries(params interface{}) ([]*Entry, error) {
 }
 
 func (g *generatorImpl) listPathTemplates() (tmplPaths []string, err error) {
-	err = vfsutil.Walk(g.templateFS, "/", func(path string, info os.FileInfo, err error) error {
+	err = fs.Walk(g.templateFS, "/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -157,7 +158,7 @@ func (g *generatorImpl) shouldRun(e *Entry) (bool, error) {
 		return false, nil
 	}
 
-	absPath := g.rootDir.Join(e.Path).String()
+	absPath := g.outDir.Join(e.Path).String()
 
 	if ok, err := afero.Exists(g.fs, absPath); err != nil {
 		return false, errors.WithStack(err)
@@ -186,7 +187,7 @@ func (g *generatorImpl) shouldRun(e *Entry) (bool, error) {
 }
 
 func (g *generatorImpl) writeFile(e *Entry) error {
-	path := g.rootDir.Join(e.Path).String()
+	path := g.outDir.Join(e.Path).String()
 	dir := filepath.Dir(path)
 
 	if ok, err := afero.DirExists(g.fs, dir); err != nil {

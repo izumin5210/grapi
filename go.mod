@@ -13,16 +13,13 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.8.5
 	github.com/izumin5210/clig v0.3.1
 	github.com/izumin5210/gex v0.5.1
-	github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15
-	github.com/jessevdk/go-assets-builder v0.0.0-20130903091706-b8483521738f
-	github.com/jessevdk/go-flags v1.3.0 // indirect
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/onsi/gomega v1.4.2 // indirect
 	github.com/pkg/errors v0.8.1
+	github.com/rakyll/statik v0.1.6
 	github.com/serenize/snaker v0.0.0-20171204205717-a683aaf2d516
-	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414
 	github.com/soheilhy/cmux v0.1.4
 	github.com/spf13/afero v1.2.2
 	github.com/spf13/cobra v0.0.5

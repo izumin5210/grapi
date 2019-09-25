@@ -5,7 +5,7 @@ export PATH
 
 .PHONY: tools
 tools:
-	go genereate ./tools.go
+	go generate ./tools.go
 
 .PHONY: clean
 clean:

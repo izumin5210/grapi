@@ -1,3 +1,3 @@
-//go:generate go run -tags=vfsgen vfsgen.go
+//go:generate statik -src ./_data -dest .. -p template -f -m
 
 package template

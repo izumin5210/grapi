@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/izumin5210/grapi/cmd/grapi-gen-type/di"
-	"github.com/izumin5210/grapi/cmd/grapi-gen-type/template"
+	_ "github.com/izumin5210/grapi/cmd/grapi-gen-type/template"
 	"github.com/izumin5210/grapi/pkg/gencmd"
 	gencmdutil "github.com/izumin5210/grapi/pkg/gencmd/util"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
@@ -37,7 +37,6 @@ func newGenerateCommand(createApp di.CreateAppFunc) *gencmd.Command {
 		Use:             "generate NAME",
 		Short:           "Generate a new type",
 		Args:            cobra.ExactArgs(1),
-		TemplateFS:      template.FS,
 		ShouldInsideApp: true,
 		PreRun: func(c *gencmd.Command, args []string) error {
 			var err error
@@ -58,7 +57,6 @@ func newDestroyCommand() *gencmd.Command {
 		Use:             "destroy NAME",
 		Short:           "Destroy a existing type",
 		Args:            cobra.ExactArgs(1),
-		TemplateFS:      template.FS,
 		ShouldInsideApp: true,
 		BuildParams: func(c *gencmd.Command, args []string) (interface{}, error) {
 			return buildParams(args[0], c.Ctx().Ctx)

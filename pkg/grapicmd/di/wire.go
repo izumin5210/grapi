@@ -4,6 +4,7 @@ package di
 
 import (
 	"github.com/google/wire"
+	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/gex/pkg/tool"
 
 	"github.com/izumin5210/grapi/pkg/cli"
@@ -24,11 +25,6 @@ func NewCommandExecutor(*grapicmd.Ctx) excmd.Executor {
 	return nil
 }
 
-func NewGenerator(*grapicmd.Ctx) module.Generator {
-	wire.Build(Set)
-	return nil
-}
-
 func NewScriptLoader(*grapicmd.Ctx) module.ScriptLoader {
 	wire.Build(Set)
 	return nil
@@ -44,7 +40,7 @@ func NewProtocWrapper(*grapicmd.Ctx) (protoc.Wrapper, error) {
 	return nil, nil
 }
 
-func NewInitializeProjectUsecase(*grapicmd.Ctx) usecase.InitializeProjectUsecase {
+func NewInitializeProjectUsecase(*grapicmd.Ctx, clib.Path) (usecase.InitializeProjectUsecase, error) {
 	wire.Build(Set)
-	return nil
+	return nil, nil
 }
