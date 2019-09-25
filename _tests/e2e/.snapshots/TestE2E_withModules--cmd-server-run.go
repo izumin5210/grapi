@@ -16,6 +16,6 @@ func run() error {
 		// TODO
 		),
 	)
-	return s.ServeContext(ctx)
+	return s.Serve(ctx)
 }
 
