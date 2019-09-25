@@ -138,9 +138,3 @@ func WithDefaultLogger() Option {
 		grpclog.SetLoggerV2(grpclog.NewLoggerV2(os.Stdout, os.Stderr, os.Stderr))
 	}
 }
-
-func WithSignalHandling(enabled bool) Option {
-	return func(c *Config) {
-		c.SignalHanding = enabled
-	}
-}

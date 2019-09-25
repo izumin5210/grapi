@@ -31,7 +31,6 @@ func createDefaultConfig() *Config {
 			IdleTimeout:  2 * time.Minute,
 		},
 		MaxConcurrentStreams: 1000,
-		SignalHanding:        true,
 	}
 	if pkg_runtime.GOOS == "windows" {
 		config.GrpcInternalAddr = &Address{
@@ -105,7 +104,6 @@ type Config struct {
 	GatewayServerConfig             *HTTPServerConfig
 	MaxConcurrentStreams            uint32
 	GatewayServerMiddlewares        []HTTPServerMiddleware
-	SignalHanding                   bool
 }
 
 func (c *Config) serverOptions() []grpc.ServerOption {

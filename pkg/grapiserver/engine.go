@@ -3,16 +3,11 @@ package grapiserver
 import (
 	"context"
 	"net"
-	"os"
-	"os/signal"
 	"reflect"
-	"sync"
-	"syscall"
 
 	"github.com/izumin5210/grapi/pkg/grapiserver/internal"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
-	"google.golang.org/grpc/grpclog"
 )
 
 // Engine is the framework instance.
@@ -28,12 +23,7 @@ func New(opts ...Option) *Engine {
 }
 
 // Serve starts gRPC and Gateway servers.
-func (e *Engine) Serve() error {
-	return errors.WithStack(e.ServeContext(context.Background()))
-}
-
-// ServeContext starts gRPC and Gateway servers.
-func (e *Engine) ServeContext(ctx context.Context) error {
+func (e *Engine) Serve(ctx context.Context) error {
 	var (
 		grpcServer, gatewayServer        internal.Server
 		grpcLis, gatewayLis, internalLis net.Listener
@@ -99,40 +89,5 @@ func (e *Engine) ServeContext(ctx context.Context) error {
 		eg.Go(func() error { cmuxServer.Serve(); return nil })
 	}
 
-	if e.SignalHanding {
-		defer watchShutdownSignal(cancel)()
-	}
-
 	return errors.WithStack(eg.Wait())
-}
-
-func watchShutdownSignal(cancel context.CancelFunc) func() {
-	var wg sync.WaitGroup
-	doneCh := make(chan struct{}, 1)
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
-		sigCh := make(chan os.Signal, 1)
-
-		signal.Notify(sigCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-		defer signal.Stop(sigCh)
-		defer close(sigCh)
-
-		for {
-			select {
-			case sig := <-sigCh:
-				grpclog.Info("received signal: %v", sig)
-				cancel()
-			case <-doneCh:
-				return
-			}
-		}
-	}()
-
-	return func() {
-		close(doneCh)
-		wg.Wait()
-	}
 }
