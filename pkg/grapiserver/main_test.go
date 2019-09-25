@@ -37,7 +37,7 @@ func startServer(t *testing.T, s *grapiserver.Engine) func() {
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		defer wg.Done()
-		if err := s.ServeContext(ctx); err != nil &&
+		if err := s.Serve(ctx); err != nil &&
 			!strings.Contains(err.Error(), "use of closed network connection") &&
 			!strings.Contains(err.Error(), "listener closed") {
 			t.Errorf("Engine.Serve returned an error: %v", err)

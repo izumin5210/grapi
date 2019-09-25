@@ -1,14 +1,14 @@
 package main
 
 import (
-	"context"
+	"github.com/srvc/appctx"
 
 	"github.com/izumin5210/grapi/pkg/grapiserver"
 )
 
 func run() error {
 	// Application context
-	ctx := context.Background()
+	ctx := appctx.Global()
 
 	s := grapiserver.New(
 		grapiserver.WithDefaultLogger(),
@@ -16,6 +16,6 @@ func run() error {
 		// TODO
 		),
 	)
-	return s.ServeContext(ctx)
+	return s.Serve(ctx)
 }
 
