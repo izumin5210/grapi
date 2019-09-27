@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/izumin5210/gex"
+	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
@@ -134,6 +135,20 @@ func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) e
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
+	{
+		// regen manifest
+		path := filepath.Join(u.gexCfg.RootDir, u.gexCfg.ManifestName)
+		m, err := tool.NewParser(u.fs, u.gexCfg.ManagerType).Parse(path)
+		if err != nil {
+			return errors.Wrapf(err, "%s was not found", path)
+		}
+		err = tool.NewWriter(u.fs).Write(path, m)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
 	err = toolRepo.BuildAll(context.Background())
 	if err != nil {
 		return errors.WithStack(err)
