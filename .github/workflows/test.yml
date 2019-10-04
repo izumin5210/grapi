@@ -1,0 +1,57 @@
+name: CI
+on: [push]
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go-version: ['1.11.x', '1.12.x', '1.13.x']
+        test-task: ['test', 'test-e2e']
+
+    steps:
+    - uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - uses: actions/checkout@v1
+
+    - run: go mod download
+
+    - run: make ${{ matrix.test-task }}
+      env:
+        TARGET_REVISION: ${{ github.sha }}
+        COVER: ${{ matrix.go-version == '1.13.x' && matrix.test-task == 'test' }} 
+
+    - run: curl -s https://codecov.io/bash | bash -s -- -t $CODECOV_TOKEN
+      if: matrix.go-version == '1.13.x' && matrix.test-task == 'test'
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-go@v1
+      with:
+        go-version: 1.13
+
+    - uses: actions/checkout@v1
+
+    - run: go mod download
+
+    - uses: izumin5210/action-go-crossbuild@releases/v1
+      with:
+        package: ./cmd/grapi
+
+    - uses: softprops/action-gh-release@v1
+      with:
+        files: './dist/*'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: startsWith(github.ref, 'refs/tags/')
+
+    - uses: izumin5210/action-homebrew@releases/v0
+      with:
+        tap: izumin5210/homebrew-tools
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tap-token: ${{ secrets.TAP_GITHUB_TOKEN }}
+      if: startsWith(github.ref, 'refs/tags/')

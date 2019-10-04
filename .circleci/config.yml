@@ -67,7 +67,7 @@ workflows:
           <<: *go-1-12
           name: 'test-1.12'
           steps:
-            - run: make cover
+            - run: COVER=true make test
             - run: bash <(curl -s https://codecov.io/bash)
           requires:
             - setup-1.12
