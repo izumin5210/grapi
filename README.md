@@ -18,6 +18,29 @@
 
 [![asciicast](https://asciinema.org/a/176280.png)](https://asciinema.org/a/176280)
 
+## :warning: Migrate 0.4.x -> 0.5.x :warning:
+[grapiserver](https://godoc.org/github.com/izumin5210/grapi/pkg/grapiserver) will not handle os signals from v0.5.x.
+We recommend to use [`appctx.Global()`](https://godoc.org/github.com/srvc/appctx#Global) if you want to handle them.
+
+<details>
+<summary>:memo: How to migrate</summary>
+
+0. Bump grapi version
+    - `go get -u github.com/izuimn5210/grapi@v0.5'
+1. Update `cmd/server/run.go`
+    - ```diff
+       	// Application context
+      -	ctx := context.Background()
+      +	ctx := appctx.Global()
+      ```
+    - ```diff
+      -	return s.ServeContext(ctx)
+      +	return s.Serve(ctx)
+      ```
+
+</details>
+
+
 ## :warning: Migrate 0.3.x -> 0.4.x :warning:
 Some tools that are depended by grapi are updated. If you have a grapi project <=v0.3.x, you should migrate it.
 
