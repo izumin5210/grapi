@@ -21,19 +21,15 @@ build:
 
 .PHONY: lint
 lint: ./bin/reviewdog ./bin/golangci-lint
-ifdef CI
-	reviewdog -reporter=github-pr-review
-else
 	reviewdog -diff="git diff master"
-endif
 
 .PHONY: test
 test:
-	go test -v ./...
-
-.PHONY: cover
-cover:
+ifeq ($(COVER),true)
 	go test -v -coverprofile coverage.txt -covermode atomic ./...
+else
+	go test -v ./...
+endif
 
 .PHONY: test-e2e
 test-e2e: build
