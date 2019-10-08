@@ -21,11 +21,7 @@ build:
 
 .PHONY: lint
 lint: ./bin/reviewdog ./bin/golangci-lint
-ifdef CI
-	reviewdog -reporter=github-pr-review
-else
 	reviewdog -diff="git diff master"
-endif
 
 .PHONY: test
 test:
