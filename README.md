@@ -1,8 +1,8 @@
 # ![grapi](./grapi.png)
-[![CircleCI](https://circleci.com/gh/izumin5210/grapi/tree/master.svg?style=svg)](https://circleci.com/gh/izumin5210/grapi/tree/master)
+[![CI](https://github.com/izumin5210/grapi/workflows/CI/badge.svg)](https://github.com/izumin5210/grapi/actions?workflow=CI)
 [![GoDoc](https://godoc.org/github.com/izumin5210/grapi/pkg/grapiserver?status.svg)](https://godoc.org/github.com/izumin5210/grapi/pkg/grapiserver)
 [![Go Report Card](https://goreportcard.com/badge/github.com/izumin5210/grapi)](https://goreportcard.com/report/github.com/izumin5210/grapi)
-[![Go project version](https://badge.fury.io/go/github.com%2Fizumin5210%2Fgrapi.svg)](https://badge.fury.io/go/github.com%2Fizumin5210%2Fgrapi)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/izumin5210/grapi)](http://github.com/izumin5210/grapi/releases/latest)
 [![license](https://img.shields.io/github/license/izumin5210/grapi.svg)](./LICENSE)
 
 :open_mouth: A surprisingly easy API server and generator in gRPC and Go
