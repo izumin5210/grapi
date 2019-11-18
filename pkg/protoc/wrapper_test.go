@@ -2,14 +2,14 @@ package protoc_test
 
 import (
 	"context"
+	"os/exec"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/izumin5210/clig/pkg/clib"
+	"github.com/izumin5210/execx"
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/spf13/afero"
-	"k8s.io/utils/exec"
-	testingexec "k8s.io/utils/exec/testing"
 
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/protoc"
@@ -25,31 +25,26 @@ func TestWrapper_Exec(t *testing.T) {
 
 	calls := [][]string{}
 
-	execer := &testingexec.FakeExec{
-		CommandScript: make([]testingexec.FakeCommandAction, 7),
-	}
-	for i := range execer.CommandScript {
-		execer.CommandScript[i] = func(cmd string, args ...string) exec.Cmd {
-			switch cmd {
+	exec := execx.New(execx.WithFakeProcess(
+		func(ctx context.Context, cmd *exec.Cmd) error {
+			switch cmd.Args[0] {
 			case "go":
-				out := []byte("/go/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.8.5\n")
-				return testingexec.InitFakeCmd(&testingexec.FakeCmd{
-					RunScript: []testingexec.FakeRunAction{
-						func() ([]byte, []byte, error) { return out, nil, nil },
-					},
-				}, cmd, args...)
+				if out := cmd.Stdout; out != nil {
+					_, err := out.Write([]byte("/go/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.8.5\n"))
+					dieIf(t, err)
+				}
 			case "protoc":
-				calls = append(calls, append([]string{cmd}, args...))
+				calls = append(calls, cmd.Args)
 			default:
-				t.Errorf("unexpected command execution: %s %v", cmd, args)
+				t.Errorf("unexpected command execution: %v", cmd.Args)
 			}
-			return testingexec.InitFakeCmd(&testingexec.FakeCmd{
-				CombinedOutputScript: []testingexec.FakeCombinedOutputAction{
-					func() ([]byte, error) { return []byte("\n"), nil },
-				},
-			}, cmd, args...)
-		}
-	}
+			if out := cmd.Stdout; out != nil {
+				_, err := out.Write([]byte("\n"))
+				dieIf(t, err)
+			}
+			return nil
+		},
+	))
 
 	rootDir := cli.RootDir{Path: clib.Path("/go/src/awesomeapp")}
 	protosDir := rootDir.Join("api", "protos")
@@ -79,7 +74,7 @@ func TestWrapper_Exec(t *testing.T) {
 		},
 	}
 
-	wrapper := protoc.NewWrapper(cfg, fs, execer, cli.NopUI, &fakeToolRepository{}, rootDir)
+	wrapper := protoc.NewWrapper(cfg, fs, exec, cli.NopUI, &fakeToolRepository{}, rootDir)
 
 	err := wrapper.Exec(context.TODO())
 	if err != nil {

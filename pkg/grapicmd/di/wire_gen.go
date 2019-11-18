@@ -54,16 +54,17 @@ func NewToolRepository(ctx *grapicmd.Ctx) (tool.Repository, error) {
 func NewProtocWrapper(ctx *grapicmd.Ctx) (protoc.Wrapper, error) {
 	config := grapicmd.ProvideProtocConfig(ctx)
 	fs := grapicmd.ProvideFS(ctx)
-	execInterface := grapicmd.ProvideExecer(ctx)
+	executor := grapicmd.ProvideExec(ctx)
 	io := grapicmd.ProvideIO(ctx)
 	ui := cli.UIInstance(io)
+	execInterface := grapicmd.ProvideExecer(ctx)
 	rootDir := grapicmd.ProvideRootDir(ctx)
 	gexConfig := protoc.ProvideGexConfig(fs, execInterface, io, rootDir)
 	repository, err := protoc.ProvideToolRepository(gexConfig)
 	if err != nil {
 		return nil, err
 	}
-	wrapper := protoc.NewWrapper(config, fs, execInterface, ui, repository, rootDir)
+	wrapper := protoc.NewWrapper(config, fs, executor, ui, repository, rootDir)
 	return wrapper, nil
 }
 

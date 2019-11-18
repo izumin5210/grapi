@@ -9,11 +9,11 @@ import (
 	"sync"
 	"text/template"
 
+	"github.com/izumin5210/execx"
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"go.uber.org/zap"
-	"k8s.io/utils/exec"
 
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
@@ -28,19 +28,19 @@ type wrapperImpl struct {
 	cfg      *Config
 	fs       afero.Fs
 	ui       cli.UI
-	execer   exec.Interface
+	exec     *execx.Executor
 	toolRepo tool.Repository
 	rootDir  cli.RootDir
 	modCache *sync.Map
 }
 
 // NewWrapper creates a new Wrapper instance.
-func NewWrapper(cfg *Config, fs afero.Fs, execer exec.Interface, ui cli.UI, toolRepo tool.Repository, rootDir cli.RootDir) Wrapper {
+func NewWrapper(cfg *Config, fs afero.Fs, exec *execx.Executor, ui cli.UI, toolRepo tool.Repository, rootDir cli.RootDir) Wrapper {
 	return &wrapperImpl{
 		cfg:      cfg,
 		fs:       fs,
 		ui:       ui,
-		execer:   execer,
+		exec:     exec,
 		toolRepo: toolRepo,
 		rootDir:  rootDir,
 		modCache: new(sync.Map),
@@ -111,9 +111,9 @@ func (e *wrapperImpl) execProtoc(ctx context.Context, protoPath string) error {
 	env := append(os.Environ(), "PATH="+path)
 
 	for _, args := range cmds {
-		cmd := e.execer.CommandContext(ctx, args[0], args[1:]...)
-		cmd.SetEnv(env)
-		cmd.SetDir(e.rootDir.String())
+		cmd := e.exec.CommandContext(ctx, args[0], args[1:]...)
+		cmd.Env = env
+		cmd.Dir = e.rootDir.String()
 		out, err := cmd.CombinedOutput()
 		if err != nil {
 			return errors.Wrapf(err, "failed to execute command: %v\n%s", args, string(out))
@@ -171,10 +171,10 @@ func (e *wrapperImpl) getModulePath(ctx context.Context, pkg string) (string, er
 		return v.(string), nil
 	}
 	buf := new(bytes.Buffer)
-	cmd := e.execer.CommandContext(ctx, "go", "list", "-f", "{{.Dir}}", "-m", pkg)
-	cmd.SetEnv(append(os.Environ(), "GO111MODULE=on"))
-	cmd.SetDir(e.rootDir.String())
-	cmd.SetStdout(buf)
+	cmd := e.exec.CommandContext(ctx, "go", "list", "-f", "{{.Dir}}", "-m", pkg)
+	cmd.Env = append(os.Environ(), "GO111MODULE=on")
+	cmd.Dir = e.rootDir.String()
+	cmd.Stdout = buf
 	err := cmd.Run()
 	if err != nil {
 		return "", errors.WithStack(err)

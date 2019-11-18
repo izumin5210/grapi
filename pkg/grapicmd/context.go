@@ -12,6 +12,7 @@ import (
 	"k8s.io/utils/exec"
 
 	"github.com/izumin5210/clig/pkg/clib"
+	"github.com/izumin5210/execx"
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/protoc"
 )
@@ -21,6 +22,7 @@ type Ctx struct {
 	FS     afero.Fs
 	Viper  *viper.Viper
 	Execer exec.Interface
+	Exec   *execx.Executor
 	IO     *clib.IO
 
 	RootDir   cli.RootDir
@@ -62,6 +64,10 @@ func (c *Ctx) Init() error {
 
 	if c.Execer == nil {
 		c.Execer = exec.New()
+	}
+
+	if c.Exec == nil {
+		c.Exec = execx.New()
 	}
 
 	if c.Build.AppName == "" {
@@ -111,6 +117,7 @@ var CtxSet = wire.NewSet(
 	ProvideFS,
 	ProvideViper,
 	ProvideExecer,
+	ProvideExec,
 	ProvideIO,
 	ProvideRootDir,
 	ProvideConfig,
@@ -121,6 +128,7 @@ var CtxSet = wire.NewSet(
 func ProvideFS(c *Ctx) afero.Fs                 { return c.FS }
 func ProvideViper(c *Ctx) *viper.Viper          { return c.Viper }
 func ProvideExecer(c *Ctx) exec.Interface       { return c.Execer }
+func ProvideExec(c *Ctx) *execx.Executor        { return c.Exec }
 func ProvideIO(c *Ctx) *clib.IO                 { return c.IO }
 func ProvideRootDir(c *Ctx) cli.RootDir         { return c.RootDir }
 func ProvideConfig(c *Ctx) *Config              { return &c.Config }
