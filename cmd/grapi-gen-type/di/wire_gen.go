@@ -22,9 +22,8 @@ func NewApp(command *gencmd.Command) (*App, error) {
 	executor := grapicmd.ProvideExec(grapicmdCtx)
 	io := grapicmd.ProvideIO(grapicmdCtx)
 	ui := cli.UIInstance(io)
-	execInterface := grapicmd.ProvideExecer(grapicmdCtx)
 	rootDir := grapicmd.ProvideRootDir(grapicmdCtx)
-	gexConfig := protoc.ProvideGexConfig(fs, execInterface, io, rootDir)
+	gexConfig := protoc.ProvideGexConfig(fs, executor, io, rootDir)
 	repository, err := protoc.ProvideToolRepository(gexConfig)
 	if err != nil {
 		return nil, err

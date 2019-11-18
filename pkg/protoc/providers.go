@@ -5,12 +5,12 @@ import (
 
 	"github.com/google/wire"
 	"github.com/izumin5210/clig/pkg/clib"
+	"github.com/izumin5210/execx"
 	"github.com/izumin5210/gex"
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"go.uber.org/zap"
-	"k8s.io/utils/exec"
 
 	"github.com/izumin5210/grapi/pkg/cli"
 )
@@ -25,7 +25,7 @@ var (
 
 func ProvideGexConfig(
 	fs afero.Fs,
-	execer exec.Interface,
+	exec *execx.Executor,
 	io *clib.IO,
 	rootDir cli.RootDir,
 ) *gex.Config {
@@ -37,7 +37,7 @@ func ProvideGexConfig(
 			ErrWriter:  io.Err,
 			InReader:   io.In,
 			FS:         fs,
-			Execer:     execer,
+			Exec:       exec,
 			WorkingDir: rootDir.String(),
 			Verbose:    clib.IsVerbose() || clib.IsDebug(),
 			Logger:     zap.NewStdLog(zap.L()),

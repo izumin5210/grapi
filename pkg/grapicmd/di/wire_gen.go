@@ -40,10 +40,10 @@ func NewScriptLoader(ctx *grapicmd.Ctx) module.ScriptLoader {
 
 func NewToolRepository(ctx *grapicmd.Ctx) (tool.Repository, error) {
 	fs := grapicmd.ProvideFS(ctx)
-	execInterface := grapicmd.ProvideExecer(ctx)
+	executor := grapicmd.ProvideExec(ctx)
 	io := grapicmd.ProvideIO(ctx)
 	rootDir := grapicmd.ProvideRootDir(ctx)
-	config := protoc.ProvideGexConfig(fs, execInterface, io, rootDir)
+	config := protoc.ProvideGexConfig(fs, executor, io, rootDir)
 	repository, err := protoc.ProvideToolRepository(config)
 	if err != nil {
 		return nil, err
@@ -57,9 +57,8 @@ func NewProtocWrapper(ctx *grapicmd.Ctx) (protoc.Wrapper, error) {
 	executor := grapicmd.ProvideExec(ctx)
 	io := grapicmd.ProvideIO(ctx)
 	ui := cli.UIInstance(io)
-	execInterface := grapicmd.ProvideExecer(ctx)
 	rootDir := grapicmd.ProvideRootDir(ctx)
-	gexConfig := protoc.ProvideGexConfig(fs, execInterface, io, rootDir)
+	gexConfig := protoc.ProvideGexConfig(fs, executor, io, rootDir)
 	repository, err := protoc.ProvideToolRepository(gexConfig)
 	if err != nil {
 		return nil, err
@@ -70,17 +69,17 @@ func NewProtocWrapper(ctx *grapicmd.Ctx) (protoc.Wrapper, error) {
 
 func NewInitializeProjectUsecase(ctx *grapicmd.Ctx, path clib.Path) (usecase.InitializeProjectUsecase, error) {
 	aferoFs := grapicmd.ProvideFS(ctx)
-	execInterface := grapicmd.ProvideExecer(ctx)
+	executor := grapicmd.ProvideExec(ctx)
 	io := grapicmd.ProvideIO(ctx)
 	rootDir := grapicmd.ProvideRootDir(ctx)
-	config := protoc.ProvideGexConfig(aferoFs, execInterface, io, rootDir)
+	config := protoc.ProvideGexConfig(aferoFs, executor, io, rootDir)
 	ui := cli.UIInstance(io)
 	fileSystem, err := fs.New()
 	if err != nil {
 		return nil, err
 	}
 	generator := ProvideGenerator(ctx, ui, aferoFs, fileSystem, path)
-	executor := excmd.NewExecutor(io)
-	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, aferoFs, generator, executor)
+	excmdExecutor := excmd.NewExecutor(io)
+	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, aferoFs, generator, excmdExecutor)
 	return initializeProjectUsecase, nil
 }

@@ -13,7 +13,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.8.5
 	github.com/izumin5210/clig v0.3.1
 	github.com/izumin5210/execx v0.1.0
-	github.com/izumin5210/gex v0.5.1
+	github.com/izumin5210/gex v0.6.0
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.9 // indirect
@@ -37,5 +37,4 @@ require (
 	golang.org/x/tools v0.0.0-20190828213141-aed303cbaa74 // indirect
 	google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8
 	google.golang.org/grpc v1.19.0
-	k8s.io/utils v0.0.0-20190920012459-5008bf6f8cd6
 )

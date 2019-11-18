@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"k8s.io/utils/exec"
 
 	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/execx"
@@ -19,11 +18,10 @@ import (
 
 // Ctx contains the runtime context of grpai.
 type Ctx struct {
-	FS     afero.Fs
-	Viper  *viper.Viper
-	Execer exec.Interface
-	Exec   *execx.Executor
-	IO     *clib.IO
+	FS    afero.Fs
+	Viper *viper.Viper
+	Exec  *execx.Executor
+	IO    *clib.IO
 
 	RootDir   cli.RootDir
 	insideApp bool
@@ -61,10 +59,6 @@ func (c *Ctx) Init() error {
 	}
 
 	c.Viper.SetFs(c.FS)
-
-	if c.Execer == nil {
-		c.Execer = exec.New()
-	}
 
 	if c.Exec == nil {
 		c.Exec = execx.New()
@@ -116,7 +110,6 @@ func (c *Ctx) IsInsideApp() bool {
 var CtxSet = wire.NewSet(
 	ProvideFS,
 	ProvideViper,
-	ProvideExecer,
 	ProvideExec,
 	ProvideIO,
 	ProvideRootDir,
@@ -127,7 +120,6 @@ var CtxSet = wire.NewSet(
 
 func ProvideFS(c *Ctx) afero.Fs                 { return c.FS }
 func ProvideViper(c *Ctx) *viper.Viper          { return c.Viper }
-func ProvideExecer(c *Ctx) exec.Interface       { return c.Execer }
 func ProvideExec(c *Ctx) *execx.Executor        { return c.Exec }
 func ProvideIO(c *Ctx) *clib.IO                 { return c.IO }
 func ProvideRootDir(c *Ctx) cli.RootDir         { return c.RootDir }
