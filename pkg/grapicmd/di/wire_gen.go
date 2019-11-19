@@ -9,7 +9,6 @@ import (
 	"github.com/izumin5210/clig/pkg/clib"
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/izumin5210/grapi/pkg/cli"
-	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
@@ -25,16 +24,10 @@ func NewUI(ctx *grapicmd.Ctx) cli.UI {
 	return ui
 }
 
-func NewCommandExecutor(ctx *grapicmd.Ctx) excmd.Executor {
-	io := grapicmd.ProvideIO(ctx)
-	executor := excmd.NewExecutor(io)
-	return executor
-}
-
 func NewScriptLoader(ctx *grapicmd.Ctx) module.ScriptLoader {
 	io := grapicmd.ProvideIO(ctx)
-	executor := excmd.NewExecutor(io)
-	scriptLoader := ProvideScriptLoader(ctx, executor)
+	executor := grapicmd.ProvideExec(ctx)
+	scriptLoader := ProvideScriptLoader(ctx, io, executor)
 	return scriptLoader
 }
 
@@ -68,18 +61,17 @@ func NewProtocWrapper(ctx *grapicmd.Ctx) (protoc.Wrapper, error) {
 }
 
 func NewInitializeProjectUsecase(ctx *grapicmd.Ctx, path clib.Path) (usecase.InitializeProjectUsecase, error) {
-	aferoFs := grapicmd.ProvideFS(ctx)
-	executor := grapicmd.ProvideExec(ctx)
 	io := grapicmd.ProvideIO(ctx)
-	rootDir := grapicmd.ProvideRootDir(ctx)
-	config := protoc.ProvideGexConfig(aferoFs, executor, io, rootDir)
 	ui := cli.UIInstance(io)
+	aferoFs := grapicmd.ProvideFS(ctx)
 	fileSystem, err := fs.New()
 	if err != nil {
 		return nil, err
 	}
 	generator := ProvideGenerator(ctx, ui, aferoFs, fileSystem, path)
-	excmdExecutor := excmd.NewExecutor(io)
-	initializeProjectUsecase := ProvideInitializeProjectUsecase(ctx, config, ui, aferoFs, generator, excmdExecutor)
+	executor := grapicmd.ProvideExec(ctx)
+	rootDir := grapicmd.ProvideRootDir(ctx)
+	config := protoc.ProvideGexConfig(aferoFs, executor, io, rootDir)
+	initializeProjectUsecase := usecase.NewInitializeProjectUsecase(ui, aferoFs, generator, io, executor, config)
 	return initializeProjectUsecase, nil
 }

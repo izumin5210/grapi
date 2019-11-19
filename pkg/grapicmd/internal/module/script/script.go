@@ -8,13 +8,15 @@ import (
 	"github.com/spf13/afero"
 	"go.uber.org/zap"
 
-	"github.com/izumin5210/grapi/pkg/excmd"
+	"github.com/izumin5210/clig/pkg/clib"
+	"github.com/izumin5210/execx"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 type script struct {
 	fs            afero.Fs
-	excmd         excmd.Executor
+	io            *clib.IO
+	exec          *execx.Executor
 	rootDir       string
 	name, binPath string
 	srcPaths      []string
@@ -31,7 +33,12 @@ func (s *script) Build(args ...string) error {
 		return errors.WithStack(err)
 	}
 
-	_, err = s.excmd.Exec(context.TODO(), "go", s.buildOpts(args)...)
+	cmd := s.exec.CommandContext(context.TODO(), "go", s.buildArgs(args)...)
+	cmd.Dir = s.rootDir
+	cmd.Stdout = s.io.Out
+	cmd.Stderr = s.io.Err
+	cmd.Stdin = s.io.In
+	err = cmd.Run()
 	if err != nil {
 		return errors.Wrapf(err, "failed to build %v", s.srcPaths)
 	}
@@ -40,24 +47,18 @@ func (s *script) Build(args ...string) error {
 }
 
 func (s *script) Run(args ...string) error {
-	_, err := s.excmd.Exec(
-		context.TODO(),
-		s.binPath,
-		excmd.WithArgs(args...),
-		excmd.WithDir(s.rootDir),
-		excmd.WithIOConnected(),
-	)
-	return errors.WithStack(err)
+	cmd := s.exec.CommandContext(context.TODO(), s.binPath, args...)
+	cmd.Dir = s.rootDir
+	cmd.Stdout = s.io.Out
+	cmd.Stderr = s.io.Err
+	cmd.Stdin = s.io.In
+	return errors.WithStack(cmd.Run())
 }
 
-func (s *script) buildOpts(args []string) []excmd.Option {
+func (s *script) buildArgs(args []string) []string {
 	built := make([]string, 0, 3+len(args)+len(s.srcPaths))
 	built = append(built, "build", "-o="+s.binPath)
 	built = append(built, args...)
 	built = append(built, s.srcPaths...)
-	return []excmd.Option{
-		excmd.WithArgs(built...),
-		excmd.WithDir(s.rootDir),
-		excmd.WithIOConnected(),
-	}
+	return built
 }

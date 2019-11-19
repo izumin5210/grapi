@@ -5,12 +5,11 @@ import (
 
 	"github.com/google/wire"
 	"github.com/izumin5210/clig/pkg/clib"
-	"github.com/izumin5210/gex"
+	"github.com/izumin5210/execx"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/afero"
 
 	"github.com/izumin5210/grapi/pkg/cli"
-	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/gencmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
@@ -19,8 +18,8 @@ import (
 	"github.com/izumin5210/grapi/pkg/protoc"
 )
 
-func ProvideScriptLoader(ctx *grapicmd.Ctx, executor excmd.Executor) module.ScriptLoader {
-	return script.NewLoader(ctx.FS, executor, ctx.RootDir.String())
+func ProvideScriptLoader(ctx *grapicmd.Ctx, io *clib.IO, exec *execx.Executor) module.ScriptLoader {
+	return script.NewLoader(ctx.FS, io, exec, ctx.RootDir.String())
 }
 
 func ProvideGenerator(ctx *grapicmd.Ctx, ui cli.UI, fs afero.Fs, tmplFs http.FileSystem, outDir clib.Path) gencmd.Generator {
@@ -33,23 +32,12 @@ func ProvideGenerator(ctx *grapicmd.Ctx, ui cli.UI, fs afero.Fs, tmplFs http.Fil
 	)
 }
 
-func ProvideInitializeProjectUsecase(ctx *grapicmd.Ctx, gexCfg *gex.Config, ui cli.UI, fs afero.Fs, generator gencmd.Generator, excmd excmd.Executor) usecase.InitializeProjectUsecase {
-	return usecase.NewInitializeProjectUsecase(
-		ui,
-		fs,
-		generator,
-		excmd,
-		gexCfg,
-	)
-}
-
 var Set = wire.NewSet(
 	grapicmd.CtxSet,
 	protoc.WrapperSet,
 	cli.UIInstance,
-	excmd.NewExecutor,
 	ProvideScriptLoader,
 	ProvideGenerator,
 	fs.New,
-	ProvideInitializeProjectUsecase,
+	usecase.NewInitializeProjectUsecase,
 )
