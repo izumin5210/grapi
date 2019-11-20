@@ -2,15 +2,17 @@ package usecase
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 
+	"github.com/izumin5210/clig/pkg/clib"
+	"github.com/izumin5210/execx"
 	"github.com/izumin5210/gex"
 	"github.com/izumin5210/gex/pkg/tool"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
 	"github.com/izumin5210/grapi/pkg/cli"
-	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/gencmd"
 	_ "github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase/template"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
@@ -24,12 +26,13 @@ type InitializeProjectUsecase interface {
 }
 
 // NewInitializeProjectUsecase creates a new InitializeProjectUsecase instance.
-func NewInitializeProjectUsecase(ui cli.UI, fs afero.Fs, generator gencmd.Generator, excmd excmd.Executor, gexCfg *gex.Config) InitializeProjectUsecase {
+func NewInitializeProjectUsecase(ui cli.UI, fs afero.Fs, generator gencmd.Generator, io *clib.IO, exec *execx.Executor, gexCfg *gex.Config) InitializeProjectUsecase {
 	return &initializeProjectUsecase{
 		ui:        ui,
 		fs:        fs,
 		generator: generator,
-		excmd:     excmd,
+		io:        io,
+		exec:      exec,
 		gexCfg:    gexCfg,
 	}
 }
@@ -38,7 +41,8 @@ type initializeProjectUsecase struct {
 	ui        cli.UI
 	fs        afero.Fs
 	generator gencmd.Generator
-	excmd     excmd.Executor
+	io        *clib.IO
+	exec      *execx.Executor
 	gexCfg    *gex.Config
 }
 
@@ -81,17 +85,17 @@ func (u *initializeProjectUsecase) GenerateProject(rootDir, pkgName string) erro
 }
 
 func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) error {
-	opts := []excmd.Option{
-		excmd.WithDir(rootDir),
-		excmd.WithIOConnected(),
-	}
-	if !cfg.Dep {
-		opts = append(opts, excmd.WithEnv("GO111MODULE", "on"))
-	}
-
 	invoke := func(name string, args ...string) error {
-		_, err := u.excmd.Exec(context.Background(), name, append([]excmd.Option{excmd.WithArgs(args...)}, opts...)...)
-		return errors.WithStack(err)
+		cmd := u.exec.CommandContext(context.TODO(), name, args...)
+		cmd.Stdout = u.io.Out
+		cmd.Stderr = u.io.Err
+		cmd.Stdin = u.io.In
+		cmd.Dir = rootDir
+		if !cfg.Dep {
+			cmd.Env = append(os.Environ(), "GO111MODULE=on")
+		}
+
+		return errors.WithStack(cmd.Run())
 	}
 
 	if cfg.Dep {

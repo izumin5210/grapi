@@ -23,16 +23,16 @@ func NewApp(command *gencmd.Command) (*App, error) {
 	grapicmdCtx := gencmd.ProvideGrapiCtx(ctx)
 	config := grapicmd.ProvideProtocConfig(grapicmdCtx)
 	fs := grapicmd.ProvideFS(grapicmdCtx)
-	execInterface := grapicmd.ProvideExecer(grapicmdCtx)
+	executor := grapicmd.ProvideExec(grapicmdCtx)
 	io := grapicmd.ProvideIO(grapicmdCtx)
 	ui := cli.UIInstance(io)
 	rootDir := grapicmd.ProvideRootDir(grapicmdCtx)
-	gexConfig := protoc.ProvideGexConfig(fs, execInterface, io, rootDir)
+	gexConfig := protoc.ProvideGexConfig(fs, executor, io, rootDir)
 	repository, err := protoc.ProvideToolRepository(gexConfig)
 	if err != nil {
 		return nil, err
 	}
-	wrapper := protoc.NewWrapper(config, fs, execInterface, ui, repository, rootDir)
+	wrapper := protoc.NewWrapper(config, fs, executor, ui, repository, rootDir)
 	grapicmdConfig := grapicmd.ProvideConfig(grapicmdCtx)
 	builder := ProvideParamsBuilder(rootDir, config, grapicmdConfig)
 	app := &App{

@@ -8,7 +8,6 @@ import (
 	"github.com/izumin5210/gex/pkg/tool"
 
 	"github.com/izumin5210/grapi/pkg/cli"
-	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/usecase"
@@ -16,11 +15,6 @@ import (
 )
 
 func NewUI(*grapicmd.Ctx) cli.UI {
-	wire.Build(Set)
-	return nil
-}
-
-func NewCommandExecutor(*grapicmd.Ctx) excmd.Executor {
 	wire.Build(Set)
 	return nil
 }

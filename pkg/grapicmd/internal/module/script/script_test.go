@@ -1,24 +1,27 @@
 package script
 
 import (
+	"context"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"testing"
 
 	"github.com/spf13/afero"
 
-	"github.com/izumin5210/grapi/pkg/excmd/testing"
+	"github.com/izumin5210/clig/pkg/clib"
+	"github.com/izumin5210/execx"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 )
 
 type testContext struct {
 	fs            afero.Fs
-	executor      *testingexcmd.FakeExecutor
 	loader        module.ScriptLoader
 	binName       string
 	rootDir       string
 	cmdDir        string
 	srcsByBinName map[string][]string
+	cmds          []*exec.Cmd
 }
 
 func createTestContext(t *testing.T) *testContext {
@@ -30,9 +33,11 @@ func createTestContext(t *testing.T) *testContext {
 		binName:       binName,
 		rootDir:       rootDir,
 		cmdDir:        filepath.Join(rootDir, "cmd"),
-		executor:      &testingexcmd.FakeExecutor{},
 		srcsByBinName: map[string][]string{},
 	}
+	exec := execx.New(execx.WithFakeProcess(
+		func(_ context.Context, c *exec.Cmd) error { ctx.cmds = append(ctx.cmds, c); return nil },
+	))
 
 	srcsByBinName := map[string][]string{
 		binName: {"bar.go", "foo.go", "main.go"},
@@ -56,7 +61,7 @@ func createTestContext(t *testing.T) *testContext {
 		ctx.srcsByBinName[binName] = srcPaths
 	}
 
-	ctx.loader = NewLoader(fs, ctx.executor, rootDir)
+	ctx.loader = NewLoader(fs, &clib.IO{}, exec, rootDir)
 
 	return ctx
 }
@@ -82,32 +87,32 @@ func Test_Script(t *testing.T) {
 		t.Errorf("script.Build() returned an error %v", err)
 	}
 
-	err = s.Build("-v")
+	err = s.Build(context.Background(), "-v")
 	binPath := filepath.Join(ctx.rootDir, "bin", ctx.binName)
-	cmd := ctx.executor.Commands[0]
+	cmd := ctx.cmds[0]
 
 	srcs := ctx.srcsByBinName[ctx.binName]
-	if got, want := cmd.Args, append([]string{"build", "-o=" + binPath, "-v"}, srcs...); !reflect.DeepEqual(got, want) {
-		t.Errorf("Build() cmduted %v, want %v", got, want)
+	if got, want := cmd.Args, append([]string{"go", "build", "-o=" + binPath, "-v"}, srcs...); !reflect.DeepEqual(got, want) {
+		t.Errorf("Build() executed %v, want %v", got, want)
 	}
 
 	if got, want := cmd.Dir, "/home/app"; got != want {
-		t.Errorf("Build() cmduted a command in %v, want %v", got, want)
+		t.Errorf("Build() executed a command in %v, want %v", got, want)
 	}
 
 	if err != nil {
 		t.Errorf("Build() returned an error %v", err)
 	}
 
-	err = s.Run("-v")
-	cmd = ctx.executor.Commands[1]
+	err = s.Run(context.Background(), "-v")
+	cmd = ctx.cmds[1]
 
-	if got, want := cmd.Name, binPath; got != want {
-		t.Errorf("Run() cmduted %v, want %v", got, want)
+	if got, want := cmd.Path, binPath; got != want {
+		t.Errorf("Run() executed %v, want %v", got, want)
 	}
 
 	if got, want := cmd.Dir, "/home/app"; got != want {
-		t.Errorf("Run() cmduted a command in %v, want %v", got, want)
+		t.Errorf("Run() executed a command in %v, want %v", got, want)
 	}
 
 	if err != nil {

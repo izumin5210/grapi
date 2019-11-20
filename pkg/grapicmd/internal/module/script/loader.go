@@ -9,16 +9,18 @@ import (
 	"github.com/spf13/afero"
 	"go.uber.org/zap"
 
-	"github.com/izumin5210/grapi/pkg/excmd"
+	"github.com/izumin5210/clig/pkg/clib"
+	"github.com/izumin5210/execx"
 	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
 )
 
 // NewLoader creates a new ScriptLoader instance.
-func NewLoader(fs afero.Fs, excmd excmd.Executor, rootDir string) module.ScriptLoader {
+func NewLoader(fs afero.Fs, io *clib.IO, exec *execx.Executor, rootDir string) module.ScriptLoader {
 	return &scriptLoader{
 		fs:      fs,
-		excmd:   excmd,
+		io:      io,
+		exec:    exec,
 		rootDir: rootDir,
 		binDir:  filepath.Join(rootDir, "bin"),
 		scripts: make(map[string]module.Script),
@@ -27,7 +29,8 @@ func NewLoader(fs afero.Fs, excmd excmd.Executor, rootDir string) module.ScriptL
 
 type scriptLoader struct {
 	fs      afero.Fs
-	excmd   excmd.Executor
+	io      *clib.IO
+	exec    *execx.Executor
 	rootDir string
 	binDir  string
 	scripts map[string]module.Script
@@ -52,7 +55,8 @@ func (f *scriptLoader) Load(dir string) error {
 		}
 		f.scripts[name] = &script{
 			fs:       f.fs,
-			excmd:    f.excmd,
+			io:       f.io,
+			exec:     f.exec,
 			srcPaths: srcPaths,
 			name:     name,
 			binPath:  filepath.Join(f.binDir, name+ext),

@@ -81,8 +81,8 @@ func Test_userDefinedCommand(t *testing.T) {
 
 		loader.EXPECT().Get(name).Return(script, true)
 
-		script.EXPECT().Build(c.buildArgs...)
-		script.EXPECT().Run(c.runArgs...)
+		script.EXPECT().Build(gomock.Any(), c.buildArgs...)
+		script.EXPECT().Run(gomock.Any(), c.runArgs...)
 		script.EXPECT().Name().Return(name)
 
 		err := cmd.Execute()

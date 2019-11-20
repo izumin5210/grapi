@@ -8,8 +8,9 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
+	"github.com/izumin5210/clig/pkg/clib"
+	"github.com/izumin5210/execx"
 	"github.com/izumin5210/gex/pkg/tool"
-	"github.com/izumin5210/grapi/pkg/excmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 	"github.com/izumin5210/grapi/pkg/grapicmd/util/fs"
@@ -75,8 +76,8 @@ func newGenerateCommands(ctx *grapicmd.Ctx) (cmds []*cobra.Command) {
 			continue
 		}
 		cmdNames[exec] = struct{}{}
-		gCmd.AddCommand(newGenerateCommandByExec(di.NewCommandExecutor(ctx), exec, "generate"))
-		dCmd.AddCommand(newGenerateCommandByExec(di.NewCommandExecutor(ctx), exec, "destroy"))
+		gCmd.AddCommand(newGenerateCommandByExec(ctx.IO, ctx.Exec, exec, "generate"))
+		dCmd.AddCommand(newGenerateCommandByExec(ctx.IO, ctx.Exec, exec, "destroy"))
 	}
 
 	cmds = append(cmds, gCmd, dCmd)
@@ -98,18 +99,24 @@ func newGenerateCommandByTool(repo tool.Repository, t tool.Tool, subCmd string) 
 	return cmd
 }
 
-func newGenerateCommandByExec(execer excmd.Executor, exec, subCmd string) *cobra.Command {
+func newGenerateCommandByExec(io *clib.IO, exec *execx.Executor, path, subCmd string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  strings.TrimPrefix(exec, "grapi-gen-"),
+		Use:  strings.TrimPrefix(path, "grapi-gen-"),
 		Args: cobra.ArbitraryArgs,
 		RunE: func(_ *cobra.Command, args []string) error {
-			_, err := execer.Exec(context.TODO(), exec, excmd.WithArgs(append([]string{subCmd}, args...)...), excmd.WithIOConnected())
-			return err
+			cmd := exec.CommandContext(context.TODO(), path, append([]string{subCmd}, args...)...)
+			cmd.Stdout = io.Out
+			cmd.Stderr = io.Err
+			cmd.Stdin = io.In
+			return cmd.Run()
 		},
 	}
 	cmd.SetUsageFunc(func(*cobra.Command) error {
-		_, err := execer.Exec(context.TODO(), exec, excmd.WithArgs(subCmd, "--help"), excmd.WithIOConnected())
-		return err
+		cmd := exec.CommandContext(context.TODO(), path, subCmd, "--help")
+		cmd.Stdout = io.Out
+		cmd.Stderr = io.Err
+		cmd.Stdin = io.In
+		return cmd.Run()
 	})
 	return cmd
 }
