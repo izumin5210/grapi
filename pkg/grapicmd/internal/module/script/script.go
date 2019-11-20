@@ -2,6 +2,7 @@ package script
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 
 	"github.com/pkg/errors"
@@ -26,14 +27,14 @@ func (s *script) Name() string {
 	return s.name
 }
 
-func (s *script) Build(args ...string) error {
+func (s *script) Build(ctx context.Context, args ...string) error {
 	zap.L().Debug("build script", zap.String("name", s.name), zap.String("bin", s.binPath), zap.Strings("srcs", s.srcPaths))
 	err := fs.CreateDirIfNotExists(s.fs, filepath.Dir(s.binPath))
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	cmd := s.exec.CommandContext(context.TODO(), "go", s.buildArgs(args)...)
+	cmd := s.exec.CommandContext(ctx, "go", s.buildArgs(args)...)
 	cmd.Dir = s.rootDir
 	cmd.Stdout = s.io.Out
 	cmd.Stderr = s.io.Err
@@ -46,13 +47,18 @@ func (s *script) Build(args ...string) error {
 	return nil
 }
 
-func (s *script) Run(args ...string) error {
-	cmd := s.exec.CommandContext(context.TODO(), s.binPath, args...)
+func (s *script) Run(ctx context.Context, args ...string) error {
+	cmd := s.exec.CommandContext(ctx, s.binPath, args...)
 	cmd.Dir = s.rootDir
 	cmd.Stdout = s.io.Out
 	cmd.Stderr = s.io.Err
 	cmd.Stdin = s.io.In
-	return errors.WithStack(cmd.Run())
+	err := cmd.Run()
+	fmt.Println(err)
+	if err == context.Canceled {
+		return nil
+	}
+	return errors.WithStack(err)
 }
 
 func (s *script) buildArgs(args []string) []string {

@@ -5,6 +5,7 @@
 package moduletesting
 
 import (
+	context "context"
 	gomock "github.com/golang/mock/gomock"
 	module "github.com/izumin5210/grapi/pkg/grapicmd/internal/module"
 	reflect "reflect"
@@ -48,9 +49,9 @@ func (mr *MockScriptMockRecorder) Name() *gomock.Call {
 }
 
 // Build mocks base method
-func (m *MockScript) Build(args ...string) error {
+func (m *MockScript) Build(ctx context.Context, args ...string) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	varargs := []interface{}{ctx}
 	for _, a := range args {
 		varargs = append(varargs, a)
 	}
@@ -60,15 +61,16 @@ func (m *MockScript) Build(args ...string) error {
 }
 
 // Build indicates an expected call of Build
-func (mr *MockScriptMockRecorder) Build(args ...interface{}) *gomock.Call {
+func (mr *MockScriptMockRecorder) Build(ctx interface{}, args ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Build", reflect.TypeOf((*MockScript)(nil).Build), args...)
+	varargs := append([]interface{}{ctx}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Build", reflect.TypeOf((*MockScript)(nil).Build), varargs...)
 }
 
 // Run mocks base method
-func (m *MockScript) Run(args ...string) error {
+func (m *MockScript) Run(ctx context.Context, args ...string) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	varargs := []interface{}{ctx}
 	for _, a := range args {
 		varargs = append(varargs, a)
 	}
@@ -78,9 +80,10 @@ func (m *MockScript) Run(args ...string) error {
 }
 
 // Run indicates an expected call of Run
-func (mr *MockScriptMockRecorder) Run(args ...interface{}) *gomock.Call {
+func (mr *MockScriptMockRecorder) Run(ctx interface{}, args ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockScript)(nil).Run), args...)
+	varargs := append([]interface{}{ctx}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockScript)(nil).Run), varargs...)
 }
 
 // MockScriptLoader is a mock of ScriptLoader interface

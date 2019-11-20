@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/srvc/appctx"
 
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
@@ -59,15 +60,17 @@ func newUserDefinedCommand(ui cli.UI, scriptLoader module.ScriptLoader, name str
 				runArgs = args[pos+1:]
 			}
 
+			ctx := appctx.Global()
+
 			ui.Section(script.Name())
 			ui.Subsection("Building...")
-			err = errors.WithStack(script.Build(buildArgs...))
+			err = errors.WithStack(script.Build(ctx, buildArgs...))
 			if err != nil {
 				return
 			}
 
 			ui.Subsection("Starting...")
-			return errors.WithStack(script.Run(runArgs...))
+			return errors.WithStack(script.Run(ctx, runArgs...))
 		},
 	}
 }

@@ -87,7 +87,7 @@ func Test_Script(t *testing.T) {
 		t.Errorf("script.Build() returned an error %v", err)
 	}
 
-	err = s.Build("-v")
+	err = s.Build(context.Background(), "-v")
 	binPath := filepath.Join(ctx.rootDir, "bin", ctx.binName)
 	cmd := ctx.cmds[0]
 
@@ -104,7 +104,7 @@ func Test_Script(t *testing.T) {
 		t.Errorf("Build() returned an error %v", err)
 	}
 
-	err = s.Run("-v")
+	err = s.Run(context.Background(), "-v")
 	cmd = ctx.cmds[1]
 
 	if got, want := cmd.Path, binPath; got != want {

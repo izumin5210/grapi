@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/srvc/appctx"
 
 	"github.com/izumin5210/grapi/pkg/grapicmd"
 	"github.com/izumin5210/grapi/pkg/grapicmd/di"
@@ -33,11 +34,13 @@ func newBuildCommand(ctx *grapicmd.Ctx) *cobra.Command {
 				return errors.WithStack(err)
 			}
 
+			ctx := appctx.Global()
+
 			for _, name := range scriptLoader.Names() {
 				script, ok := scriptLoader.Get(name)
 				if ok && (isAll || nameSet[script.Name()]) {
 					ui.Subsection("Building " + script.Name())
-					err := script.Build(args...)
+					err := script.Build(ctx, args...)
 					if err != nil {
 						return errors.WithStack(err)
 					}

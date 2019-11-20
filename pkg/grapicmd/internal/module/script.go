@@ -1,10 +1,12 @@
 package module
 
+import "context"
+
 // Script represents an user-defined command.
 type Script interface {
 	Name() string
-	Build(args ...string) error
-	Run(args ...string) error
+	Build(ctx context.Context, args ...string) error
+	Run(ctx context.Context, args ...string) error
 }
 
 // ScriptLoader is a factory object for creating Script objects.
