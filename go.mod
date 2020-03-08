@@ -9,7 +9,7 @@ require (
 	github.com/golang/protobuf v1.2.0
 	github.com/google/go-cmp v0.3.1
 	github.com/google/wire v0.2.1
-	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
+	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.8.5
 	github.com/izumin5210/clig v0.3.1
 	github.com/izumin5210/execx v0.1.0
