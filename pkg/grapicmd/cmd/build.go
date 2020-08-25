@@ -11,7 +11,7 @@ import (
 
 func newBuildCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	return &cobra.Command{
-		Use:           "build [TARGET]... [-- BUILD_OPTIONS]",
+		Use:           "build [flags] [TARGET]... [-- BUILD_OPTIONS]",
 		Short:         "Build commands",
 		SilenceErrors: true,
 		SilenceUsage:  true,
