@@ -121,7 +121,7 @@ func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) e
 		}
 	} else {
 		if cfg.GrapiReplacementURL != "" {
-			err := invoke("go", "mod", "edit", "-replace", "github.com/izumin5210/grapi=" + cfg.GrapiReplacementURL)
+			err := invoke("go", "mod", "edit", "-replace", "github.com/izumin5210/grapi="+cfg.GrapiReplacementURL)
 			if err != nil {
 				return errors.WithStack(err)
 			}
