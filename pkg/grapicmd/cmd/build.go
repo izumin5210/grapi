@@ -11,11 +11,12 @@ import (
 	"github.com/izumin5210/grapi/pkg/grapicmd/di"
 )
 
-func getBuildOption(args []string) ([]string, []string) {
+func splitOptions(args []string) ([]string, []string) {
 	pos := len(args)
 	for i, arg := range args {
 		if strings.HasPrefix(arg, "-") {
 			pos = i
+
 			break
 		}
 	}
@@ -33,13 +34,13 @@ func newBuildCommand(ctx *grapicmd.Ctx) *cobra.Command {
 				return errors.New("protoc command should be execute inside a grapi application directory")
 			}
 
-			arg, opt := getBuildOption(args)
+			names, opt := splitOptions(args)
 
-			nameSet := make(map[string]bool, len(arg))
-			for _, n := range arg {
+			nameSet := make(map[string]bool, len(names))
+			for _, n := range names {
 				nameSet[n] = true
 			}
-			isAll := len(arg) == 0
+			isAll := len(names) == 0
 
 			scriptLoader := di.NewScriptLoader(ctx)
 			ui := di.NewUI(ctx)
