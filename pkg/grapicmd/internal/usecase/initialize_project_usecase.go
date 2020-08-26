@@ -120,7 +120,12 @@ func (u *initializeProjectUsecase) InstallDeps(rootDir string, cfg InitConfig) e
 			u.ui.ItemFailure("--version, --revision, --branch and --HEAD are not supported in dep mode")
 		}
 	} else {
-		if spec := cfg.BuildSpec(); spec != "" {
+		if cfg.GrapiReplacementURL != "" {
+			err := invoke("go", "mod", "edit", "-replace", "github.com/izumin5210/grapi=" + cfg.GrapiReplacementURL)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+		} else if spec := cfg.BuildSpec(); spec != "" {
 			pkg := "github.com/izumin5210/grapi/pkg/grapiserver"
 			err := invoke("go", "get", pkg+spec)
 			if err != nil {

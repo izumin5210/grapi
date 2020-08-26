@@ -29,9 +29,14 @@ jobs:
 
     - run: go mod download
 
+    - run: echo "::set-env name=TARGET_REVISION::${{ github.sha }}"
+      if: "github.event.push"
+
+    - run: echo "::set-env name=GRAPI_URL::$(pwd)"
+      if: "!github.event.push"
+
     - run: make ${{ matrix.test-task }}
       env:
-        TARGET_REVISION: ${{ github.sha }}
         COVER: ${{ matrix.go-version == '1.13.x' && matrix.test-task == 'test' }} 
 
     - run: curl -s https://codecov.io/bash | bash -s -- -t $CODECOV_TOKEN

@@ -33,7 +33,7 @@ endif
 
 .PHONY: test-e2e
 test-e2e: build
-	go test -v -timeout 4m ./_tests/e2e --grapi=$$PWD/bin/grapi --revision="$(TARGET_REVISION)"
+	go test -v -timeout 4m ./_tests/e2e --grapi=$$PWD/bin/grapi --grapi-url="$(GRAPI_URL)" --revision="$(TARGET_REVISION)"
 
 # linters
 bin/reviewdog:

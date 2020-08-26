@@ -26,6 +26,7 @@ import (
 
 var (
 	grapiCmd = flag.String("grapi", "grapi", "path of grapi command")
+	grapiURL = flag.String("grapi-url", "", "url for replacing github.com/izumin5210/grapi")
 	revision = flag.String("revision", "", "target revision")
 )
 
@@ -53,7 +54,10 @@ func invokeE2ETest(t *testing.T, exporter packagestest.Exporter) {
 	// init
 	{
 		args := []string{"--debug", "init", "--package", "testuser.sampleapp"}
-		if *revision != "" {
+		if *grapiURL != "" {
+			// Add replacements later
+			args = append(args, "--replace-grapi="+*grapiURL)
+		} else if *revision != "" {
 			args = append(args, "--revision="+*revision)
 		} else {
 			args = append(args, "--HEAD")
