@@ -3,12 +3,13 @@ package usecase
 import "bytes"
 
 type InitConfig struct {
-	Revision string
-	Branch   string
-	Version  string
-	HEAD     bool
-	Package  string
-	Dep      bool
+	Revision            string
+	Branch              string
+	Version             string
+	HEAD                bool
+	GrapiReplacementURL string
+	Package             string
+	Dep                 bool
 }
 
 func (c *InitConfig) BuildSpec() string {

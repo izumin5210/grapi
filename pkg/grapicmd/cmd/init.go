@@ -42,6 +42,7 @@ func newInitCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	cmd.PersistentFlags().StringVar(&cfg.Branch, "branch", "", "Specify grapi branch")
 	cmd.PersistentFlags().StringVar(&cfg.Version, "version", "", "Specify grapi version")
 	cmd.PersistentFlags().BoolVar(&cfg.HEAD, "HEAD", false, "Use HEAD grapi")
+	cmd.PersistentFlags().StringVar(&cfg.GrapiReplacementURL, "replace-grapi", "", "Specify grapi replacement url")
 	cmd.PersistentFlags().StringVarP(&cfg.Package, "package", "p", "", `Package name of the application(default: "<parent_package_or_username>.<app_name>")`)
 	cmd.PersistentFlags().BoolVar(&cfg.Dep, "use-dep", false, "Use dep instead of Modules")
 
