@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"errors"
-	//"github.com/spf13/pflag"
-	"github.com/golang/mock/gomock"
-	"github.com/izumin5210/grapi/pkg/cli"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
-
 	"reflect"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+
+	"github.com/izumin5210/grapi/pkg/cli"
+	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
 )
 
 func TestSplitOptions(t *testing.T) {
@@ -65,108 +65,161 @@ func TestSplitOptions(t *testing.T) {
 	}
 }
 
+var errBuildFailed = errors.New("error occur")
+
 func Test_newBuildCommandMocked(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
-	cases := []struct {
+	newTestCases := []struct {
 		args              []string
-		argsStriped       []string
+		argsSplited       []string
 		opt               []string
 		scriptLoaderNames []string
-		hasNameSet        []bool
-		wantErr           bool
-		err               error
+		// 単体のbuildの結果
+		buildResult map[string]struct {
+			err error
+		}
+		// 全体のbuildの結果
+		errWhole bool
 	}{
 		{
-			args:              []string{"aaa", "bbb", "ccc", "--", "-a", "-b", "-c"},
-			argsStriped:       []string{"aaa", "bbb", "ccc"},
-			opt:               []string{"-a", "-b", "-c"},
-			scriptLoaderNames: []string{"aaa", "bbb", "ccc"},
-			hasNameSet:        []bool{true, true, true},
-			wantErr:           true,
-			err:               errors.New("error occur"),
-		},
-		{
-			args:              []string{"aaa", "bbb", "ccc"},
-			argsStriped:       []string{"aaa", "bbb", "ccc"},
-			opt:               []string{},
-			scriptLoaderNames: []string{"aaa", "bbb", "ccc"},
-			hasNameSet:        []bool{true, true, true},
-			wantErr:           false,
-			err:               nil,
-		},
-		{
+			// "aaa"だけ指定した場合，buildには成功する
+			// "bbb"と"ccc"は呼ばれない
 			args:              []string{"aaa"},
-			argsStriped:       []string{"aaa"},
+			argsSplited:       []string{"aaa"},
 			opt:               []string{},
-			scriptLoaderNames: []string{"aaa", "bbb", "ccc"},
-			hasNameSet:        []bool{true, false, false},
-			wantErr:           false,
-			err:               nil,
+			scriptLoaderNames: []string{"aaa", "bbb", "bbb"},
+			buildResult: map[string]struct {
+				err error
+			}{
+				"aaa": {
+					err: nil,
+				},
+			},
+			errWhole: false,
 		},
 		{
-			args:              []string{"aaa", "--", "-b", "c"},
-			argsStriped:       []string{"aaa"},
-			opt:               []string{"-b", "c"},
-			scriptLoaderNames: []string{"aaa"},
-			hasNameSet:        []bool{true},
-			wantErr:           true,
-			err:               errors.New("error occur"),
-		},
-		{
-			args:              []string{"--", "-a", "-b"},
-			argsStriped:       []string{},
-			opt:               []string{"-a", "-b"},
-			scriptLoaderNames: []string{"aaa", "bbb", "ccc"},
-			hasNameSet:        []bool{false, false, false},
-			wantErr:           true,
-			err:               errors.New("error occur"),
-		},
-		{
-			args:              []string{"--", "-a", "b"},
-			argsStriped:       []string{},
-			opt:               []string{"-a", "b"},
-			scriptLoaderNames: []string{"aaa", "bbb", "ccc"},
-			hasNameSet:        []bool{false, false, false},
-			wantErr:           true,
-			err:               errors.New("error occur"),
-		},
-		{
+			// なんらかの理由で"bbb"のbuildができずに失敗（args指定なし）
+			// "ccc"はbuildされない
 			args:              []string{},
-			argsStriped:       []string{},
+			argsSplited:       []string{},
 			opt:               []string{},
 			scriptLoaderNames: []string{"aaa", "bbb", "ccc"},
-			hasNameSet:        []bool{false, false, false},
-			wantErr:           false,
-			err:               nil,
+			buildResult: map[string]struct {
+				err error
+			}{
+				"aaa": {
+					err: nil,
+				},
+				"bbb": {
+					err: errBuildFailed,
+				},
+			},
+			errWhole: true,
+		},
+		{
+			// なんらかの理由で"bbb"でエラーが発生した場合（args指定あり）
+			// "ccc"は実行されない
+			args:              []string{"aaa", "bbb", "ddd"},
+			argsSplited:       []string{"aaa", "bbb", "ddd"},
+			opt:               []string{},
+			scriptLoaderNames: []string{"aaa", "bbb", "ddd"},
+			buildResult: map[string]struct {
+				err error
+			}{
+				"aaa": {
+					err: nil,
+				},
+				"bbb": {
+					err: errBuildFailed,
+				},
+			},
+			errWhole: true,
+		},
+		{
+			// 与えたオプションによってエラーが発生する場合
+			// "bbb"以降は実行されない
+			args:              []string{"--", "-b", "-c"},
+			argsSplited:       []string{},
+			opt:               []string{"-b", "-c"},
+			scriptLoaderNames: []string{"aaa", "bbb", "bbb"},
+			buildResult: map[string]struct {
+				err error
+			}{
+				"aaa": {
+					err: errBuildFailed,
+				},
+			},
+			errWhole: true,
+		},
+		{
+			// build対象は与えず与えたオプションが正当でありすべて成功する場合
+			args:              []string{"--", "-a"},
+			argsSplited:       []string{},
+			opt:               []string{"-a"},
+			scriptLoaderNames: []string{"aaa", "bbb", "ccc"},
+			buildResult: map[string]struct {
+				err error
+			}{
+				"aaa": {
+					err: nil,
+				},
+				"bbb": {
+					err: nil,
+				},
+				"ccc": {
+					err: nil,
+				},
+			},
+			errWhole: false,
+		},
+		{
+			// build対象とオプションの両者を与えず，すべて成功する場合
+			args:              []string{},
+			argsSplited:       []string{},
+			opt:               []string{},
+			scriptLoaderNames: []string{"aaa", "bbb", "ccc"},
+			buildResult: map[string]struct {
+				err error
+			}{
+				"aaa": {
+					err: nil,
+				},
+				"bbb": {
+					err: nil,
+				},
+				"ccc": {
+					err: nil,
+				},
+			},
+			errWhole: false,
 		},
 	}
 
-	for _, c := range cases {
+	for _, c := range newTestCases {
 		loader := moduletesting.NewMockScriptLoader(ctrl)
 
 		loader.EXPECT().Names().Return(c.scriptLoaderNames)
-
-		for i, arg := range c.scriptLoaderNames {
+		for _, arg := range c.scriptLoaderNames {
 			script := moduletesting.NewMockScript(ctrl)
-			loader.EXPECT().Get(arg).Return(script, true)
+			loader.EXPECT().Get(arg).Return(script, true).AnyTimes()
 			script.EXPECT().Name().Return(arg).AnyTimes()
 
-			if len(c.argsStriped) == 0 || c.hasNameSet[i] {
-				script.EXPECT().Build(gomock.Any(), c.opt).Return(c.err)
-			}
-			if c.err != nil {
-				break
+			if buildResult, ok := c.buildResult[arg]; len(c.argsSplited) == 0 || ok {
+				script.EXPECT().Build(gomock.Any(), c.opt).Return(buildResult.err).Times(1)
+				// if once build error occur, not build subsequent build args
+				if buildResult.err != nil {
+					break
+				}
 			}
 		}
 
-		cmd := newBuildCommandMocked(loader, cli.NopUI)
+		cmd := newBuildCommandMocked(true, loader, cli.NopUI)
 		cmd.SetArgs(c.args)
 		err := cmd.Execute()
 
-		if c.wantErr != (err != nil) {
-			t.Errorf("wantErr: %v, gotErr: %v", c.wantErr, err != nil)
+		if c.errWhole != (err != nil) {
+			t.Errorf("wantErr: %v, gotErr: %v", c.errWhole, err != nil)
 		}
 	}
 }
