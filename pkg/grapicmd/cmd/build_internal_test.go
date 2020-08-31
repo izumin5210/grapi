@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
-	"os"
 	"reflect"
 	"testing"
 
@@ -11,7 +9,7 @@ import (
 
 	"github.com/izumin5210/grapi/pkg/cli"
 	"github.com/izumin5210/grapi/pkg/grapicmd"
-	"github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
+	moduletesting "github.com/izumin5210/grapi/pkg/grapicmd/internal/module/testing"
 )
 
 func TestSplitOptions(t *testing.T) {
@@ -78,11 +76,9 @@ func Test_newBuildCommandMocked(t *testing.T) {
 		err error
 	}
 
-	newTestCases := []struct {
-		args              []string
-		argsSplited       []string
-		opt               []string
-		scriptLoaderNames []string
+	testCases := []struct {
+		args      []string
+		optExpect []string
 		// 単体のbuildの結果
 		buildResult map[string]errBuild
 		// 全体のbuildの結果
@@ -91,28 +87,19 @@ func Test_newBuildCommandMocked(t *testing.T) {
 		{
 			// "aaa"だけ指定した場合，buildには成功する
 			// "bbb"と"ccc"は呼ばれない
-			args:              []string{"aaa"},
-			argsSplited:       []string{"aaa"},
-			opt:               []string{},
-			scriptLoaderNames: []string{"aaa", "bbb", "bbb"},
+			args:      []string{"aaa"},
+			optExpect: []string{},
 			buildResult: map[string]errBuild{
-				"aaa": {
-					err: nil,
-				},
+				"aaa": {},
 			},
-			wantErr: false,
 		},
 		{
 			// なんらかの理由で"bbb"のbuildができずに失敗（args指定なし）
 			// "ccc"はbuildされない
-			args:              []string{},
-			argsSplited:       []string{},
-			opt:               []string{},
-			scriptLoaderNames: []string{"aaa", "bbb", "ccc"},
+			args:      []string{},
+			optExpect: []string{},
 			buildResult: map[string]errBuild{
-				"aaa": {
-					err: nil,
-				},
+				"aaa": {},
 				"bbb": {
 					err: errBuildFailed,
 				},
@@ -122,14 +109,10 @@ func Test_newBuildCommandMocked(t *testing.T) {
 		{
 			// なんらかの理由で"bbb"でエラーが発生した場合（args指定あり）
 			// "ccc"は実行されない
-			args:              []string{"aaa", "bbb", "ddd"},
-			argsSplited:       []string{"aaa", "bbb", "ddd"},
-			opt:               []string{},
-			scriptLoaderNames: []string{"aaa", "bbb", "ddd"},
+			args:      []string{"aaa", "bbb", "ccc"},
+			optExpect: []string{},
 			buildResult: map[string]errBuild{
-				"aaa": {
-					err: nil,
-				},
+				"aaa": {},
 				"bbb": {
 					err: errBuildFailed,
 				},
@@ -139,10 +122,8 @@ func Test_newBuildCommandMocked(t *testing.T) {
 		{
 			// 与えたオプションによってエラーが発生する場合
 			// "bbb"以降は実行されない
-			args:              []string{"--", "-b", "-c"},
-			argsSplited:       []string{},
-			opt:               []string{"-b", "-c"},
-			scriptLoaderNames: []string{"aaa", "bbb", "bbb"},
+			args:      []string{"--", "-b", "-c"},
+			optExpect: []string{"-b", "-c"},
 			buildResult: map[string]errBuild{
 				"aaa": {
 					err: errBuildFailed,
@@ -152,62 +133,44 @@ func Test_newBuildCommandMocked(t *testing.T) {
 		},
 		{
 			// build対象は与えず与えたオプションが正当でありすべて成功する場合
-			args:              []string{"--", "-a"},
-			argsSplited:       []string{},
-			opt:               []string{"-a"},
-			scriptLoaderNames: []string{"aaa", "bbb", "ccc"},
+			args:      []string{"--", "-a"},
+			optExpect: []string{"-a"},
 			buildResult: map[string]errBuild{
-				"aaa": {
-					err: nil,
-				},
-				"bbb": {
-					err: nil,
-				},
-				"ccc": {
-					err: nil,
-				},
+				"aaa": {},
+				"bbb": {},
+				"ccc": {},
 			},
-			wantErr: false,
 		},
 		{
 			// build対象とオプションの両者を与えず，すべて成功する場合
-			args:              []string{},
-			argsSplited:       []string{},
-			opt:               []string{},
-			scriptLoaderNames: []string{"aaa", "bbb", "ccc"},
+			args:      []string{},
+			optExpect: []string{},
 			buildResult: map[string]errBuild{
-				"aaa": {
-					err: nil,
-				},
-				"bbb": {
-					err: nil,
-				},
-				"ccc": {
-					err: nil,
-				},
+				"aaa": {},
+				"bbb": {},
+				"ccc": {},
 			},
-			wantErr: false,
 		},
 	}
 
 	ctx := &grapicmd.Ctx{}
 	err := ctx.Init()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return
+		t.Fatal(err)
 	}
 
-	for _, c := range newTestCases {
+	commandNames := []string{"aaa", "bbb", "ccc"}
+	for _, c := range testCases {
 		loader := moduletesting.NewMockScriptLoader(ctrl)
 
 		loader.EXPECT().Load(gomock.Any()).Return(nil)
-		loader.EXPECT().Names().Return(c.scriptLoaderNames)
-		for _, arg := range c.scriptLoaderNames {
+		loader.EXPECT().Names().Return(commandNames)
+		for _, arg := range commandNames {
 			script := moduletesting.NewMockScript(ctrl)
 			loader.EXPECT().Get(arg).Return(script, true).AnyTimes()
 			script.EXPECT().Name().Return(arg).AnyTimes()
 			if buildResult, ok := c.buildResult[arg]; ok {
-				script.EXPECT().Build(gomock.Any(), c.opt).Return(buildResult.err)
+				script.EXPECT().Build(gomock.Any(), c.optExpect).Return(buildResult.err)
 			}
 		}
 
