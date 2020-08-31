@@ -28,18 +28,12 @@ func splitOptions(args []string) ([]string, []string) {
 
 func newBuildCommand(ctx *grapicmd.Ctx) *cobra.Command {
 	scriptLoader := di.NewScriptLoader(ctx)
-	err := scriptLoader.Load(ctx.RootDir.Join("cmd").String())
-	if err != nil {
-		// TODO: log
-	}
-
-	isInsideApp := ctx.IsInsideApp()
 	ui := di.NewUI(ctx)
 
-	return newBuildCommandMocked(isInsideApp, scriptLoader, ui)
+	return newBuildCommandMocked(ctx.IsInsideApp(), ctx, scriptLoader, ui)
 }
 
-func newBuildCommandMocked(isInsideApp bool, scriptLoader module.ScriptLoader, ui cli.UI) *cobra.Command {
+func newBuildCommandMocked(isInsideApp bool, ctx *grapicmd.Ctx, scriptLoader module.ScriptLoader, ui cli.UI) *cobra.Command {
 	return &cobra.Command{
 		Use:           "build [TARGET]... [-- BUILD_OPTIONS]",
 		Short:         "Build commands",
@@ -57,7 +51,13 @@ func newBuildCommandMocked(isInsideApp bool, scriptLoader module.ScriptLoader, u
 			}
 			isAll := len(names) == 0
 
+			err := scriptLoader.Load(ctx.RootDir.Join("cmd").String())
+			if err != nil {
+				return errors.WithStack(err)
+			}
+
 			ctx := appctx.Global()
+
 			for _, name := range scriptLoader.Names() {
 				script, ok := scriptLoader.Get(name)
 				if ok && (isAll || nameSet[script.Name()]) {
