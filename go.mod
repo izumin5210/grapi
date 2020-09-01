@@ -23,7 +23,7 @@ require (
 	github.com/spf13/afero v1.2.2
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/pflag v1.0.5
-	github.com/spf13/viper v1.4.0
+	github.com/spf13/viper v1.7.1
 	github.com/srvc/appctx v0.1.0
 	github.com/tcnksm/go-input v0.0.0-20180404061846-548a7d7a8ee8
 	go.uber.org/zap v1.10.0
@@ -31,8 +31,6 @@ require (
 	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
 	golang.org/x/sync v0.0.0-20190423024810-112230192c58
 	golang.org/x/sys v0.0.0-20191118133127-cf1e2d577169 // indirect
-	golang.org/x/text v0.3.2 // indirect
-	golang.org/x/tools v0.0.0-20190828213141-aed303cbaa74 // indirect
-	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55
-	google.golang.org/grpc v1.21.0
+	google.golang.org/genproto v0.0.0-20191108220845-16a3f7862a1a
+	google.golang.org/grpc v1.21.1
 )
