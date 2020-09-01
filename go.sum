@@ -88,6 +88,8 @@ github.com/izumin5210/execx v0.1.0 h1:QLtjHrG2nZmb/kvJ8/fXAlGcp+ECAfsWha+Yx2R6Cz
 github.com/izumin5210/execx v0.1.0/go.mod h1:qrIQVE0XTXWXoNpeA+OWZgAjpBxiztOKHfHpPIzc5t0=
 github.com/izumin5210/gex v0.6.0 h1:p79JHia3LRwC1M4sheTBZxSOJXubsW8jyWIhI60NMMs=
 github.com/izumin5210/gex v0.6.0/go.mod h1:nDH4zt3QvsIJipyYDoedHcNrNzawwkseKfpqGTUDN2Q=
+github.com/izumin5210/gex v0.6.1 h1:LMtP9JuHqMLZFT0U65htImXYqGk6rTnTcEpbAHGfhV8=
+github.com/izumin5210/gex v0.6.1/go.mod h1:xue88jW9Jxl66xyi6D82AOOrXKOjrSTtEY+rTxmGXew=
 github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a h1:eeaG9XMUvRBYXJi4pg1ZKM7nxc5AfXfojeLLW7O5J3k=
 github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/jonboulle/clockwork v0.1.0/go.mod h1:Ii8DK3G1RaLaWxj9trq07+26W01tbo22gdxWY5EU2bo=
