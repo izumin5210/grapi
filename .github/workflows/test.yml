@@ -29,10 +29,10 @@ jobs:
 
     - run: go mod download
 
-    - run: echo "::set-env name=TARGET_REVISION::${{ github.sha }}"
+    - run: echo "TARGET_REVISION=${{ github.sha }}" >> $GITHUB_ENV
       if: "github.event.push"
 
-    - run: echo "::set-env name=GRAPI_URL::$(pwd)"
+    - run: echo "GRAPI_URL=$(pwd)" >> $GITHUB_ENV
       if: "!github.event.push"
 
     - run: make ${{ matrix.test-task }}
