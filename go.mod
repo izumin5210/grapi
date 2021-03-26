@@ -6,7 +6,7 @@ require (
 	github.com/bradleyjkemp/cupaloy/v2 v2.5.0
 	github.com/fatih/color v1.9.0
 	github.com/golang/mock v1.4.3
-	github.com/golang/protobuf v1.3.2
+	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.2
 	github.com/google/wire v0.2.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
@@ -33,6 +33,6 @@ require (
 	golang.org/x/sys v0.0.0-20191118133127-cf1e2d577169 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/tools v0.0.0-20190828213141-aed303cbaa74 // indirect
-	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55
-	google.golang.org/grpc v1.21.0
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
+	google.golang.org/grpc v1.36.1
 )
