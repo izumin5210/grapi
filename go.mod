@@ -6,8 +6,8 @@ require (
 	github.com/bradleyjkemp/cupaloy/v2 v2.5.0
 	github.com/fatih/color v1.9.0
 	github.com/golang/mock v1.4.3
-	github.com/golang/protobuf v1.3.2
-	github.com/google/go-cmp v0.5.2
+	github.com/golang/protobuf v1.5.2
+	github.com/google/go-cmp v0.5.5
 	github.com/google/wire v0.2.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.9.0
