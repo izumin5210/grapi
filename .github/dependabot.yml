@@ -1,0 +1,34 @@
+version: 2
+updates:
+- package-ecosystem: gomod
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "20:00"
+  open-pull-requests-limit: 10
+  reviewers:
+  - izumin5210
+  ignore:
+  - dependency-name: google.golang.org/grpc
+    versions:
+    - 1.35.0
+    - 1.36.0
+    - 1.36.1
+  - dependency-name: github.com/golang/protobuf
+    versions:
+    - 1.4.3
+    - 1.5.1
+  - dependency-name: github.com/spf13/afero
+    versions:
+    - 1.5.1
+  - dependency-name: github.com/grpc-ecosystem/go-grpc-middleware
+    versions:
+    - 1.2.2
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "20:00"
+  open-pull-requests-limit: 10
+  reviewers:
+  - izumin5210
