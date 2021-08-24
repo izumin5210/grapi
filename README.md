@@ -26,7 +26,7 @@ We recommend to use [`appctx.Global()`](https://godoc.org/github.com/srvc/appctx
 <summary>:memo: How to migrate</summary>
 
 0. Bump grapi version
-    - `go get -u github.com/izuimn5210/grapi@v0.5'
+    - `go get -u github.com/izumin5210/grapi@v0.5'
 1. Update `cmd/server/run.go`
     - ```diff
        	// Application context
