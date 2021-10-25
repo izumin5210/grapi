@@ -33,5 +33,5 @@ func (s *cmuxServer) GRPCListener() net.Listener {
 }
 
 func (s *cmuxServer) HTTPListener() net.Listener {
-	return s.mux.Match(cmux.HTTP2(), cmux.HTTP1Fast())
+	return s.mux.Match(cmux.HTTP2(), cmux.HTTP1Fast("PATCH"))
 }
